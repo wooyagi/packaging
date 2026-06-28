@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CoWoS-R 신호 경로 종합도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0e16; --panel:#0e1420; --ink:#e8edf6; --ink-dim:#8a98b2; --ink-faint:#5a6884; --line:#1e2a40;
+    --interposer:#d98cb6;      /* organic RDL interposer slab */
+    --interposer-via:#b3688d;  /* dense via / layer lines */
+    --signal:#46d3e6;          /* internal signal accent */
+    --signal-bright:#9af0fa;   /* pulses */
+    --logic:#9b7ddb; --hbm:#f0a830;
+    --external:#f0844a; --external-bright:#ffb98a;
+    --substrate:#525d78; --pcb:#56a567; --bump:#aab6cc;
+    --font-d:'Space Grotesk',system-ui,sans-serif; --font-m:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    background:
+      radial-gradient(1100px 640px at 72% -8%, #2a1830 0%, transparent 60%),
+      radial-gradient(820px 520px at 4% 108%, #15182e 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink); font-family:var(--font-d); -webkit-font-smoothing:antialiased;
+    display:flex; justify-content:center; padding:clamp(20px,4vw,52px);
+  }
+  .wrap{width:100%;max-width:1000px}
+  .eyebrow{font-family:var(--font-m);font-size:clamp(11px,1.1vw,13px);letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint);display:flex;align-items:center;gap:13px}
+  .eyebrow::before{content:"";width:32px;height:1px;background:var(--line)}
+  .eyebrow .n{color:var(--interposer)}
+  h1{font-size:clamp(28px,4.6vw,46px);font-weight:700;letter-spacing:-.025em;line-height:1.02;margin:.28em 0 .14em}
+  .sub{color:var(--ink-dim);font-size:clamp(14px,1.7vw,18px);font-weight:400;line-height:1.5;max-width:62ch}
+
+  .stage{margin-top:clamp(18px,3vh,30px);border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.018),transparent);padding:clamp(14px,2.4vw,26px)}
+  .fig{width:100%;height:auto;display:block}
+  [data-path]{transition:opacity .35s ease}
+  .lbl{font-family:var(--font-m);font-size:13px}
+  .pulse{filter:drop-shadow(0 0 5px currentColor)}
+
+  @keyframes pHBM{0%{transform:translate(0,0);opacity:0}6%{opacity:1}20%{transform:translate(0,22px)}38%{transform:translate(-54px,22px)}88%{transform:translate(-54px,-72px);opacity:1}100%{transform:translate(-54px,-72px);opacity:0}}
+  @keyframes pHBMrev{0%{transform:translate(0,0);opacity:0}6%{opacity:1}60%{transform:translate(0,94px)}78%{transform:translate(54px,94px)}94%{transform:translate(54px,72px);opacity:1}100%{transform:translate(54px,72px);opacity:0}}
+  @keyframes pDIE{0%{transform:translate(0,0);opacity:0}8%{opacity:1}33%{transform:translate(0,22px)}66%{transform:translate(50px,22px)}90%{transform:translate(50px,0);opacity:1}100%{transform:translate(50px,0);opacity:0}}
+  @keyframes pEXT{0%{transform:translate(0,0);opacity:0}8%{opacity:1}92%{transform:translate(0,150px);opacity:1}100%{transform:translate(0,150px);opacity:0}}
+  @keyframes pDIErev{0%{transform:translate(0,0);opacity:0}8%{opacity:1}33%{transform:translate(0,22px)}66%{transform:translate(-50px,22px)}90%{transform:translate(-50px,0);opacity:1}100%{transform:translate(-50px,0);opacity:0}}
+  .sig-hbm{animation:pHBM 2.4s linear infinite .1s;color:var(--signal)}
+  .sig-hbm-rev{animation:pHBMrev 2.6s linear infinite 1.2s;color:var(--signal)}
+  .sig-die{animation:pDIE 1.9s linear infinite .5s;color:var(--signal)}
+  .sig-die-rev{animation:pDIErev 2.1s linear infinite 1s;color:var(--signal)}
+  .sig-ext{animation:pEXT 2.2s linear infinite .3s;color:var(--external)}
+  .sig-ext-a{animation:pEXT 2.2s linear infinite 1.3s;color:var(--external)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:clamp(16px,2.6vh,24px)}
+  .controls button{font-family:var(--font-m);font-size:13px;letter-spacing:.02em;color:var(--ink-dim);background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:9px;padding:9px 15px;cursor:pointer;transition:all .2s}
+  .controls button:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .controls button.on{color:var(--bg);font-weight:600}
+  .controls button.on[data-mode="all"]{background:var(--ink);border-color:var(--ink)}
+  .controls button.on[data-mode="ddie"],.controls button.on[data-mode="dhbm"]{background:var(--signal);border-color:var(--signal)}
+  .controls button.on[data-mode="ext"]{background:var(--external);border-color:var(--external)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:clamp(16px,2.6vh,24px);font-size:14px;color:var(--ink-dim)}
+  .legend .item{display:flex;align-items:center;gap:10px;line-height:1.4}
+  .legend .dot{width:13px;height:13px;border-radius:50%;flex:none}
+  .legend .sq{width:13px;height:13px;border-radius:3px;flex:none}
+  .legend b{color:var(--ink);font-weight:500}
+
+  .note{margin-top:clamp(14px,2.4vh,22px);font-family:var(--font-m);font-size:clamp(12px,1.3vw,13.5px);line-height:1.6;color:var(--ink-faint);border-left:2px solid var(--interposer);padding-left:14px}
+  .note b{color:var(--interposer);font-weight:600}
+  .note .o{color:var(--external)}
+  .note .w{color:var(--ink)}
+
+  @media (prefers-reduced-motion: reduce){.sig-hbm,.sig-hbm-rev,.sig-die,.sig-die-rev,.sig-ext,.sig-ext-a{animation:none;opacity:1;transform:translate(0,0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow"><span class="n">PKG · R</span> SIGNAL ROUTING · CoWoS-R</div>
+  <h1>CoWoS-R — 통짜 유기물 RDL 인터포저</h1>
+  <p class="sub">실리콘 인터포저를 <b style="color:var(--interposer)">유기물 RDL</b>(폴리머+구리)로 대체. 가로 연결도, 세로(전력·외부 I/O)도 모두 RDL을 거친다. 유연·저비용·고수율, 그러나 실리콘보다 낮은 배선 밀도(대역폭).</p>
+
+  <div class="stage">
+    <div class="diagram" id="diagram" data-mode="all">
+    <svg class="fig" viewBox="0 0 680 332" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CoWoS-R 신호 경로 단면도">
+      <!-- interposer callout -->
+      <text x="179" y="20" text-anchor="middle" class="lbl" style="font-weight:500;fill:var(--interposer)">유기물 RDL 인터포저</text>
+      <line x1="179" y1="28" x2="179" y2="154" stroke="var(--interposer)" stroke-width="0.6" stroke-dasharray="4 4" opacity="0.55"/>
+      <circle cx="179" cy="154" r="2.2" fill="var(--interposer)"/>
+
+      <!-- HBM -->
+      <rect x="70" y="38" width="92" height="104" rx="6" fill="var(--hbm)"/>
+      <g stroke="#8a6014" stroke-width="1" opacity="0.5"><line x1="70" y1="62" x2="162" y2="62"/><line x1="70" y1="84" x2="162" y2="84"/><line x1="70" y1="106" x2="162" y2="106"/></g>
+      <rect x="70" y="126" width="92" height="16" fill="#d9921f"/>
+      <line x1="100" y1="126" x2="100" y2="66" stroke="#8a6014" stroke-width="1.4" opacity="0.45"/>
+      <line x1="152" y1="126" x2="152" y2="66" stroke="#8a6014" stroke-width="1.4" opacity="0.45"/>
+      <text x="116" y="54" text-anchor="middle" class="lbl" style="font-weight:600;fill:#4a3206">HBM</text>
+      <text x="116" y="137" text-anchor="middle" style="font-family:var(--font-m);font-size:10.5px;fill:#5e3f08">베이스 다이</text>
+
+      <!-- Logic dies -->
+      <rect x="196" y="66" width="156" height="76" rx="8" fill="var(--logic)"/>
+      <text x="274" y="104" text-anchor="middle" dominant-baseline="central" class="lbl" style="font-weight:600;fill:#1c1040">연산 칩 A</text>
+      <rect x="386" y="66" width="156" height="76" rx="8" fill="var(--logic)"/>
+      <text x="464" y="104" text-anchor="middle" dominant-baseline="central" class="lbl" style="font-weight:600;fill:#1c1040">연산 칩 B</text>
+
+      <!-- microbumps -->
+      <g fill="var(--bump)">
+        <circle cx="86" cy="148" r="3"/><circle cx="112" cy="148" r="3"/><circle cx="138" cy="148" r="3"/>
+        <circle cx="212" cy="148" r="3"/><circle cx="242" cy="148" r="3"/><circle cx="272" cy="148" r="3"/><circle cx="302" cy="148" r="3"/><circle cx="332" cy="148" r="3"/>
+        <circle cx="406" cy="148" r="3"/><circle cx="436" cy="148" r="3"/><circle cx="466" cy="148" r="3"/><circle cx="496" cy="148" r="3"/><circle cx="526" cy="148" r="3"/>
+      </g>
+
+      <!-- ===== ORGANIC RDL INTERPOSER (full slab) ===== -->
+      <rect x="58" y="154" width="520" height="50" rx="6" fill="var(--interposer)"/>
+      <!-- RDL layer lines -->
+      <g stroke="#7a4a63" stroke-width="0.8" opacity="0.45"><line x1="72" y1="163" x2="564" y2="163"/><line x1="72" y1="176" x2="564" y2="176"/><line x1="72" y1="189" x2="564" y2="189"/></g>
+      <!-- dense vertical vias (copper in polymer) -->
+      <g stroke="var(--interposer-via)" stroke-width="1" opacity="0.55">
+        <line x1="230" y1="170" x2="230" y2="200"/><line x1="248" y1="170" x2="248" y2="200"/><line x1="266" y1="170" x2="266" y2="200"/><line x1="284" y1="170" x2="284" y2="200"/><line x1="302" y1="170" x2="302" y2="200"/><line x1="320" y1="170" x2="320" y2="200"/>
+        <line x1="410" y1="170" x2="410" y2="200"/><line x1="428" y1="170" x2="428" y2="200"/><line x1="446" y1="170" x2="446" y2="200"/><line x1="482" y1="170" x2="482" y2="200"/><line x1="500" y1="170" x2="500" y2="200"/><line x1="518" y1="170" x2="518" y2="200"/><line x1="536" y1="170" x2="536" y2="200"/>
+      </g>
+      <text x="140" y="190" text-anchor="middle" class="lbl" style="font-weight:600;fill:#3a1528">RDL · 비아</text>
+
+      <!-- C4 bumps -->
+      <g fill="var(--bump)"><circle cx="100" cy="209" r="4"/><circle cx="150" cy="209" r="4"/><circle cx="200" cy="209" r="4"/><circle cx="250" cy="209" r="4"/><circle cx="300" cy="209" r="4"/><circle cx="350" cy="209" r="4"/><circle cx="400" cy="209" r="4"/><circle cx="450" cy="209" r="4"/><circle cx="500" cy="209" r="4"/><circle cx="540" cy="209" r="4"/></g>
+
+      <!-- Substrate -->
+      <rect x="58" y="214" width="520" height="46" rx="6" fill="var(--substrate)"/>
+      <g stroke="#39425c" stroke-width="0.8" opacity="0.7"><line x1="72" y1="232" x2="564" y2="232"/><line x1="72" y1="245" x2="564" y2="245"/></g>
+      <text x="150" y="237" text-anchor="middle" dominant-baseline="central" class="lbl" style="font-weight:600;fill:#d3dbec">패키지 기판</text>
+
+      <!-- BGA balls -->
+      <g fill="var(--bump)"><circle cx="100" cy="266" r="6"/><circle cx="155" cy="266" r="6"/><circle cx="210" cy="266" r="6"/><circle cx="265" cy="266" r="6"/><circle cx="320" cy="266" r="6"/><circle cx="375" cy="266" r="6"/><circle cx="425" cy="266" r="6"/><circle cx="525" cy="266" r="6"/></g>
+
+      <!-- PCB -->
+      <rect x="58" y="274" width="520" height="22" rx="4" fill="var(--pcb)"/>
+      <text x="150" y="285" text-anchor="middle" dominant-baseline="central" class="lbl" style="font-weight:600;fill:#0e3018">메인보드 (PCB)</text>
+
+      <!-- ===== SIGNAL PATHS ===== -->
+      <!-- die-to-HBM (through organic RDL) — bidirectional -->
+      <g data-path="dhbm">
+        <path d="M 206 142 L 206 164 L 152 164 L 152 70" fill="none" stroke="var(--signal)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.42"/>
+        <circle class="pulse sig-hbm" cx="206" cy="142" r="5" fill="var(--signal-bright)"/>
+        <circle class="pulse sig-hbm-rev" cx="152" cy="70" r="5" fill="var(--signal-bright)"/>
+      </g>
+      <!-- die-to-die (through organic RDL) — bidirectional -->
+      <g data-path="ddie">
+        <path d="M 344 142 L 344 164 L 394 164 L 394 142" fill="none" stroke="var(--signal)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.42"/>
+        <circle class="pulse sig-die" cx="344" cy="142" r="5" fill="var(--signal-bright)"/>
+        <circle class="pulse sig-die-rev" cx="394" cy="142" r="5" fill="var(--signal-bright)"/>
+      </g>
+      <!-- external I/O (down through RDL vias → substrate → BGA → PCB) — from BOTH chips -->
+      <g data-path="ext">
+        <!-- from chip A -->
+        <path d="M 240 142 L 240 292" fill="none" stroke="var(--external)" stroke-width="3" stroke-linecap="round" opacity="0.34"/>
+        <circle cx="240" cy="266" r="6" fill="var(--external)" opacity="0.5"/>
+        <circle class="pulse sig-ext-a" cx="240" cy="142" r="5.5" fill="var(--external-bright)"/>
+        <line x1="240" y1="297" x2="240" y2="313" stroke="var(--external)" stroke-width="2.2"/>
+        <path d="M 236 308 L 240 314 L 244 308" fill="none" stroke="var(--external)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- from chip B -->
+        <path d="M 470 142 L 470 292" fill="none" stroke="var(--external)" stroke-width="3" stroke-linecap="round" opacity="0.34"/>
+        <circle cx="470" cy="266" r="6" fill="var(--external)" opacity="0.5"/>
+        <circle class="pulse sig-ext" cx="470" cy="142" r="5.5" fill="var(--external-bright)"/>
+        <line x1="470" y1="297" x2="470" y2="313" stroke="var(--external)" stroke-width="2.2"/>
+        <path d="M 466 308 L 470 314 L 474 308" fill="none" stroke="var(--external)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="355" y="328" text-anchor="middle" style="font-family:var(--font-m);font-size:12.5px;font-weight:500;fill:var(--external-bright)">전원 · 외부 I/O · 두 칩 모두 (NVLink·PCIe·네트워크)</text>
+      </g>
+    </svg>
+    </div>
+
+    <div class="controls" id="controls">
+      <button data-mode="all" class="on">전체 보기</button>
+      <button data-mode="ddie">die-to-die</button>
+      <button data-mode="dhbm">HBM ↔ 연산칩</button>
+      <button data-mode="ext">외부 I/O · 전력</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="dot" style="background:var(--signal)"></span><span><b>내부 고밀도 신호</b> — die-to-die · HBM↔연산칩 (모두 양방향)</span></div>
+    <div class="item"><span class="dot" style="background:var(--external)"></span><span><b>외부 I/O · 전력</b> — RDL 비아 → 기판 → BGA → PCB</span></div>
+    <div class="item"><span class="sq" style="background:var(--interposer)"></span><span>유기물 RDL 인터포저</span></div>
+    <div class="item"><span class="sq" style="background:var(--logic)"></span><span>로직 다이</span></div>
+    <div class="item"><span class="sq" style="background:var(--hbm)"></span><span>HBM</span></div>
+  </div>
+
+  <p class="note">
+    <b>실리콘 없이 전부 유기 RDL</b> — 가로 연결도 세로(<span class="o">전력·외부 I/O</span>)도 모두 폴리머+구리 RDL을 거쳐 기판→BGA→PCB로. 유연해서 열팽창 응력을 완충 → <span class="w">수율·신뢰성↑, 크기 확장 쉬움.</span> 단 실리콘보다 배선 피치가 거칠어 <span class="w">대역폭 밀도가 낮다</span> → 플래그십 단독 구동은 어렵고 비용 민감·중급용(AI ASIC·네트워킹 칩 등).<br><br>
+    내부 링크(die간·HBM)는 <b>모두 양방향</b>이고, <span class="o">외부 I/O·전력은 두 칩 모두</span>에서 빠져나간다.<br><br>
+    비교 — <span class="w">S(통짜 실리콘) · R(통짜 유기) · L(하이브리드)</span> 중 <b>R은 저비용·고수율, 대역폭 최하.</b>
+  </p>
+</div>
+
+<script>
+  const diagram=document.getElementById('diagram');
+  const groups=Array.from(diagram.querySelectorAll('[data-path]'));
+  const buttons=Array.from(document.querySelectorAll('#controls button'));
+  function setMode(mode){
+    diagram.dataset.mode=mode;
+    groups.forEach(g=>{g.style.opacity=(mode==='all'||g.dataset.path===mode)?'1':'0.1';});
+    buttons.forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+  }
+  buttons.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  setMode('all');
+</script>
+</body>
+</html>
