@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>뉴스 · 첨단 패키징 리서치</title>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  /* 히어로 */
+  .hero{background:var(--ink);color:#fff;padding:56px 24px 48px;}
+  .hero-inner{max-width:860px;margin:0 auto;}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+  .hero h1{font-size:32px;font-weight:800;margin:0 0 12px;letter-spacing:-.5px;line-height:1.2;}
+  .hero p{font-size:15px;color:#9aa6b7;margin:0;max-width:560px;line-height:1.6;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;}
+  .crumb a:hover{color:var(--accent);}
+
+  /* 메인 */
+  main{max-width:860px;margin:0 auto;padding:36px 24px 80px;}
+
+  /* 날짜 섹션 */
+  .date-section{margin-bottom:48px;}
+  .date-heading{
+    font-size:13px;font-weight:700;font-family:var(--mono);
+    color:var(--accent);letter-spacing:.5px;
+    border-left:3px solid var(--accent);
+    padding:6px 0 6px 12px;
+    margin:0 0 20px;
+  }
+
+  /* 뉴스 아이템 */
+  .news-list{display:flex;flex-direction:column;gap:14px;}
+  .news-item{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .news-item:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(0,0,0,.07);}
+  .news-headline{
+    font-size:15px;font-weight:700;line-height:1.4;margin:0 0 6px;
+  }
+  .news-headline a{
+    color:var(--ink);text-decoration:none;
+  }
+  .news-headline a:hover{color:var(--accent);text-decoration:underline;}
+  .news-summary{font-size:13px;color:#444;line-height:1.6;margin:0 0 10px;}
+  .news-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .news-source{font-size:11px;font-family:var(--mono);color:var(--muted);}
+  .news-tag{
+    font-size:10px;font-weight:700;color:#fff;
+    border-radius:4px;padding:2px 7px;
+  }
+
+  /* 태그 색상 */
+  .tag-cowos{background:#2563a8;}
+  .tag-copos{background:#7c3aed;}
+  .tag-hbm{background:#1f7a4d;}
+  .tag-glass{background:#b45309;}
+  .tag-foplp{background:#0e7490;}
+  .tag-tsmc{background:#374151;}
+  .tag-skhynix{background:#1f7a4d;}
+  .tag-roadmap{background:#6d28d9;}
+
+  footer{max-width:860px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+
+  @media(max-width:560px){
+    .hero h1{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / 뉴스</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Daily News · 첨단 패키징</div>
+    <h1>패키징 밸류체인 뉴스</h1>
+    <p>CoWoS·CoPoS·HBM·유리기판 등 첨단 반도체 패키징 밸류체인 관련 주요 뉴스를 날짜별로 누적 정리합니다.</p>
+  </div>
+</div>
+
+<main>
+
+  <!-- ════════════════════════════════════════
+       2026-06-28
+  ════════════════════════════════════════ -->
+  <div class="date-section">
+    <div class="date-heading">2026-06-28</div>
+    <div class="news-list">
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.trendforce.com/presscenter/news/20260617-13107.html" target="_blank">
+            TSMC, CoPoS 개발 가속화 — 대만 패널 업체·장비 업체, FOPLP로 유리기판 기회 선점 나서
+          </a>
+        </div>
+        <div class="news-summary">TrendForce(2026-06-17): TSMC가 CoPoS(Chip-on-Panel-on-Substrate) 개발을 가속하면서 대만 패널 제조업체와 소재·장비 업체들이 팬아웃 패널레벨 패키징(FOPLP)을 통해 유리기판 공급망 주도권 확보에 나서고 있다. 2026년은 CoPoS 관련 장비·소재 업체들의 핵심 검증 연도, 파일럿 생산은 2027년, 양산은 2028년 하반기 목표.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: TrendForce (2026-06-17)</span>
+          <span class="news-tag tag-copos">CoPoS</span>
+          <span class="news-tag tag-foplp">FOPLP</span>
+          <span class="news-tag tag-glass">유리기판</span>
+          <span class="news-tag tag-tsmc">TSMC</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.trendforce.com/news/2026/06/16/news-tsmc-reportedly-runs-dual-track-evaluation-on-copos-pilot-line-sparking-global-vs-local-vendor-competition/" target="_blank">
+            TSMC CoPoS 파일럿 라인, 글로벌·대만 장비업체 '듀얼트랙' 평가 돌입 — 납기·비용·안정성 경쟁 본격화
+          </a>
+        </div>
+        <div class="news-summary">TSMC 룽탄(龍潭) CoPoS 파일럿 라인이 글로벌 주요 장비업체 트랙과 대만 현지 장비업체 트랙으로 나뉜 이중(dual-track) 평가를 진행 중. 공정 안정성·납기·비용 효율·현지 지원 역량을 비교하는 구조로, 대만 장비업체의 선전 여부가 주목된다.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: TrendForce (2026-06-16)</span>
+          <span class="news-tag tag-copos">CoPoS</span>
+          <span class="news-tag tag-tsmc">TSMC</span>
+          <span class="news-tag tag-foplp">패널레벨</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.trendforce.com/news/2026/06/15/news-tsmc-cowos-supply-demand-gap-reportedly-seen-narrowing-from-20-to-10-by-end-2026-as-capacity-expands/" target="_blank">
+            TSMC CoWoS 공급-수요 격차, 연말까지 20% → 10%로 축소 전망 — 월 12~14만 장 돌파 예상
+          </a>
+        </div>
+        <div class="news-summary">TrendForce에 따르면 TSMC CoWoS의 공급-수요 갭이 현재 약 20%에서 2026년 말 10% 수준으로 좁아질 전망. 월간 CoWoS 생산 능력은 올해 최대 12~14만 장에 도달할 것으로 예상되며, OSAT 파트너 포함 시 업계 전체 생산 능력은 월 20만 장에 근접할 수 있다. 2027년에도 추가 개선이 기대된다.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: TrendForce (2026-06-15)</span>
+          <span class="news-tag tag-cowos">CoWoS</span>
+          <span class="news-tag tag-tsmc">TSMC</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.tomshardware.com/tech-industry/semiconductors/tsmcs-details-next-gen-cowos-roadmap-over-14-reticle-packages-and-48x-leap-in-compute-power-expected-by-2029-massive-size-enables-24-hbm5e-stacks-and-additional-memory-bandwidth-jump" target="_blank">
+            TSMC, CoWoS 장기 로드맵 공개 — 2029년 14-레티클 이상 SiP에 HBM5E 24스택, 컴퓨팅 성능 48배 향상
+          </a>
+        </div>
+        <div class="news-summary">TSMC 북미 기술 심포지엄 2026에서 공개된 CoWoS 로드맵: 2027년 9.5-레티클(HBM5 12스택) → 2028년 14-레티클(20 컴퓨팅 다이 + 20 HBM5) → 2029년 14-레티클 초과(24 HBM5E 스택)로 확장. 2024년 대비 컴퓨팅 트랜지스터 수 48배, 메모리 대역폭 34배 향상이 목표.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: Tom's Hardware (2026-06)</span>
+          <span class="news-tag tag-cowos">CoWoS</span>
+          <span class="news-tag tag-hbm">HBM5E</span>
+          <span class="news-tag tag-roadmap">로드맵</span>
+          <span class="news-tag tag-tsmc">TSMC</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.tomshardware.com/tech-industry/semiconductors/tsmc-says-panel-packaging-wont-replace-cowos-anytime-soon-for-the-largest-future-ai-processors-wafer-level-tech-can-scale-to-58-massive-dies-in-one-package" target="_blank">
+            TSMC "CoPoS, 단기간 내 CoWoS 대체 없다" — 웨이퍼 레벨 기술, 58개 대형 다이까지 확장 가능
+          </a>
+        </div>
+        <div class="news-summary">TSMC CEO C.C. 웨이가 최대 규모 AI 프로세서에 대해서는 CoPoS가 CoWoS를 당분간 대체하지 않을 것이라고 밝혔다. CoWoS는 웨이퍼 레벨에서 14X 규모까지 확장 가능하며, 하나의 패키지에 58개 대형 레티클 다이를 통합할 수 있다. CoPoS와 CoWoS는 서로 다른 세그먼트와 가격대를 타깃으로 공존할 전망.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: Tom's Hardware (2026-06)</span>
+          <span class="news-tag tag-copos">CoPoS</span>
+          <span class="news-tag tag-cowos">CoWoS</span>
+          <span class="news-tag tag-tsmc">TSMC</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.trendforce.com/news/2026/05/19/news-equipment-maker-schmid-flags-tsmc-panel-level-packaging-push-310x310mm-progress-glass-integration-under-review/" target="_blank">
+            SCHMID, TSMC의 310×310mm 패널레벨 패키징 진전 공개 — 유리기판 통합 옵션 검토 중
+          </a>
+        </div>
+        <div class="news-summary">독일 장비업체 SCHMID가 핵심 고객 TSMC의 CoPoS 패널 포맷이 310×310mm 규격으로 진전 중임을 공개하고, 동일 크기에서의 유리기판 통합 검토가 병행되고 있다고 밝혔다. SCHMID는 Trumpf와 협력해 레이저 식각·습식 화학 공정 기반의 유리 관통 홀(TGV) 형성 기술을 개발 중.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: TrendForce (2026-05-19)</span>
+          <span class="news-tag tag-copos">CoPoS</span>
+          <span class="news-tag tag-glass">유리기판</span>
+          <span class="news-tag tag-foplp">패널레벨</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-headline">
+          <a href="https://www.trendforce.com/news/2026/04/22/news-sk-hynix-reportedly-breaks-ground-on-first-u-s-advanced-packaging-plant-in-indiana-eyes-2h28-production/" target="_blank">
+            SK하이닉스, 미국 인디애나 첫 HBM 패키징 공장 착공 — 38.7억 달러 투자, 2028년 하반기 양산 목표
+          </a>
+        </div>
+        <div class="news-summary">SK하이닉스가 미국 인디애나주에 HBM 전용 첨단 패키징 공장의 기초 파일링 작업을 시작했다. 총 투자 규모 38.7억 달러(CHIPS법 보조금 4.58억 달러 포함), 2.5D 패키징 양산 라인 구축 목표. HBM4E·HBM5를 핵심 제품으로 NVIDIA 등 주요 고객과의 공급망 단축이 전략적 목적. Amkor와의 합작 가능성도 언급.</div>
+        <div class="news-meta">
+          <span class="news-source">출처: TrendForce / The Register (2026-04-22)</span>
+          <span class="news-tag tag-hbm">HBM</span>
+          <span class="news-tag tag-skhynix">SK하이닉스</span>
+          <span class="news-tag tag-foplp">2.5D 패키징</span>
+        </div>
+      </div>
+
+    </div><!-- .news-list -->
+  </div><!-- .date-section -->
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+</body>
+</html>
