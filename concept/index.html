@@ -34,6 +34,7 @@
 
   .main-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s,border-color .15s,transform .15s;}
   .main-card:hover{border-color:var(--accent);box-shadow:0 6px 24px rgba(0,0,0,.08);transform:translateY(-2px);}
+  .main-card.feature{background:linear-gradient(135deg,#ffffff,#faf8ff);border-color:#d9cdf5;border-left:4px solid var(--accent);}
   .card-icon{font-size:28px;line-height:1;}
   .card-title{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.3px;}
   .card-desc{font-size:13px;color:#555;line-height:1.6;}
@@ -62,6 +63,23 @@
 </div>
 
 <main>
+
+  <p class="section-label">기본 구조</p>
+  <div class="cards">
+
+    <a class="main-card feature" href="cowos_study.html">
+      <div class="card-icon">📘</div>
+      <div class="card-title">CoWoS 기본 구조</div>
+      <div class="card-desc">칩을 잘 만드는 시대에서 잘 붙이는 시대로 — CoWoS가 무엇이고 왜 필요한지, Chip-on-Wafer-on-Substrate의 기본 구조와 산업적 맥락을 큰 그림으로 정리합니다. S·R·L 분기를 보기 전에 먼저 읽어보세요.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#13171e;">개요</span>
+        <span class="card-tag" style="background:#2563a8;">2.5D 패키징</span>
+        <span class="card-tag" style="background:#1f7a4d;">산업 스터디</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </a>
+
+  </div>
 
   <p class="section-label">CoWoS 패밀리</p>
   <div class="cards">
