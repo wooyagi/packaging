@@ -9,23 +9,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg:#0a0e16;
-    --panel:#0e1420;
-    --ink:#e8edf6;
-    --ink-dim:#8a98b2;
-    --ink-faint:#5a6884;
-    --line:#1e2a40;
+    --bg:#ffffff;
+    --panel:#f6f8fb;
+    --ink:#161b24;
+    --ink-dim:#4c586b;
+    --ink-faint:#5b6678;
+    --line:#e2e7ef;
 
-    --silicon:#46d3e6;
-    --silicon-bright:#9af0fa;
-    --rdl:#d98cb6;
+    --silicon:#0b8ea3;
+    --silicon-bright:#0fb0c8;
+    --rdl:#c25a8a;
     --logic:#9b7ddb;
     --hbm:#f0a830;
-    --external:#f0844a;
-    --external-bright:#ffb98a;
+    --external:#dd6323;
+    --external-bright:#ee7a2b;
     --substrate:#525d78;
     --pcb:#56a567;
-    --bump:#aab6cc;
+    --bump:#7d8ba4;
 
     --font-d:'Space Grotesk',system-ui,sans-serif;
     --font-m:'IBM Plex Mono',ui-monospace,monospace;
@@ -34,8 +34,8 @@
   html,body{min-height:100%}
   body{
     background:
-      radial-gradient(1100px 640px at 72% -8%, #12203a 0%, transparent 60%),
-      radial-gradient(820px 520px at 4% 108%, #15182e 0%, transparent 55%),
+      radial-gradient(1100px 640px at 72% -8%, #e9f0f8 0%, transparent 60%),
+      radial-gradient(820px 520px at 4% 108%, #eef1f8 0%, transparent 55%),
       var(--bg);
     color:var(--ink);
     font-family:var(--font-d);
@@ -58,7 +58,7 @@
   .stage{
     margin-top:clamp(18px,3vh,30px);
     border:1px solid var(--line);border-radius:16px;
-    background:linear-gradient(180deg,rgba(255,255,255,.018),transparent);
+    background:#ffffff;box-shadow:0 6px 24px rgba(23,32,50,.07);
     padding:clamp(14px,2.4vw,26px);
   }
   .fig{width:100%;height:auto;display:block}
@@ -116,12 +116,12 @@
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:clamp(16px,2.6vh,24px)}
   .controls button{
     font-family:var(--font-m);font-size:13px;letter-spacing:.02em;
-    color:var(--ink-dim);background:rgba(255,255,255,.02);
+    color:var(--ink-dim);background:#f1f4f8;
     border:1px solid var(--line);border-radius:9px;padding:9px 15px;cursor:pointer;
     transition:all .2s;
   }
   .controls button:hover{border-color:var(--ink-faint);color:var(--ink)}
-  .controls button.on{color:var(--bg);font-weight:600}
+  .controls button.on{color:#ffffff;font-weight:600}
   .controls button.on[data-mode="all"]{background:var(--ink);border-color:var(--ink)}
   .controls button.on[data-mode="ddie"],
   .controls button.on[data-mode="dhbm"]{background:var(--silicon);border-color:var(--silicon)}
