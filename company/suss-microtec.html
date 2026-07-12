@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SÜSS MicroTec (SMHN) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / SÜSS MicroTec</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · 리소·본딩·코팅 · 첨단 패키징 장비</div>
+    <h1>SÜSS MicroTec</h1>
+    <div class="tick">XETRA: SMHN · 리소그래피·본더·코터 & 포토마스크 세정 (독일) · EUR</div>
+    <p>첨단 패키징 장비 강자(임시본딩 세계 1위 ~45%). CoWoS向 UV 프로젝션 스캐너·코터, HBM 임시본딩, 마스크 세정이 주력. AI로 <b>Q1'26 수주 €149M 사상최대</b>(BB 1.73)이나 매출은 저점 — 2026은 '전환의 해'. 매출 첫 €0.5B 돌파(FY25 €503M). 최근 12개 분기 재무와 4개 실적발표를 IR 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">€149.3M</div><div class="l">Q1'26 수주 (사상최대)</div></div>
+      <div class="hstat"><div class="v">1.73</div><div class="l">Q1'26 book-to-bill</div></div>
+      <div class="hstat"><div class="v">~45%</div><div class="l">임시본딩 세계 점유율</div></div>
+      <div class="hstat"><div class="v">€503M</div><div class="l">FY25 매출(첫 0.5B 돌파)</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    SÜSS MicroTec는 반도체 <b>리소그래피(마스크 얼라이너·UV 프로젝션 스캐너)·본더·코터/디벨로퍼</b>와 <b>포토마스크 세정</b> 장비를 만드는 독일 기업입니다.
+    매출의 ~70%가 <b>첨단 패키징 노출(ABS 세그먼트)</b>. 특히 <b>임시본딩(temporary bonding)은 세계 1위(~45%)</b>로 HBM 웨이퍼 박막화 공정의 핵심입니다.
+    <b>세그먼트 매출·EBIT를 모두 공시</b>하나, 독일 관행상 전체 손익은 반기(H1·FY), Q1·9M은 매출·EBIT·수주 중심 공시. 통화 EUR.
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Advanced Backend Solutions (ABS, ~70%)</div>
+      <div class="bd">첨단 패키징 프랜차이즈 — Imaging(UV/EUV 프로젝션 스캐너, CoWoS向)·Coating(스핀코터)·Bonding(임시/영구/하이브리드). FY25 매출 €350M(+11%).</div>
+      <span class="tag" style="background:var(--blue);">첨단 패키징</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Photomask Solutions (~30%)</div>
+      <div class="bd">프론트엔드 포토마스크 세정. FY25 매출 €153M(+17%). <b>FY25엔 EBIT율 28%로 ABS(8%)를 역전</b>한 고마진 세그먼트.</div>
+      <span class="tag" style="background:var(--teal);">마스크 세정</span>
+    </div>
+    <div class="biz">
+      <div class="bt">경영진 · 지배구조</div>
+      <div class="bd">CEO <b>Burkhardt Frick</b>(2030까지 연장)·CFO <b>Cornelia Ballwießer</b>·COO Thomas Rohe. 2026.6 MDAX 편입. 발행주식 ~19.1M주. (참고: 2011년 이후 사업매각 없음)</div>
+      <span class="tag" style="background:var(--gray);">Frick 체제</span>
+    </div>
+  </div>
+  <div class="callout warn" style="margin-top:16px;">
+    <b>⚠ 2025년 유의사항 3가지.</b> ① <b>회계정책 변경·재작성(FY25)</b> — 설치·업그레이드 매출을 시점→기간 인식으로 전환, 전년 비교 재작성(오류정정 아닌 정책 변경). Q1'25 매출이 기존 €123.2M→재작성 €124.9M. ② <b>2025년 마진 가이던스 2차례 하향</b>(GM 39–41%→37–39%→35–37%). ③ <b>MicroOptics 매각(2024.1)</b>으로 FY24 순이익엔 ~€58M 일회성 차익 포함(영업 아님). 본 페이지는 연속사업(continuing ops) 기준.
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·EBIT·마진 (최근 12개 분기)</h2>
+  <p class="lead">막대=매출·EBIT(좌축, €M) · 선=GPM/EBIT마진/순이익률(우축, %). Q2'23~Q1'26. <b>Q3'23·Q3'25 마진 저하</b>는 믹스·일회성(램프업·상각). 순이익률은 연속사업 EAT 기준(Q3 등 파생분기 포함).</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>EBIT</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GPM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>EBIT마진</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>순이익률</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: SÜSS 분기 statement·반기/연차보고서(IFRS, 연속사업). 표준 분기 중 Q2/Q3/Q4는 누계 차분 도출(파생). Q1'26은 재작성 기준(비교 Q1'25 €124.9M).</div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">수주(Order Intake) & Book-to-Bill — SÜSS의 핵심 선행지표</h3>
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--teal)"></i>수주</span>
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>Book-to-Bill</span>
+    </div>
+    <div class="chart-wrap chart-sm"><canvas id="chartOrder"></canvas></div>
+    <div class="chart-note">출처: 분기 statement. <b>Q1'26 수주 €149.3M 사상최대, BB 1.73</b> — 매출은 저점이나 AI(HBM·CoWoS)發 수주 급반등이 '전환의 해' 회복 신호. 백로그 Q1'26말 €330.1M.</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Segments</p>
+  <h2>세그먼트 — ABS vs Photomask (매출·EBIT 모두 공시)</h2>
+  <p class="lead">SÜSS는 2개 세그먼트의 <b>매출과 EBIT를 모두 공시</b>. <b>FY25엔 Photomask(EBIT 28%)가 ABS(8%)를 역전</b> — ABS는 본더(HBM 소화) 약세로 마진 급락, Photomask는 믹스 개선. Q1'26엔 ABS EBIT 적자 전환(저매출).</p>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">세그먼트 매출 (€M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>ABS</span>
+        <span><i class="dot" style="background:var(--teal)"></i>Photomask</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartSegRev"></canvas></div>
+      <div class="chart-note">출처: 연차보고서·Q1'26 자료. FY23~FY25 + Q1'26.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">세그먼트 EBIT (€M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>ABS</span>
+        <span><i class="dot" style="background:var(--teal)"></i>Photomask</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartSegEbit"></canvas></div>
+      <div class="chart-note">출처: 동일. FY25 ABS 8.2% vs Photomask 28.1%. Q1'26 ABS −€3.0M(저매출·고정비).</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · Region & Guidance</p>
+  <h2>지역별 매출 & 가이던스 경로</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">지역별 매출 (€M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>APAC</span>
+        <span><i class="dot" style="background:var(--teal)"></i>북미</span>
+        <span><i class="dot" style="background:var(--orange)"></i>EMEA</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartGeo"></canvas></div>
+      <div class="chart-note">출처: 연차보고서. FY25 APAC 82.3%(대만·한국 중심, TSMC CoWoS). 중국은 수주 기준 2025 급감(30%→18.5%).</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">가이던스 경로 (매출/GM/EBIT마진)</h3>
+      <div style="font-size:12.5px;line-height:1.85;padding:4px 2px;">
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0;"><span style="color:var(--muted);font-family:var(--mono);">FY25 최초</span><span>€470–510M · GM 39–41% · EBIT 15–17%</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0;"><span style="color:var(--muted);font-family:var(--mono);">'25.5 하향①</span><span>GM 37–39% · EBIT 13–15%</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0;"><span style="color:var(--muted);font-family:var(--mono);">'25.10 하향②</span><span>GM 35–37% · EBIT 11–13%</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0;"><span style="color:var(--muted);font-family:var(--mono);">FY25 실적</span><span style="font-weight:700;color:var(--ink);">€503M · GM 35.7% · EBIT 13.1%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="color:var(--muted);font-family:var(--mono);">FY26 가이드</span><span style="font-weight:700;color:var(--ink);">€425–485M · GM 35–37% · EBIT 8–10%</span></div>
+      </div>
+      <div class="chart-note" style="margin-top:10px;">2026 "전환의 해"(매출 감소). 신제품 마진 기여는 2027부터. Ambition 2030: 매출 €750–900M·GM 43–45%·EBIT 20–22%.</div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Advanced Packaging & Alpha</p>
+  <h2>첨단 패키징 알파</h2>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>임시본딩 세계 1위 ~45%</b> — HBM 웨이퍼 박막화 핵심, 2030까지 최다판매 본더. ② <b>CoWoS向 UV 프로젝션 스캐너·코터가 FY25 각 +50%↑</b> 성장(AI 파운드리 패키징). ③ <b>Q1'26 수주 €149M 사상최대·BB 1.73</b> — 저점 통과 신호(주가 +7.7%). ④ <b>패널레벨</b>: 310×310mm 프로젝션 스캐너 2026.3Q 대만 파일럿(양산은 2028–29). ⑤ 3대 메모리사 전부 임시본더 채택.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 리스크.</b> ① <b>하이브리드 본딩은 추격자</b> — wafer-to-wafer는 경쟁사 2곳이 앞섬(SÜSS는 IMEC 데모 단계, die-to-wafer는 정체). ② <b>본더 매출 HBM 소화로 FY25 감소</b>(2026 회복 기대). ③ 2025년 마진 2차례 하향·회계 재작성. ④ 배당 €0.30→€0.04 급감(FCF −€22.6M). ⑤ 중국 수주 급감·대만 편중.
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (IFRS 연속사업, €M)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기</th><th>매출</th><th>매출총이익</th><th>GPM</th><th>EBIT</th><th>EBIT마진</th><th>순이익(EAT)</th><th>순이익률</th><th>수주</th><th>백로그</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">Q2/Q3/Q4는 누계 차분 도출(파생). 순이익=연속사업 EAT. Q1'26 재작성 기준. FY25 EBIT는 세그먼트합 €62.4M vs 마진율 13.1% 함의 €65.9M 간 소차(회사 헤드라인은 13.1%).</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Results Calls</p>
+  <h2>별첨 — 최근 4개 실적발표 요약</h2>
+  <p class="lead">CEO <b>Burkhardt Frick</b> · CFO <b>Cornelia Ballwießer</b> · COO Thomas Rohe. 실적·가이던스 / 경영진 / 마진·자본 / Q&A, <b>첨단 패키징</b>은 별도 블록. 회사 자료·트랜스크립트 기반.</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">Q1'26</span> 수주 €149M 사상최대 — 저점 통과 <span class="q-meta">2026.5.7 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li><b>수주 €149.3M(+69.5% YoY, 사상최대)</b>, BB <b>1.73</b>. 매출 €86.5M(−30.7%, 의도된 저점). GM 36.1%, EBIT마진 4.3%(EBIT €3.7M), 순이익 €2.5M. 백로그 €330.1M(+23.7% vs 연말).</li>
+          <li><b>FY26 가이드 재확인</b>: 매출 €425–485M, GM 35–37%, EBIT마진 8–10%. FCF +€23.2M, 순현금 €72.0M. 발표 후 주가 ~+7.7%.</li>
+        </ul>
+        <h4>경영진 (Frick)</h4>
+        <ul>
+          <li>"매우 강한 고객 수요, 양 세그먼트 기여" — AI(HBM+CoWoS)가 동인, 유연 생산능력 확대. 대만 Zhubei 신팹 가동(Q1이 이전 관련 P&L 부담 마지막 분기). 2026 신제품 4종 출시 지속.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — Q1'26</span>
+          <ul>
+            <li>ABS 수주 €99.7M(vs €54.3M) — "본딩 시스템 수주 최강". Imaging은 "<b>CoWoS 관련 주문</b>으로 견조". Photomask EBIT 23.1%(중국 세정 믹스).</li>
+            <li>패널 대응 <b>310×310mm UV/EUV 프로젝션 스캐너</b> 2026.3Q 대만 파일럿 출시 예정.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">FY2025</span> 매출 첫 €0.5B 돌파 — 전환의 해 예고 <span class="q-meta">2026.3.30 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">€503.2M</span>(첫 0.5B 돌파), GM 35.7%, EBIT마진 13.1%, 순이익 €49.5M. 수주 €354.0M(Q4 €117.5M로 반등, BB ~1.0). 백로그 €266.8M.</li>
+          <li><b>FY26 가이드</b>: 매출 €425–485M(−9.6% 중간값), GM 35–37%, EBIT 8–10% — <b>2026은 '전환의 해'</b>. 양 세그먼트 ~−10%.</li>
+          <li>배당 €0.04(FCF 20–40% 정책, FCF −€22.6M). 신규 €115M 신디케이트 시설.</li>
+        </ul>
+        <h4>경영진 (Frick)</h4>
+        <ul>
+          <li>Q4 수주는 AI("HBM·CoWoS 모두")가 견인, Q1'26까지 모멘텀 지속. 마진 회복은 <b>신제품 세대가 2027부터 P&L 기여</b>. APAC 수주 ~77%(대만 지배적).</li>
+          <li>메모리 3대사 전부 임시본더 채택, 2번째 한국사에서 HBM 관련 수주. TSMC 후공정 현지화는 "위협 아닌 기회".</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — FY2025</span>
+          <ul>
+            <li>ABS 매출 +10.7% ~€350M(Imaging·Coating 각 +50%↑, <b>Bonding은 HBM 소화로 감소</b>). 2026 본더 "HBM 고객 증설 재개로 유의한 개선" 기대.</li>
+            <li><b>하이브리드 본딩</b>: die-to-wafer 정체, TCB 런웨이 연장, wafer-to-wafer는 "실험 단계". "SÜSS는 w2w 하이브리드 본더 선두 아님(경쟁사 2곳 앞섬)", IMEC서 데모. <b>패널/글래스</b>: 310×310 스캐너, 양산은 2028–29.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">9M'25</span> 매출 €384M — 2차 가이던스 하향 <span class="q-meta">2025.10 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>9M 매출 €384.4M(+30.2%), 수주 €236.8M(−14.3%), GM 35.9%, EBIT마진 14.1%. Q3 GM 33.1%(−5.9%p), EBIT 10.5%. 백로그 €276.1M, BB 0.62.</li>
+          <li><b>2차 가이던스 하향</b>: GM 35–37%(37–39%에서), EBIT 추가 하향. 매출 ~€490M 유지. "마진 압박은 2030 목표에 영향 없음"(Frick).</li>
+        </ul>
+        <h4>경영진 · 마진</h4>
+        <ul>
+          <li>AI 주도 수주 회복 시사: "Q4 &gt;€100m 수주 기대"(→€117.5M 달성). GP 갭 ~€16m을 믹스 €7m·스캐너 램프 €3.2m·기술 상각 €2.2m 등으로 브리지. <b>중국 수주 비중 18.5%로 급락</b>(대만 ~40%). Zhubei 신팹 Q3 개소.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 9M'25</span>
+          <ul>
+            <li>ABS: <b>코터·UV 스캐너 매출 +50%↑</b>, 본더 소폭 성장. 백로그 €140M이 2026 인도분. 2026 로드맵: 차세대 UV 스캐너(2026 중반 초도), 임시본딩 신솔루션, 패널레벨, 웨이퍼 세정.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">H1'25</span> 매출 €266M(+38%) — 1차 가이던스 하향 <span class="q-meta">2025.8 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>H1 매출 €266.4M(+38.2%), 수주 €166.8M(−13.2%), GM 37.2%, EBIT마진 15.7%. 백로그 €325M. BB 0.63.</li>
+          <li><b>1차 가이던스 하향(2025.5.14 프로핏워닝 반영)</b>: 매출 €470–510M 유지, GM 37–39%(39–41%에서), EBIT 13–15%. 원인: 수주 둔화·프로젝트 지연·믹스·Zhubei 이중부담.</li>
+        </ul>
+        <h4>경영진 (Frick/Ballwießer)</h4>
+        <ul>
+          <li>"2년 호황 뒤 고객 신중(불확실성·인도장비 커미셔닝)." CFO: <b>HBM 포화(digestion)</b> 언급, USD/EUR 역풍 ~€25–27M/년. Q2 중국 수주 급감(Q1의 ~20% 수준).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — H1'25</span>
+          <ul>
+            <li><b>임시본더/디본더 약세</b>(HBM 후속주문 축소), 300mm 스핀코터는 한국·대만 패키징 고객으로 견조. 하이브리드 본딩 근단 상용화 미기대(현 오퍼링은 플립칩/TCB 중심).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(전부 1차 자료).</b><br>
+    · 재무: SÜSS 분기 statement·반기/연차보고서(IFRS, 연속사업) — suss.com/en/investor-relations. Q2'23~Q1'26. <b>Q2/Q3/Q4 표준분기는 누계 차분 도출(파생)</b>. 2025년 회계정책 변경으로 일부 비교치 재작성(Q1'25 €123.2M 기존/€124.9M 재작성).<br>
+    · 세그먼트: ABS·Photomask 매출·EBIT 공시(연간+Q1'26). 지역은 연차보고서.<br>
+    · 실적발표: FY2025 공식 트랜스크립트 + 분기 자료·Investing.com 트랜스크립트. CEO Burkhardt Frick(2023.9~), CFO Cornelia Ballwießer, COO Thomas Rohe. (창업자/CEO 교체설은 1차 자료와 상충 — Frick 유임 확인).<br>
+    · 통화 EUR. EBITDA 아닌 IFRS EBIT 기준. 마진 %는 보고 기준. FY24 순이익엔 MicroOptics 매각차익(비영업) 포함.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 원문(IR·공시)으로 재확인하세요. 최종 확인일 2026-07-13.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["Q2'23","Q3'23","Q4'23","Q1'24","Q2'24","Q3'24","Q4'24","Q1'25","Q2'25","Q3'25","Q4'25","Q1'26"];
+const revenue=[68.4,70.0,102.0,93.5,99.3,102.5,150.8,123.2,143.2,118.0,118.8,86.5];
+const ebit=[7.7,1.3,15.0,14.9,15.2,17.3,27.7,20.4,21.5,12.4,11.6,3.7];
+const gpm=[36.7,29.4,35.5,39.1,40.5,39.0,40.8,37.9,36.5,33.0,34.9,36.1];
+const opm=[11.3,1.9,14.7,15.9,15.3,16.9,18.4,16.6,15.0,10.5,9.8,4.3];
+const npm=[9.4,0.6,7.4,11.1,12.2,12.6,11.1,12.2,11.0,7.8,8.2,2.9];
+const gp=[25.1,20.6,36.2,36.6,40.2,40.0,61.5,46.7,52.3,38.9,41.5,31.2];
+const ni=[6.4,0.4,7.5,10.4,12.1,12.9,16.7,15.0,15.7,9.2,9.7,2.5];
+const orderIntake=[83.3,103.0,139.3,98.3,93.9,84.0,147.5,88.1,78.7,70.0,117.5,149.3];
+const backlog=[381.5,414.7,452.5,456.9,450.0,430.8,428.4,392.7,325.8,276.1,266.8,330.1];
+const b2b=Q.map((_,i)=>orderIntake[i]/revenue[i]);
+
+// 세그먼트 (FY23/24/25 + Q1'26)
+const segLbl=["FY23","FY24","FY25","Q1'26"];
+const absRev=[214.5,315.9,349.7,55.7];
+const pmRev=[89.7,130.75,153.4,30.8];
+const absEbit=[20.1,59.8,28.6,-3.0];
+const pmEbit=[12.4,26.3,43.1,7.1];
+// 지역
+const geoLbl2=["FY23","FY24","FY25"];
+const apac=[202.6,390.3,414.1];
+const namer=[45.1,26.1,46.0];
+const emea=[56.6,31.1,43.0];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'EBIT',data:ebit,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GPM',data:gpm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'EBIT마진',data:opm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'순이익률',data:npm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=c.dataset.label.includes('M')||c.dataset.label.includes('률')||c.dataset.label==='GPM';return c.dataset.label+': '+(['GPM','EBIT마진','순이익률'].includes(c.dataset.label)?c.parsed.y.toFixed(1)+'%':'€'+c.parsed.y.toFixed(1)+'M');}}}},
+    scales:{y:{position:'left',title:{display:true,text:'€M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:50,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartOrder'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'수주',data:orderIntake,backgroundColor:'rgba(15,118,110,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.7},
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.55)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.7},
+    {type:'line',label:'Book-to-Bill',data:b2b,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:3,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='Book-to-Bill'?'BB: '+c.parsed.y.toFixed(2):c.dataset.label+': €'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{position:'left',title:{display:true,text:'€M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'B/B'},grid:{drawOnChartArea:false},min:0,max:2,ticks:{callback:v=>v.toFixed(1)}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSegRev'),{
+  type:'bar',
+  data:{labels:segLbl,datasets:[
+    {label:'ABS',data:absRev,backgroundColor:CLR.blue},
+    {label:'Photomask',data:pmRev,backgroundColor:CLR.teal},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': €'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{title:{display:true,text:'€M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSegEbit'),{
+  type:'bar',
+  data:{labels:segLbl,datasets:[
+    {label:'ABS',data:absEbit,backgroundColor:CLR.blue},
+    {label:'Photomask',data:pmEbit,backgroundColor:CLR.teal},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': €'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{title:{display:true,text:'€M'},grid:{color:gridClr}},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartGeo'),{
+  type:'bar',
+  data:{labels:geoLbl2,datasets:[
+    {label:'APAC',data:apac,backgroundColor:CLR.blue},
+    {label:'북미',data:namer,backgroundColor:CLR.teal},
+    {label:'EMEA',data:emea,backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>c.dataset.label+': €'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{stacked:true,title:{display:true,text:'€M'},grid:{color:gridClr},beginAtZero:true},x:{stacked:true,grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(1)}</td><td>${gp[i].toFixed(1)}</td><td>${gpm[i].toFixed(1)}%</td>`+
+    `<td>${ebit[i].toFixed(1)}</td><td>${opm[i].toFixed(1)}%</td><td>${ni[i].toFixed(1)}</td><td>${npm[i].toFixed(1)}%</td><td>${orderIntake[i].toFixed(1)}</td><td>${backlog[i].toFixed(1)}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
