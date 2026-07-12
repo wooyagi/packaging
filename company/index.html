@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기업 분석 · 첨단 패키징 리서치</title>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  /* 히어로 */
+  .hero{background:var(--ink);color:#fff;padding:56px 24px 48px;}
+  .hero-inner{max-width:860px;margin:0 auto;}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+  .hero h1{font-size:32px;font-weight:800;margin:0 0 12px;letter-spacing:-.5px;line-height:1.2;}
+  .hero p{font-size:15px;color:#9aa6b7;margin:0;max-width:560px;line-height:1.6;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;}
+  .crumb a:hover{color:var(--accent);}
+
+  /* 메인 카드 그리드 */
+  main{max-width:860px;margin:0 auto;padding:36px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:0 0 14px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:40px;}
+
+  .main-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s,border-color .15s,transform .15s;}
+  .main-card:hover{border-color:var(--accent);box-shadow:0 6px 24px rgba(0,0,0,.08);transform:translateY(-2px);}
+  .card-icon{font-size:28px;line-height:1;}
+  .card-title{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.3px;}
+  .card-ticker{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:600;}
+  .card-desc{font-size:13px;color:#555;line-height:1.6;}
+  .card-meta{display:flex;gap:8px;flex-wrap:wrap;}
+  .card-tag{font-size:11px;font-weight:700;color:#fff;border-radius:4px;padding:2px 8px;}
+  .card-arrow{font-size:20px;color:var(--muted);margin-top:auto;transition:transform .15s,color .15s;}
+  .main-card:hover .card-arrow{transform:translateX(4px);color:var(--accent);}
+
+  /* 빈 상태 */
+  .empty{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:40px 26px;text-align:center;color:var(--muted);font-size:14px;line-height:1.7;}
+  .empty code{font-family:var(--mono);background:#f0eefc;color:var(--accent);padding:2px 7px;border-radius:5px;font-size:13px;}
+
+  footer{max-width:860px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+
+  @media(max-width:560px){
+    .hero h1{font-size:24px;}
+    .cards{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / 기업 분석</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · Deep Dive</div>
+    <h1>기업 분석</h1>
+    <p>첨단 패키징 밸류체인 핵심 기업을 IR·공시·어닝콜 원문 기반으로 정리 — 최근 12개 분기 재무 추이, 사업부·전방산업 구조, 최근 4개 분기 컨콜 요약. 핵심을 추출하고 산업 변화 속 알파를 찾습니다.</p>
+  </div>
+</div>
+
+<main>
+
+  <p class="section-label">등록 기업</p>
+  <div class="cards">
+    <!-- COMPANY_CARDS_START -->
+
+    <a class="main-card" href="onto-innovation.html">
+      <div class="card-icon">🔬</div>
+      <div class="card-title">Onto Innovation</div>
+      <div class="card-ticker">NYSE: ONTO</div>
+      <div class="card-desc">반도체 공정제어(계측·검사) & 첨단 패키징 리소그래피. AI 패키징 주도로 1Q26 사상최대 매출 $292M, FY26 첨단패키징 &gt;50% 성장 가이드. Dragonfly·3DI·JetStep이 성장 엔진.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#1f7a4d;">첨단 패키징</span>
+        <span class="card-tag" style="background:#2563a8;">HBM·2.5D</span>
+        <span class="card-tag" style="background:#7c3aed;">계측·검사</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </a>
+
+    <!-- COMPANY_CARDS_END -->
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+</body>
+</html>

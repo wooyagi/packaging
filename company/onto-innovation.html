@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto Innovation (ONTO) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;}
+  .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:680px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat{}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;}
+  .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;}
+  .hl td:first-child{background:#f4f0ff;}
+
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;}
+  details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;}
+  .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);}
+
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  .disc a{color:var(--muted);}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+  .dot.line{border-radius:50%;width:9px;height:9px;}
+
+  @media(max-width:640px){
+    .hero h1{font-size:23px;}
+    .chart-wrap{height:320px;}
+    h2{font-size:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Onto Innovation</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · Process Control · Advanced Packaging</div>
+    <h1>Onto Innovation</h1>
+    <div class="tick">NYSE: ONTO · 반도체 공정제어(계측·검사) & 첨단 패키징 리소그래피</div>
+    <p>AI 컴퓨트發 첨단 패키징·선단노드 투자 사이클의 계측/검사 수혜주. 2025년 3분기 저점($218M) → AI 패키징 주도 회복으로 4분기 사상 최대($267M), 2026년 1분기 재차 신기록($292M). 12개 분기 재무와 최근 4개 컨콜을 IR·10-Q·어닝콜 원문 기반으로 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$291.9M</div><div class="l">1Q26 매출 (사상최대)</div></div>
+      <div class="hstat"><div class="v">50.1%</div><div class="l">1Q26 GPM (GAAP)</div></div>
+      <div class="hstat"><div class="v">&gt;$1.3B</div><div class="l">FY26 매출 가이드</div></div>
+      <div class="hstat"><div class="v">&gt;50%</div><div class="l">FY26 AP 성장 가이드</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1. 기업 개요 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Onto Innovation은 2019년 <b>Nanometrics + Rudolph Technologies</b> 합병으로 출범한 반도체 <b>공정제어(Process Control)</b> 전문기업입니다.
+    웨이퍼·패키지 제조 공정에서 <b>계측(Metrology)</b>과 <b>검사(Inspection)</b> 장비, 그리고 <b>리소그래피 시스템·수율 소프트웨어</b>를 공급합니다.
+    회계상 <b>단일 보고부문(single reportable segment)</b>으로, 사업부별 영업이익은 공시되지 않습니다(아래 3번 항목 주석 참조).
+    다만 IR·컨콜에서는 응용시장을 <b>선단노드 / 특수소자·첨단패키징 / 소프트웨어·서비스</b> 세 갈래로 설명합니다.
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Advanced Nodes (선단노드)</div>
+      <div class="bd">선단 로직·메모리(GAA, HBM4 DRAM, NAND)용 OCD 계측(Atlas), 박막(Iris), 표면전하 계측. FY25 매출 약 $300M으로 FY24($148.5M) 대비 2배 이상 성장.</div>
+      <span class="tag" style="background:var(--blue);">Atlas · Iris</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Specialty Device & Advanced Packaging</div>
+      <div class="bd">첨단 패키징(2.5D·HBM·CoWoS) 검사(Dragonfly), 3D 범프 계측(3DI), 패널레벨 리소그래피(JetStep)·검사(Firefly). 특수소자(전력·RF·이미지센서)와 합산 공시. FY25 약 $504M.</div>
+      <span class="tag" style="background:var(--green);">Dragonfly · 3DI · JetStep</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Software & Services</div>
+      <div class="bd">수율관리 소프트웨어(Discover), 부품(Parts)·서비스(Services). 10-Q 재무주석은 매출을 <b>시스템·소프트웨어 / 부품 / 서비스</b>로 분해 공시.</div>
+      <span class="tag" style="background:var(--orange);">Discover · 부품·서비스</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>최근 자본배치 — 규모 확장 국면.</b> 2025.11 <b>Semilab USA 인수</b>($526.6M, 표면전하·전력반도체 계측 확보, FY26 기여 $100~110M 예상) 완료.
+    2026.1 일본 <b>Rigaku 지분 27% 취득</b>(~$710M, 2H26 예정) 발표 — 하이브리드 계측 라이선스·배당 시너지 목표.
+  </div>
+
+  <!-- 2. 전사 재무 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·영업익·마진 (최근 12개 분기, GAAP)</h2>
+  <p class="lead">막대=매출·영업이익(좌축, $M) · 선=GPM/OPM/NPM(우축, %). 2Q23~1Q26. 4Q25 GAAP 마진은 Semilab 통합 관련 매출원가 내 약 $21.8M 구조조정/일회성 비용으로 눌림(비GAAP OPM은 25.2%).</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>영업이익</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GPM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>OPM</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>NPM</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: Onto Innovation 분기 실적 보도자료(8-K Item 2.02) 및 10-Q, SEC EDGAR(CIK 0000704532). 모든 수치 GAAP. 마진 % = 보고 달러 기준.</div>
+  </div>
+
+  <!-- 3. 사업분야 매출 -->
+  <p class="section-label">03 · Revenue by Source</p>
+  <h2>매출 분해 — 시스템·소프트웨어 / 부품 / 서비스 (10-Q 공시)</h2>
+  <p class="lead">
+    Onto가 <b>SEC 10-Q/10-K에서 분기별로 계량 공시</b>하는 유일한 매출 분해 기준입니다. 시스템·소프트웨어가 매출의 80~87%로 압도적.
+  </p>
+  <div class="callout">
+    <b>⚠ 영업이익 by 사업부는 미공시.</b> Onto는 <b>단일 보고부문</b>(1Q26 10-Q Note 12: "one operating and reportable segment", CODM은 연결 순이익으로 평가)이므로 사업분야별 영업이익은 공시되지 않습니다.
+    따라서 요구사항 3의 "사업부별 영업익 그래프"는 데이터 부재(N/A)이며, 매출 분해만 제시합니다.
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>시스템·소프트웨어</span>
+      <span><i class="dot" style="background:var(--blue)"></i>부품(Parts)</span>
+      <span><i class="dot" style="background:var(--orange)"></i>서비스(Services)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartSeg"></canvas></div>
+    <div class="chart-note">출처: 각 분기 10-Q "sources of revenue" 주석. 4Q23·4Q24·4Q25는 10-K − 9개월 10-Q로 도출(파생값, 합계는 보고 매출과 정확히 일치).</div>
+  </div>
+
+  <!-- 4. 사업분야 비중 -->
+  <p class="section-label">04 · Revenue Mix</p>
+  <h2>매출 구성비 — 매출원별 비중 추이 (100% 누적)</h2>
+  <p class="lead">시스템·소프트웨어 비중은 장비 사이클에 따라 80~87% 사이. 저점 분기(3Q25)에 부품·서비스 비중이 상대적으로 상승(20%).</p>
+  <div class="card">
+    <div class="chart-wrap chart-sm"><canvas id="chartMix"></canvas></div>
+    <div class="chart-note">출처: 위와 동일. 각 분기 매출 100% 대비 구성비.</div>
+  </div>
+
+  <!-- 5. 전방산업 -->
+  <p class="section-label">05 · End-Market</p>
+  <h2>전방/응용시장 — 특수소자·첨단패키징 매출 (컨콜 공시 기준)</h2>
+  <p class="lead">
+    Onto는 전방산업별 매출 %를 <b>정규 재무제표로는 계량 공시하지 않습니다.</b> 다만 컨콜에서 <b>"Specialty Device & Advanced Packaging"</b> 매출 금액·비중을 분기별로 언급 —
+    공시된 분기만 제시합니다(그 외 분기는 이 기준으로 N/A).
+  </p>
+  <div class="card">
+    <div class="chart-wrap chart-sm"><canvas id="chartEnd"></canvas></div>
+    <div class="chart-note">출처: 분기 어닝콜 발언. 4Q25는 3Q25 콜에서 제시한 "약 $150M" 가이드 기준(FY25 세그먼트 합계 ≈ $504M). 1Q26 $160M = 첨단패키징 ≈ $107M + Semilab ≈ $25M + 전력·특수 ≈ $28M(경영진 발언).</div>
+  </div>
+  <div class="callout">
+    <b>알파 포인트.</b> 이 세그먼트 안에서 <b>첨단 패키징</b>은 1Q26 기준 약 2/3(~$107M)이며, 경영진은 <b>FY26 첨단 패키징 매출 &gt;50% 성장</b>(4Q25 콜의 "&gt;30%"에서 상향)을 가이드. HBM과 2.5D 로직이 성장률 기여 "거의 5:5". Dragonfly G5·3DI 범프계측·JetStep 패널레벨이 2027년까지의 성장 엔진.
+  </div>
+
+  <!-- 데이터 테이블 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (GAAP, 12개 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>분기</th><th>매출 $M</th><th>매출총이익 $M</th><th>GPM</th>
+          <th>영업이익 $M</th><th>OPM</th><th>순이익 $M</th><th>NPM</th><th>희석 EPS</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">비GAAP 참고(1Q26): GPM 55.7% · OPM 26.7% · EPS $1.42. 비GAAP은 무형자산상각·M&A비용·구조조정·소송 등 제외.</div>
+
+  <!-- 별첨: 컨콜 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Michael Plisinski</b> · CFO <b>Brian Roberts</b>. 각 분기 실적·가이던스 / CEO·CFO 발언 / Q&A 핵심, 그리고 <b>첨단 패키징</b>은 별도 블록. 모두 실제 트랜스크립트·보도자료 기반.</p>
+
+  <div class="appendix">
+
+    <!-- 1Q26 -->
+    <details open>
+      <summary><span class="q-badge">1Q26</span> 사상 최대 매출 $292M — AI 패키징 가속 <span class="q-meta">2026.5.5 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$292M</span>(QoQ +10%), 가이던스 상단 전 지표 상회. 비GAAP EPS <span class="num">$1.42</span>(QoQ +13%, 컨센 ~$1.38 상회).</li>
+          <li>GPM <span class="num">55.7%</span>(+110bp), OPM <span class="num">26.7%</span>(+150bp).</li>
+          <li><b>2Q26 가이드</b>: 매출 <span class="num">$320~330M</span>(중간값 YoY +28%), 비GAAP EPS ~$1.69, GPM 56.0~56.5%.</li>
+          <li><b>FY26 상향</b>: 매출 <span class="num">&gt;$1.3B</span>(연 &gt;30% 성장), <b>4Q26까지 영업이익률 &gt;30%</b>, 3Q부터 분기당 최소 +50bp 마진 확대.</li>
+        </ul>
+        <h4>CEO (Plisinski)</h4>
+        <ul>
+          <li>"고성능 컴퓨트에 대한 <b>끝없는 수요</b>"가 선단노드와 첨단패키징을 동시에 견인 — 고객 증설·신제품 채택 가속, 백로그 증가.</li>
+          <li>제품 성과: <b>Dragonfly G5</b> 선도 2.5D 로직 고객 퀄 통과("계획 대비 출하 앞서감"), <b>Atlas G6</b> 차세대 로직 채택 확대, Atlas <b>TSV 계측</b> 신규 win.</li>
+        </ul>
+        <h4>CFO (Roberts)</h4>
+        <ul>
+          <li>자재비·운임 상승에도 GPM 개선. <b>Rigaku 투자</b>($710M/27%)는 "거의 100% 마진" 라이선스 매출 + 연 $7M 배당, 1년 내 이자수익 감소분 상쇄 전망.</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>G5 파이프라인: 10개 이상 고객·15개 이상 애플리케이션. 마진 기여는 <b>2027년</b> 볼륨 램프 때 본격화.</li>
+          <li>선단노드 ~25% 성장 전망 — Atlas OCD 채택, 미세 스팟(in-die 측정), 박막 툴이 견인. 로직·메모리 동반.</li>
+          <li>Pull-in이 2027 수요를 당겨쓰는 것 아니냐? → "2027 훼손 아님, 신규 팹 가동에 따른 별도 수요."</li>
+          <li>G5 우위: &lt;200nm 해상도(기존 ~800nm 한계 대비), 신규 광학·카메라·스테이징, die-to-die 알고리즘 → "최저 TCO·최고 유연성."</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 1Q26</span>
+          <h4>핵심 요약</h4>
+          <ul>
+            <li><b>특수소자·첨단패키징 매출 $160M</b> 중 첨단패키징 약 <b>2/3(~$107M)</b>, Semilab ~$25M, 나머지 전력·특수.</li>
+            <li><b>FY26 첨단 패키징 매출 &gt;50% 성장</b> 가이드(4Q25 콜의 "&gt;30%"에서 상향). HBM과 2.5D 로직 성장 기여 "거의 5:5".</li>
+            <li><b>Dragonfly G5</b>: 선도 2.5D 로직 고객 퀄·출하 계획 상회. 램프 "분기마다 거의 2배". 단 FY26 첨단패키징 매출의 &lt;10%(초기 램프) — 본격 기여는 2027, 잠재 신규시장 "~$10억."</li>
+            <li><b>범프/구리필러 검사(3DI)</b>: 범프 미세화(2년 전 15~25µm → 현재 6µm 미만 샘플링)가 3DI 강점에 부합. 분기 중 복수 OSAT에서 추가 주문 <b>10건 이상</b>.</li>
+            <li><b>패널레벨(JetStep·Firefly)</b>: JetStep이 "AI 디바이스 패키징 공급사 2곳에서 퀄" 완료. 양산 램프 <b>2027</b>, 수년간 <b>~$200M</b> 시장.</li>
+            <li>Atlas <b>TSV 계측</b> 신규 win, 초도 출하 2H26.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- 4Q25 -->
+    <details>
+      <summary><span class="q-badge">4Q25</span> 분기·연간 사상 최대 — HBM $240M VPA <span class="q-meta">2026.2.19 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>4Q 매출 <span class="num">$267M</span>(사상최대, QoQ +22%). <b>FY25 $1.005B</b>(사상최대). 조정 EPS <span class="num">$1.26</span>(매출은 가이드 상회, EPS는 컨센 ~$1.28 대비 소폭 하회).</li>
+          <li>GPM <span class="num">54.6%</span>(+50bp), OPM <span class="num">25.2%</span>(+410bp).</li>
+          <li><b>1Q26 가이드</b>: 매출 $275~285M, EPS $1.26~1.36. 2Q26 매출 $300M 초과 시사.</li>
+          <li><b>FY26 전망(당시)</b>: 첨단 패키징 &gt;30% 성장, 선단노드 중간 십수% 성장.</li>
+        </ul>
+        <h4>CEO (Plisinski)</h4>
+        <ul>
+          <li>"분기 중 AI 디바이스용 <b>2.5D 패키징 주문이 2배 이상</b>." 업계 2026 WFE 10~20% 성장, TSMC 2026 capex &gt;30% 시그널 인용.</li>
+          <li>선단노드 2025 매출 "전년比 2배 이상". Atlas G6 GAA·<b>HBM4 DRAM</b> 채택, 신규 로직 고객 2곳 2026 램프.</li>
+        </ul>
+        <h4>CFO (Roberts)</h4>
+        <ul>
+          <li>분기 현금창출 <span class="num">$95M</span>(현금전환 ~150%). 4Q 확장(해외)공장 출하 비중 &gt;50%. Semilab FY26 매출 "$100M 초반~$110M"(전력반도체 부분은 ~10% 감소 예상).</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li><b>백로그가 3개월 만에 거의 2배</b> → 사상최대 "약 2개 분기" 수준. 확장공장으로 "$20억 런레이트" 대응 가능, 제약은 정밀광학 공급망.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 4Q25 (패키징 뉴스의 정점)</span>
+          <ul>
+            <li>첨단 패키징 <b>QoQ &gt;25% 성장</b>. FY25 특수소자+첨단패키징 세그먼트 <b>$504M</b>(FY26 30%+ 성장의 기준).</li>
+            <li><b>HBM $240M+ 볼륨구매계약(VPA)</b>: 한 HBM 고객과 2027년까지 계약, <b>3D 범프 계측 $60M+ 포함</b>. 믹스가 기존 2/3 Dragonfly 2D·1/3 3D범프 → "50:50으로 이동", 타 고객 VPA도 협상 중.</li>
+            <li><b>2.5D AI 패키징 주문 QoQ 2배 이상.</b></li>
+            <li><b>차세대 Dragonfly(G5)</b>: 고객 평가 4건 진행, "광학 성능·처리량 유의미 개선" 피드백. 평가 1H26 종료·2H 램프(모델은 보수적 가정).</li>
+            <li><b>패널레벨</b>: 신규 대형 패널 패키징 팹向 <b>JetStep + Firefly 8대 수주</b>. 과잉설비 해소로 주문 재개. 표면전하 계측(Semilab) 첫 주문 확보.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- 3Q25 -->
+    <details>
+      <summary><span class="q-badge">3Q25</span> 저점 분기 $218M — 변곡 메시지 <span class="q-meta">2025.11.7 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$218.2M</span>(가이드 중간값 소폭 상회, 사전 예고한 "저점"). 조정 EPS <span class="num">$0.92</span>(가이드 상단 근접).</li>
+          <li>GPM <span class="num">54%</span>(관세 ~1%p 포함), OPM <span class="num">21.1%</span>(가이드 상단 상회).</li>
+          <li><b>4Q25 가이드</b>: 매출 $250~265M(+15~21% QoQ, 14주차 포함), EPS $1.02~1.12 → 실제는 상회($267M/$1.26).</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO: "2026 시장 성장은 AI 컴퓨트 수요에 대응한 <b>첨단 패키징 투자 증가</b> 포함 가능성." 선단노드 FY25 ~$300M(FY24 $148.5M) 궤도. 아시아 확장공장 출하 &gt;30%, 2026말 국제 &gt;60% 목표.</li>
+          <li>CFO: GPM 54%에 관세 ~1% 영향, 오프쇼어링 램프로 완화 예상. Semilab "수주 내 마감"(당시 ~$495M 언급).</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>3DI 경쟁: "다른 곳이 퀄됐다는 인지 없음." 신규 3개 애플리케이션(리플로우前 범프계측·다이워피지·2.5D 특수계측) 개방.</li>
+          <li>3DI 규모: 2026 "수천만 달러", 2027 더 큰 영향.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 3Q25</span>
+          <ul>
+            <li><b>특수소자·첨단패키징 매출 $113M(전체의 52%).</b> 4Q ~$150M, FY25 "$500M 소폭 상회" 예상.</li>
+            <li><b>3DI</b>: HBM 고객 2곳 <b>풀 퀄 완료</b>("더 작고 조밀한 3D 인터커넥트에 우수한 성능"), 리플로우前 계측 전환 가능.</li>
+            <li>차세대 Dragonfly: 선도 AI 패키징 고객 초도 출하 임박, 12월 메모리 고객 추가. 유의미 기여 2H26.</li>
+            <li><b>용량 시그널(널리 인용)</b>: "패키징 고객들이 2D·서브서피스·3DI 검사 확장 위해 <b>툴 최대 20% 추가</b> 필요성 시사."</li>
+            <li>4Q 패키징 매출 "3Q에서 거의 2배" — 강한 Dragonfly 수요. AI 패키징 성장의 대부분은 HBM.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- 2Q25 -->
+    <details>
+      <summary><span class="q-badge">2Q25</span> 변곡 직전 $254M — 3Q 저점 가이드 <span class="q-meta">2025.8.7 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$253.6M</span>(YoY +5%, 컨센 ~$250.5M 소폭 상회). 비GAAP EPS <span class="num">$1.25</span>(컨센 ~$1.27 소폭 하회, FX·세율 역풍).</li>
+          <li>GPM <span class="num">54.5%</span>(관세 제외 ~55%), OPM <span class="num">25.9%</span>. 영업현금 $58M(전환 ~95%), 현금·투자 ~$895M.</li>
+          <li><b>3Q25 가이드</b>: 매출 $210~225M — 명시적으로 사업 <b>"저점(low watermark)"</b>. EPS $0.75~0.95, OPM 18~21%(일시 저하).</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO: 상반기 YoY +10% 후 3Q 저점, 4Q는 상반기 수준으로 반등. <b>GAA 매출(직전 YoY &gt;50% 성장)이 2Q 둔화</b>했으나 신규 GAA 고객 확보(Atlas OCD+Iris &gt;$20M). <b>Semilab 인수 발표</b>($545M, 연매출 &gt;$130M, 1년차 EPS &gt;10% 가산).</li>
+          <li>CFO: 현금전환 ~95%, <b>2Q 자사주 매입 없음</b>(Semilab 클로징 대기). 2026 관세 노출 "무시할 수준" 목표.</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>차세대 Dragonfly: 고객이 광학·검출 성능·처리량 검증 → 재고 축적·생산계획 상향, 2H 다수 툴 출하.</li>
+          <li>AI 패키징 구성: "대부분 기존 주고객, 다만 OSAT 주문도 발생."</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 2Q25</span>
+          <ul>
+            <li><b>특수소자·첨단패키징 매출 $117M(전체의 46%).</b></li>
+            <li><b>AI 로직 패키징</b>: 4Q "매출 QoQ 최소 +50%" 급가속 예상. 서브서피스 검사(다이스택·다이크랙) 수요 "2H 상반기比 거의 2배."</li>
+            <li>차세대 Dragonfly(2.5D 로직): 주요 고객 신규 요구사항 대비 검증, 2H 다수 고객 출하 계획.</li>
+            <li>3DI: 메모리·로직·OSAT·특수소자 <b>10개 이상 고객</b> 출하. 공정광학(CPO)에서 2D 포지션 win → CPO 5년 30% CAGR 전망.</li>
+            <li>패널 리소: 분기 중 <b>JetStep 2대</b> 출하(사각기판 채택). HBM 수요는 "상반기 대비 대체로 평탄."</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <!-- 출처 -->
+  <div class="disc">
+    <b>데이터 출처(전부 1차 자료).</b><br>
+    · 재무: Onto Innovation 분기 실적 보도자료(8-K Item 2.02, Ex-99.1) 및 10-Q/10-K — SEC EDGAR, CIK 0000704532. 발표일 2023.8.10 ~ 2026.5.5. 전 분기 GAAP, 전년동기 비교값 상호검증 완료. 4Q 매출원별 분해는 10-K − 9개월 10-Q 도출값(합계 정확 일치, 파생 표기).<br>
+    · 컨콜: 1Q26·3Q25 Motley Fool 트랜스크립트, 4Q25·2Q25 Insider Monkey 트랜스크립트, Seeking Alpha·Investing.com 교차확인. CEO Michael Plisinski, CFO Brian K. Roberts.<br>
+    · 통화 USD. 마진 %는 보고 달러 기준 산출(회사 반올림 %와 일치). 비GAAP은 회사 조정 기준.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요. 최종 확인일 2026-07-12.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const Q = ["2Q23","3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26"];
+// GAAP 재무 (단위 $M / %)
+const revenue = [190.662,207.185,218.856,228.846,242.327,252.210,263.939,266.607,253.597,218.193,266.866,291.949];
+const opInc   = [24.807,34.006,28.230,42.738,48.833,53.072,42.460,63.134,32.247,23.688,13.858,33.514];
+const gpm = [52.7,51.6,49.3,51.7,52.9,54.1,50.2,53.7,48.2,50.7,46.4,50.1];
+const opm = [13.0,16.4,12.9,18.7,20.2,21.0,16.1,23.7,12.7,10.9,5.2,11.5];
+const npm = [13.6,17.3,13.8,20.5,21.9,21.0,18.5,24.0,13.4,12.9,3.9,11.6];
+const gp  = [100.461,106.852,107.966,118.285,128.236,136.379,132.408,143.233,122.122,110.623,123.792,146.389];
+const ni  = [25.896,35.886,30.309,46.853,52.949,53.051,48.817,64.095,33.911,28.224,10.529,33.750];
+const eps = [0.52,0.72,0.61,0.95,1.07,1.07,0.98,1.30,0.69,0.57,0.21,0.67];
+// 매출 분해 $M : 시스템·소프트웨어 / 부품 / 서비스
+const ss   = [159.353,169.346,187.793,194.836,210.428,217.135,228.043,231.150,214.506,173.795,228.384,247.157];
+const parts= [18.142,20.100,15.939,20.108,16.788,19.995,19.694,18.176,19.849,23.930,22.245,26.550];
+const svc  = [13.167,17.739,15.124,13.902,15.111,15.080,16.202,17.281,19.242,20.468,16.237,18.242];
+// 전방: 특수소자·첨단패키징 매출 (컨콜 공시 분기만)
+const endMkt = [null,null,null,null,null,null,null,null,117,113,150,160];
+
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;
+Chart.defaults.font.size=11;
+Chart.defaults.color='#5b6678';
+
+const gridClr='#eceef2';
+function pct(v){return v==null?'—':v.toFixed(1)+'%';}
+function usd(v){return v==null?'—':'$'+v.toFixed(1)+'M';}
+
+// Chart 1: 전사 재무 (혼합, 이중축)
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'영업이익',data:opInc,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GPM',data:gpm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'OPM',data:opm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'NPM',data:npm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{
+      const isPct=['GPM','OPM','NPM'].includes(c.dataset.label);
+      return c.dataset.label+': '+(isPct?c.parsed.y.toFixed(1)+'%':'$'+c.parsed.y.toFixed(1)+'M');}}}},
+    scales:{
+      y:{position:'left',title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:60,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}
+    }}
+});
+
+// Chart 2: 매출 분해 (그룹 막대)
+new Chart(document.getElementById('chartSeg'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'시스템·소프트웨어',data:ss,backgroundColor:CLR.acc},
+    {label:'부품',data:parts,backgroundColor:CLR.blue},
+    {label:'서비스',data:svc,backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{stacked:false,title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+// Chart 3: 매출 구성비 (100% 누적)
+const tot=Q.map((_,i)=>ss[i]+parts[i]+svc[i]);
+new Chart(document.getElementById('chartMix'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'시스템·소프트웨어',data:ss.map((v,i)=>v/tot[i]*100),backgroundColor:CLR.acc},
+    {label:'부품',data:parts.map((v,i)=>v/tot[i]*100),backgroundColor:CLR.blue},
+    {label:'서비스',data:svc.map((v,i)=>v/tot[i]*100),backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:14}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},
+    scales:{y:{stacked:true,max:100,title:{display:true,text:'%'},grid:{color:gridClr},ticks:{callback:v=>v+'%'}},x:{stacked:true,grid:{display:false}}}}
+});
+
+// Chart 4: 전방(특수소자·첨단패키징 매출)
+new Chart(document.getElementById('chartEnd'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'특수소자·첨단패키징 매출',data:endMkt,backgroundColor:CLR.green,barPercentage:.6},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y==null?'미공시':'$'+c.parsed.y+'M'}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+// 데이터 테이블
+const tb=document.getElementById('tblBody');
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(1)}</td><td>${gp[i].toFixed(1)}</td><td>${gpm[i].toFixed(1)}%</td>`+
+    `<td>${opInc[i].toFixed(1)}</td><td>${opm[i].toFixed(1)}%</td><td>${ni[i].toFixed(1)}</td><td>${npm[i].toFixed(1)}%</td><td>$${eps[i].toFixed(2)}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
