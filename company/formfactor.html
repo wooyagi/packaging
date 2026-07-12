@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FormFactor (FORM) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / FormFactor</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · Probe Cards · Test & Measurement</div>
+    <h1>FormFactor</h1>
+    <div class="tick">NASDAQ: FORM · 프로브카드 & 테스트/계측 시스템 · USD · 12월 결산</div>
+    <p>웨이퍼 테스트 프로브카드 글로벌 1위. <b>HBM용 DRAM 프로브카드</b>가 AI 사이클의 핵심 성장축 — DRAM 프로브카드 매출이 1Q26 $82.9M(+70% YoY)로 사상최대. Foundry&Logic은 네트워킹·데이터센터가 견인. CPO(공정광학) 테스트 Triton·Keystone 인수로 신영역 확장. 12개 분기 재무와 4개 컨콜을 10-Q·어닝콜 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$226.1M</div><div class="l">1Q26 매출 (사상최대)</div></div>
+      <div class="hstat"><div class="v">$82.9M</div><div class="l">1Q26 DRAM 프로브카드</div></div>
+      <div class="hstat"><div class="v">3社</div><div class="l">주요 HBM 고객 전부 공급</div></div>
+      <div class="hstat"><div class="v">17.2%</div><div class="l">4Q25 비GAAP OPM</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    FormFactor는 웨이퍼 상태 칩을 테스트 장비와 연결하는 <b>프로브카드(Probe Card)</b> 글로벌 1위이며, 엔지니어링·양산용 <b>프로브 스테이션·열/극저온 시스템(Systems)</b>도 공급합니다.
+    <b>2개 보고부문(Probe Cards / Systems)의 매출과 세그먼트 이익(net contribution)을 공시</b>하고, 프로브카드는 <b>시장별(Foundry&Logic / DRAM / Flash)</b>로 매출을 분해 공시합니다. 통화 USD, 12월 결산(13주 분기).
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Probe Cards (주력, ~88%)</div>
+      <div class="bd">Foundry&Logic(선단로직·네트워킹·HPC), DRAM(HBM 포함), Flash. <b>HBM용 DRAM 프로브카드</b>가 AI 성장 핵심. Smart Matrix가 HBM4 고병렬 테스트(10Gbps+) 대응.</div>
+      <span class="tag" style="background:var(--blue);">핵심</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Systems (~12%)</div>
+      <div class="bd">엔지니어링/양산 프로브 스테이션, 열/극저온(양자). <b>CPO(공정광학) 테스트 Triton</b>(Advantest·TEL 공동개발)으로 전환 중 — 레거시 스테이션 감소.</div>
+      <span class="tag" style="background:var(--teal);">CPO·양자</span>
+    </div>
+    <div class="biz">
+      <div class="bt">시장별 공시</div>
+      <div class="bd">프로브카드를 F&L/DRAM/Flash로 분해 공시 → HBM(DRAM) 성장 추적 가능. 세그먼트 net contribution은 2025.1Q부터 공시(그 이전 N/A).</div>
+      <span class="tag" style="background:var(--gray);">투명성</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경영진 · 이벤트.</b> CEO <b>Mike Slessor</b>. CFO는 <b>Q3'25부터 Aric McKinnis</b>(이전 Shai Shahar). 주요 이벤트: FRT 계측 매각(2023.4Q, Camtek行 $73M 차익) · 중국사업 매각(2024.1Q, $20M 차익) · <b>FICT 20% 지분(2025.2, $67M, 유기기판)</b> · <b>Keystone Photonics 인수(2025.12, $20.6M, 실리콘 포토닉스 테스트)</b> · Farmers Branch(TX) 증설(FY26 capex $140–170M) · 2026 구조조정(Baldwin Park 폐쇄, $30–40M).
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·영업익·마진 (최근 12개 분기, 비GAAP)</h2>
+  <div class="callout warn">
+    <b>⚠ 왜 비GAAP인가.</b> FormFactor GAAP 영업익은 <b>일회성 사업매각이익</b>(4Q23 FRT $73M·1Q24 중국 $20M)과 <b>1Q26 구조조정 환입 $21.5M</b>으로 왜곡됩니다. 운영 추세를 보기 위해 통합차트는 회사 헤드라인인 <b>비GAAP</b>로 그렸습니다(GAAP 수치는 아래 데이터표에 병기). <b>1Q26 비GAAP GM 49%·OPM 21.6%는 구조조정 환입으로 부풀려짐</b>(정상화 시 GM ~43–44%).
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>영업이익(비GAAP)</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GPM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>OPM</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>NPM</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: FormFactor 실적 보도자료(8-K Ex-99.01) 및 10-Q/10-K, SEC(CIK 1039399). 비GAAP 기준(GM·OM 보고값, NPM은 보고 비GAAP EPS×희석주식수 산출). 2Q23~1Q26.</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Segments</p>
+  <h2>세그먼트 — Probe Cards vs Systems</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">세그먼트 매출 (12분기, $M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>Probe Cards</span>
+        <span><i class="dot" style="background:var(--teal)"></i>Systems</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartSeg"></canvas></div>
+      <div class="chart-note">출처: 각 분기 10-Q 세그먼트 주석. 4Q(4Q23·4Q24·4Q25)는 10-K−9개월 도출(파생). Probe Cards ~88%.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">세그먼트 이익 (net contribution, $M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>Probe Cards</span>
+        <span><i class="dot" style="background:var(--teal)"></i>Systems</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartSegProfit"></canvas></div>
+      <div class="chart-note">출처: 10-Q(ASU 2023-07, 2025.1Q부터 공시). 미배분 G&A·팹 초기비용 제외. <b>4Q25는 분기 미공시(N/A)</b>. Probe Cards 이익이 1Q26 $69.0M으로 급증(HBM·F&L).</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · Probe Cards by Market</p>
+  <h2>프로브카드 시장별 — HBM(DRAM) 급증</h2>
+  <p class="lead">프로브카드를 <b>Foundry&Logic / DRAM / Flash</b>로 공시. <b>DRAM 프로브카드가 HBM으로 급증</b> — 연 $114M(FY23)→$227M(FY24)→$247M(FY25), 1Q26 분기 $82.9M(+70% YoY, 전사 매출의 36.7%). Flash는 축소(Baldwin Park 폐쇄).</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--blue)"></i>Foundry&Logic</span>
+      <span><i class="dot" style="background:var(--magenta)"></i>DRAM(HBM 포함)</span>
+      <span><i class="dot" style="background:var(--orange)"></i>Flash</span>
+      <span><i class="dot" style="background:var(--gray)"></i>Systems</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartMkt"></canvas></div>
+    <div class="chart-note">출처: 각 분기 10-Q. 4Q는 파생. DRAM(자홍)의 우상향이 HBM 사이클을 반영.</div>
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Advanced Packaging & Geography</p>
+  <h2>첨단 패키징·HBM 알파 & 지역</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">1Q26 지역별 매출 ($M)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartGeo"></canvas></div>
+      <div class="chart-note">출처: 1Q26 10-Q. 한국 35.6% + 대만 31.3% = ~67%(HBM DRAM·F&L). 미국 13%, 중국 5%(수출 규제로 축소).</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">HBM 프로브카드 매출 추이 ($M)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartHBM"></canvas></div>
+      <div class="chart-note">출처: 컨콜. HBM 매출 1Q25 $29.5M → 2Q25 $37M → 3Q25 ~$40M → 4Q25 mid-$40s → 1Q26 low-$50s. H1'25→H1'26 &gt;50% 성장.</div>
+    </div>
+  </div>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>HBM4 = 16단, 2+Tbps, I/O 10–11Gbps</b> — <b>Smart Matrix</b>가 유일한 양산검증 고병렬 프로브카드(속도 우위). ② <b>3대 HBM 제조사 전부 공급</b>(비선두 2개사에선 DRAM #2), 점유율 확대 중. ③ HBM3E→HBM4→HBM5 로드맵이 반복 수요 창출, HBM5엔 하이브리드 본딩(구리 프로빙) 기회. ④ <b>CPO 매출 2026 $10–20M 상단</b>(Triton·Keystone). ⑤ 마진 회복: 38.5%(2Q25)→49%(1Q26 비GAAP, 환입 포함), 목표모델 47%@$850M 런레이트 도달.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① DRAM 프로브카드는 F&L 대비 마진 낮음(믹스 역풍). ② 1Q26 비GAAP 마진은 구조조정 환입으로 과대. ③ Systems는 CPO 전환기 레거시 감소(1Q26 net contribution 소폭 적자). ④ Farmers Branch 증설로 자사주 후순위. ⑤ 관세 ~140–200bp GM 역풍.
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (12개 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기</th><th>매출 $M</th><th>GAAP GM</th><th>GAAP OM</th><th>GAAP NM</th><th>GAAP EPS</th><th>비GAAP GM</th><th>비GAAP OM</th><th>비GAAP EPS</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">4Q23 GAAP(OM 48.3%·EPS $0.97)·1Q24는 사업매각 일회성 이익 포함, 1Q26 비GAAP은 구조조정 환입으로 과대 — 운영추세는 비GAAP 마진으로 판단 권장.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Mike Slessor</b> · CFO <b>Aric McKinnis</b>(Q3'25~, 이전 Shai Shahar). 실적·가이던스 / CEO·CFO / Q&A, <b>첨단 패키징·HBM</b>은 별도 블록. 수치는 대체로 비GAAP.</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">1Q26</span> 사상최대 $226M — DRAM 프로브카드 급증 <span class="q-meta">2026.4.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$226.1M</span>(사상최대, +32% YoY, 가이드 상회). 비GAAP EPS <span class="num">$0.56</span>(컨센 ~$0.44, ~27% 상회). 비GAAP GM 49.0%(+510bp, 단 구조조정 환입 포함).</li>
+          <li><b>Q2'26 가이드</b>: 매출 <span class="num">$240M ±$5M</span>(또 기록), 비GAAP GM 49.5%±150bp, 비GAAP EPS $0.61±$0.04.</li>
+        </ul>
+        <h4>CEO (Slessor)</h4>
+        <ul>
+          <li>수요가 "첨단 패키징 × HPC 교차점"에 집중. <b>DRAM 사상최대</b>(HBM+DDR), Q2 또 기록 전망. F&L은 <b>네트워킹(데이터센터 스위치)</b>이 견인, 신규 HPC 리더 고객이 10% 돌파.</li>
+          <li>제품 성과: fabless XPU 2번째 디자인 수주, TSMC GPU 퀄 완료 임박(2H 양산), Intel "2026 Epic Supplier Award".</li>
+        </ul>
+        <h4>CFO (McKinnis) · Q&A</h4>
+        <ul>
+          <li>GM +510bp 중 ~400bp 지속(구조조정 절감 조기실현+관세 완화), ~200bp 타이밍. "가격 아님, 원가·수율·사이클타임". FCF $30.7M, 현금 $303M. 자사주 없음(Farmers Branch 우선).</li>
+          <li>Q&A: GM 지속성 vs 타이밍, 관세(Section 122), Farmers Branch 램프, 5.11 투자자의 날 신목표.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징·HBM — 1Q26</span>
+          <ul>
+            <li><b>DRAM 프로브카드 비GAAP GM 50.5%</b>(+603bp). <b>Smart Matrix</b>가 HBM4 고병렬·at-speed(10Gbps+) 유일 양산검증. 2번째 HBM 고객 Smart Matrix 채택 확대 → Q2 성장동력.</li>
+            <li>HBM 프로브카드 <b>H1'25→H1'26 &gt;50% 성장</b>. <b>CPO 2026 매출 $10–20M 상단</b>(Triton 램프, Keystone 통합). "Insertion One" PIC 웨이퍼 광프로빙 양산 준비.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">4Q25</span> 매출 $215M(기록) — HBM4 초기 램프 <span class="q-meta">2026.2.4 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$215.2M</span>(기록). 비GAAP EPS <span class="num">$0.46</span>. 비GAAP GM 43.9%(+290bp).</li>
+          <li><b>Q1'26 가이드</b>: 매출 $225M±$5M(~$900M 연환산), 비GAAP GM 45%±150bp, 비GAAP EPS $0.45. (실제 대폭 상회)</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO: Q4 DRAM 기록(비HBM DDR4/5 주도), Q1 "사상최대 DRAM"은 HBM 강세 — "HBM3E 지속 + HBM4 초기 램프". GPU 퀄 진전(연말 양산주문). 커스텀 ASIC 수백만 달러.</li>
+          <li>CFO: 2Q25 38.5%→4Q 43.9%로 <b>누적 540bp 개선</b>(사이클타임·수율·인력). 목표 <b>47%@$850M</b>. Keystone $20M 인수(12월). 자사주 후순위.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징·HBM — 4Q25</span>
+          <ul>
+            <li><b>HBM 매출 mid-$40s(Q4) → low-$50s(Q1'26 가이드).</b> <b>HBM4=16단</b>, 대역폭 2+Tbps(HBM3 2배+), I/O 11Gbps, HBM5 또 2배·하이브리드 본딩 기회.</li>
+            <li>점유율: "3대 HBM 제조사 모두 점유율 확대", 비선두 2개사에서 DRAM #2. GPU merchant TAM ~$50M/yr, 커스텀 ASIC TAM "수억 달러".</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">3Q25</span> 매출 $202.7M — HBM 기록 <span class="q-meta">2025.10.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$202.7M</span>(중간값 상회). 비GAAP EPS <span class="num">$0.33</span>. 비GAAP GM 41.0%(+250bp).</li>
+          <li>Q4 가이드: 매출 $210M±$5M, 비GAAP GM 42%, 비GAAP EPS $0.35.</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO: DRAM 내 <b>HBM 기록</b>. F&L은 Q2 대비 순차 약화. CPU 근단 성장 없음(레거시노드). GPU 파일럿 양산, 2026 볼륨 경쟁 가능.</li>
+          <li>CFO: 원가절감 구조적("믹스 독립"), 관세 150–200bp 역풍. FCF $19.7M, 현금 $266M.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징·HBM — 3Q25</span>
+          <ul>
+            <li><b>Q3 HBM 매출 ~$40M</b>(DRAM 프로브카드 사상최대), 3대 HBM사 모두 기여. HBM4 16단·10Gbps+, Smart Matrix "유일 양산검증 고병렬". HBM4E 커스터마이징 차별화.</li>
+            <li>CPO: Triton(Advantest·TEL) 다수 파일럿, 26년초 외부 발표. Systems에 양자컴퓨팅 기여.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">2Q25</span> 매출 $195.8M — 3대 HBM사 볼륨 공급 <span class="q-meta">2025.7.30 발표 (CFO Shahar)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$195.8M</span>(상단 상회, +14% QoQ). 비GAAP EPS <span class="num">$0.27</span>(컨센 소폭 하회). 비GAAP GM 38.5%(하단).</li>
+          <li>매출 상세: 프로브카드 $162.1M(F&L $100M·DRAM $57.1M·<b>HBM $37M</b>·Flash $5.5M), Systems $33.7M. Q3 가이드 $200M.</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO: <b>3대 HBM 제조사 전부에 볼륨 공급</b>(과거 최대고객 집중). HBM3/HBM4 균형, HBM4 증가추세. "PC·모바일 미지근" → GPU·하이퍼스케일러 ASIC·AI 전환.</li>
+          <li>CFO(Shahar): GM 하회는 DRAM 믹스·관세·<b>2번째 HBM 고객 램프비용</b>(HBM4 단일 디자인, Q3 해소). FCF −$47.1M(Farmers Branch $55M). capex 가이드 $110–130M 상향.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징·HBM — 2Q25</span>
+          <ul>
+            <li><b>HBM 매출 1Q25 $29.5M → 2Q25 $37M.</b> HBM4 고속·고온 → ASP 상승. CPO CM300xi 파일럿(고객+파운드리+Advantest), 1H26 양산 목표.</li>
+            <li>양자/극저온 IQ2000/3000. FICT(유기기판) 소수지분 투자. Farmers Branch(TX) 저비용 증설.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(전부 1차 자료).</b><br>
+    · 재무: FormFactor 실적 보도자료(8-K Ex-99.01) 및 10-Q/FY2025 10-K — SEC EDGAR, CIK 1039399. 2Q23~1Q26. GAAP·비GAAP 병기. 4Q 세그먼트·시장별은 10-K−9개월 도출(파생, 매출합 정확 일치).<br>
+    · 세그먼트: Probe Cards/Systems 매출(전분기), net contribution(2025.1Q~, ASU 2023-07). 시장별(F&L/DRAM/Flash)·지역 10-Q.<br>
+    · 컨콜: Motley Fool·Seeking Alpha·Insider Monkey 트랜스크립트 교차확인. CEO Mike Slessor, CFO Aric McKinnis(Q3'25~)/Shai Shahar(~Q2'25).<br>
+    · 통화 USD. 통합차트는 비GAAP(일회성 왜곡 회피), 데이터표 GAAP 병기. 마진 %는 보고 기준.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요. 최종 확인일 2026-07-13.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["2Q23","3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26"];
+const revenue=[155.916,171.575,168.163,168.725,197.474,207.917,189.483,171.356,195.798,202.676,215.163,226.144];
+// 비GAAP
+const ngOpInc=[11.166,17.269,19.142,12.953,28.538,28.347,20.901,16.898,22.849,28.591,36.924,48.727];
+const ngGpm=[40.6,41.9,42.1,38.7,45.3,42.2,40.2,39.2,38.5,41.0,43.9,49.0];
+const ngOpm=[7.2,10.1,11.4,7.7,14.4,13.6,11.0,9.9,11.7,14.1,17.2,21.6];
+const ngNpm=[7.0,10.1,9.3,8.4,14.0,13.2,11.1,10.5,10.7,12.7,16.9,19.7];
+// GAAP (데이터표)
+const gGpm=[38.7,40.4,40.4,37.2,44.0,40.7,38.8,37.7,37.3,39.8,42.2,38.4];
+const gOpm=[-0.8,1.6,48.3,12.6,9.0,8.6,4.1,1.9,6.3,8.9,10.9,7.4];
+const gNpm=[0.5,2.5,45.1,12.9,9.8,9.0,5.1,3.7,4.6,7.7,10.8,9.0];
+const gEps=[0.01,0.06,0.97,0.28,0.25,0.24,0.12,0.08,0.12,0.20,0.29,0.26];
+const ngEps=[0.14,0.22,0.20,0.18,0.35,0.35,0.27,0.23,0.27,0.33,0.46,0.56];
+// 세그먼트 매출
+const segPC=[115.303,128.339,126.933,136.701,166.792,172.174,150.293,136.520,162.108,166.380,172.890,198.257];
+const segSys=[40.613,43.236,41.230,32.024,30.682,35.743,39.190,34.836,33.690,36.296,42.273,27.887];
+// net contribution (2025.1Q~) — Q4'25 미공시(null)
+const ncPC=[null,null,null,null,null,null,null,22.413,32.315,36.903,null,69.014];
+const ncSys=[null,null,null,null,null,null,null,6.146,2.704,5.592,null,-0.287];
+// 프로브카드 시장별
+const mFL=[81.967,96.366,83.644,86.768,103.660,107.446,83.308,85.272,99.513,92.933,92.179,111.188];
+const mDR=[30.464,27.478,35.947,45.896,58.042,60.184,63.300,48.858,57.057,68.182,73.300,82.933];
+const mFL2=[2.872,4.495,7.342,4.037,5.090,4.544,3.685,2.390,5.538,5.265,7.411,4.136]; // flash
+// 지역 1Q26
+const geoLbl=["한국","대만","미국","중국","싱가포르","일본","유럽","기타"];
+const geoVal=[80.562,70.840,29.410,11.362,10.275,8.282,7.774,7.639];
+// HBM 매출 추이
+const hbmQ=["1Q25","2Q25","3Q25","4Q25","1Q26"];
+const hbmV=[29.5,37,40,45,52];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'영업이익(비GAAP)',data:ngOpInc,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GPM',data:ngGpm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'OPM',data:ngOpm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'NPM',data:ngNpm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=['GPM','OPM','NPM'].includes(c.dataset.label);return c.dataset.label+': '+(p?c.parsed.y.toFixed(1)+'%':'$'+c.parsed.y.toFixed(1)+'M');}}}},
+    scales:{y:{position:'left',title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:60,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSeg'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'Probe Cards',data:segPC,backgroundColor:CLR.blue},
+    {label:'Systems',data:segSys,backgroundColor:CLR.teal},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{stacked:true,title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{stacked:true,grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSegProfit'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'Probe Cards',data:ncPC,backgroundColor:CLR.blue},
+    {label:'Systems',data:ncSys,backgroundColor:CLR.teal},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y==null?c.dataset.label+': 미공시':c.dataset.label+': $'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr}},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartMkt'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'Foundry&Logic',data:mFL,backgroundColor:CLR.blue},
+    {label:'DRAM(HBM 포함)',data:mDR,backgroundColor:CLR.magenta},
+    {label:'Flash',data:mFL2,backgroundColor:CLR.orange},
+    {label:'Systems',data:segSys,backgroundColor:CLR.gray},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{stacked:true,title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{stacked:true,grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartGeo'),{
+  type:'doughnut',
+  data:{labels:geoLbl,datasets:[{data:geoVal,backgroundColor:[CLR.acc,CLR.blue,CLR.teal,CLR.magenta,CLR.green,CLR.orange,CLR.gray,'#c9ccd1'],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:7,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': $'+c.parsed.toFixed(1)+'M'}}}}
+});
+
+new Chart(document.getElementById('chartHBM'),{
+  type:'bar',
+  data:{labels:hbmQ,datasets:[{label:'HBM 프로브카드 매출',data:hbmV,backgroundColor:CLR.magenta,barPercentage:.6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'~$'+c.parsed.y+'M'}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(1)}</td><td>${gGpm[i].toFixed(1)}%</td><td>${gOpm[i].toFixed(1)}%</td><td>${gNpm[i].toFixed(1)}%</td><td>$${gEps[i].toFixed(2)}</td>`+
+    `<td>${ngGpm[i].toFixed(1)}%</td><td>${ngOpm[i].toFixed(1)}%</td><td>$${ngEps[i].toFixed(2)}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
