@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KLA Corporation (KLAC) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;}
+  .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;}
+  .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;}
+  .hl td:first-child{background:#f4f0ff;}
+
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;}
+  details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;}
+  .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);}
+  .callout.warn{border-color:var(--orange);background:#fff8ef;}
+
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+  .dot.line{border-radius:50%;width:9px;height:9px;}
+
+  @media(max-width:640px){
+    .hero h1{font-size:23px;}
+    .chart-wrap{height:320px;}
+    h2{font-size:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / KLA</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · Process Control 글로벌 1위</div>
+    <h1>KLA Corporation</h1>
+    <div class="tick">NASDAQ: KLAC · 반도체 공정제어(계측·검사) 지배적 1위 · 회계연도 6월 결산</div>
+    <p>공정제어 시장 점유율 ~58%(2021년 이후 +360bp)의 압도적 리더. AI·선단노드·HBM 수요로 매출·마진 동반 확대 중이며, <b>첨단 패키징 공정제어</b>가 신성장 축 — 2024년 ~$500M → 2025년 ~$950M(+70%) → 2026년(공정제어) ~$1B. 최근 12개 회계분기 재무와 4개 컨콜을 IR·10-Q·어닝콜 원문 기반으로 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$3.42B</div><div class="l">FQ3'26 매출 (Mar'26)</div></div>
+      <div class="hstat"><div class="v">62.2%</div><div class="l">FQ3'26 GPM (비GAAP)</div></div>
+      <div class="hstat"><div class="v">~58%</div><div class="l">공정제어 점유율</div></div>
+      <div class="hstat"><div class="v">~$1B</div><div class="l">CY26 AP 공정제어 매출</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1. 개요 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    KLA는 반도체 <b>공정제어(Process Control)</b> 글로벌 지배적 1위입니다. 웨이퍼·레티클 <b>검사(Inspection)</b>와 <b>계측(Metrology)</b> 장비에서 압도적 점유율(전체 공정제어 ~58%)을 보유하며,
+    첨단 패키징·특수반도체·PCB 검사로 영역을 확장합니다. Onto와 달리 <b>세그먼트별 영업이익까지 공시</b>합니다. 회계연도는 <b>6월 말 결산</b>(FY2026 = 2025.7~2026.6),
+    회계분기는 캘린더보다 한 분기 선행표기(FQ1=9월분기 / FQ2=12월 / FQ3=3월 / FQ4=6월).
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Semiconductor Process Control (SPC)</div>
+      <div class="bd">전사 매출의 ~90%. 웨이퍼 검사(매출의 ~51%)·패터닝/레티클(~18%)·계측·서비스(~23%). 선단 파운드리·로직·메모리(DRAM/HBM/NAND)와 첨단 패키징 공정제어 포함.</div>
+      <span class="tag" style="background:var(--blue);">핵심 · ~90%</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Specialty Semiconductor Process</div>
+      <div class="bd">전력·특수반도체용 식각·증착 등 공정장비(SPTS 등). 매출 비중 ~4%대, 안정적 흑자.</div>
+      <span class="tag" style="background:var(--green);">~4%</span>
+    </div>
+    <div class="biz">
+      <div class="bt">PCB and Component Inspection</div>
+      <div class="bd">PCB·부품 검사. 매출 ~3~5%. 무형자산 손상차손으로 GAAP 세그먼트 적자 지속(FY24 디스플레이 사업 철수 포함).</div>
+      <span class="tag" style="background:var(--orange);">~3~5% · 손상차손</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>주주환원.</b> FQ3'26 배당 <b>$2.30</b>로 +21% 인상(<b>17년 연속 증액</b>), 신규 <b>$70억</b> 자사주 매입 승인. 희석주식수 137.7M(FQ4'23)→131.8M(FQ3'26)로 지속 감소. LTM 환원 ~$3.15B, FCF의 &gt;90% 환원 목표.
+  </div>
+
+  <!-- 2. 전사 재무 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·영업익·마진 (최근 12개 회계분기, GAAP)</h2>
+  <p class="lead">막대=매출·영업이익(좌축, $M) · 선=GPM/OPM/NPM(우축, %). FQ4'23(Jun'23)~FQ3'26(Mar'26). <b>FQ2'24·FQ2'25 GAAP 마진 급락은 PCB 세그먼트 무형자산 손상차손</b>(각 $219M·$239M) 때문 — 비GAAP OPM은 40%대 유지.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>영업이익</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GPM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>OPM</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>NPM</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: KLA 분기 실적 보도자료(8-K Ex-99.1) 및 10-Q, SEC EDGAR(CIK 0000319201). 전부 GAAP. 회계분기 라벨(FQ) — 6월 결산.</div>
+  </div>
+
+  <!-- 3. 세그먼트 -->
+  <p class="section-label">03 · Segments</p>
+  <h2>세그먼트별 매출 · 영업이익</h2>
+  <p class="lead">KLA는 3개 보고부문의 <b>매출과 영업이익(세그먼트 이익)을 모두 공시</b>합니다. 매출은 분기별(보도자료), 세그먼트 이익은 분기(10-Q)·연간(10-K) 공시. 세그먼트 이익은 이자·기타·구조조정·환효과·전사비용 제외 기준이라 합계가 연결 영업이익과 거의 일치.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--blue)"></i>Semiconductor Process Control</span>
+      <span><i class="dot" style="background:var(--green)"></i>Specialty Semi</span>
+      <span><i class="dot" style="background:var(--orange)"></i>PCB & Component</span>
+    </div>
+    <h3 style="margin-top:6px;">분기별 세그먼트 매출 (12개 회계분기, $M)</h3>
+    <div class="chart-wrap"><canvas id="chartSegRev"></canvas></div>
+    <div class="chart-note">출처: 각 분기 보도자료 "Information by Segment" 및 10-Q. SPC가 전사 ~90%. FQ4'23~FQ3'24는 3번째 세그먼트가 'PCB·Display·Component'(디스플레이 포함), 2024.3 디스플레이 철수 후 'PCB·Component'로 변경.</div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">연간 세그먼트 영업이익 (FY23~FY25, $M)</h3>
+    <p class="chart-note" style="margin:0 0 12px;">세그먼트 <b>이익</b>은 분기 단위로 일관 공시되지 않아(10-Q 부분·10-K 연간) 연간 기준으로 제시. PCB는 손상차손으로 매년 적자.</p>
+    <div class="chart-wrap chart-sm"><canvas id="chartSegProfit"></canvas></div>
+    <div class="chart-note">출처: FY2025 10-K(klac-20250630) 세그먼트 주석. FY23 SPC 4,100 / Specialty 81 / PCB −142 · FY24 3,768 / 91 / −470 · FY25 5,003 / 99 / −281 ($M).</div>
+  </div>
+
+  <!-- 4. 구성비 -->
+  <p class="section-label">04 · Revenue Mix</p>
+  <h2>매출 구성비 — 세그먼트 비중 (100% 누적)</h2>
+  <p class="lead">SPC(공정제어)가 전 분기 ~90% 이상. 첨단 패키징 성장도 대부분 SPC 안에 포함됩니다.</p>
+  <div class="card">
+    <div class="chart-wrap chart-sm"><canvas id="chartMix"></canvas></div>
+    <div class="chart-note">출처: 위 세그먼트 매출과 동일. 각 분기 세그먼트 합계 100% 대비 구성비.</div>
+  </div>
+
+  <!-- 5. 전방/응용 -->
+  <p class="section-label">05 · Advanced Packaging & End-Market</p>
+  <h2>첨단 패키징 매출 궤적 & 전방시장 (핵심 알파)</h2>
+  <p class="lead">
+    KLA의 최대 알파는 <b>첨단 패키징 공정제어</b>의 폭발적 성장입니다. AI·HBM·2.5D(CoWoS)發 수요로 백엔드 검사/계측 샘플링이 급증.
+    KLA는 첨단 패키징 공정제어 점유율을 <b>2021년 ~10% → 2025년 "시장의 절반 가까이"</b>로 끌어올렸습니다.
+  </p>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">첨단 패키징 매출 (캘린더 연도, $M)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartAP"></canvas></div>
+      <div class="chart-note">2024·2025는 "총 AP 시스템 매출"(회사 발언), 2026E는 <b>공정제어 한정 스코프</b> ~$1B(FQ3'26 콜). 스코프 상이 — 아래 주석 참조.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">FQ3'26 매출 구성 (제품군)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartProd"></canvas></div>
+      <div class="chart-note">출처: 10-Q(klac-20260331). 웨이퍼검사 51% · 서비스 23% · 패터닝 18% · Specialty 4% · PCB 3% · 기타 1%.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">FQ3'26 지역별 매출 (Ship-to, $M)</h3>
+    <div class="chart-wrap chart-sm"><canvas id="chartGeo"></canvas></div>
+    <div class="chart-note">출처: 10-Q(klac-20260331). 대만 25.5% · 중국 24.3% · 한국 19.9% · 북미 12.0% · 유럽·이스라엘 7.2% · 기타아시아 5.8% · 일본 5.3%.</div>
+  </div>
+  <div class="callout warn">
+    <b>⚠ 스코프 주석(중요).</b> KLA는 연중 헤드라인 지표를 바꿨습니다. FQ2'26까지는 <b>"총 첨단 패키징 시스템 매출"</b>(CY24 ~$500M → CY25 ~$950M, +70%)을 인용했고, FQ3'26 콜부터는 더 좁은 <b>"첨단 패키징 공정제어 매출"</b>(CY25 ~$635M → CY26 ~$1B, "upper 50%" 성장)을 헤드라인으로 제시. 즉 ~$950M(총 AP) 안에 ~$635M(공정제어 슬라이스)가 포함된 관계로 해석됩니다. 인용 시 스코프 병기 필요.
+  </div>
+  <div class="callout">
+    <b>알파 포인트.</b> ① 첨단 패키징 공정제어 성장률 전망이 4Q'25 ">30%" → FQ3'26 "upper 50%(~57%)"로 <b>상향</b>. ② AWLP(첨단 웨이퍼레벨 패키징) 공정제어에서 <b>2025년 점유율 +14%p, 매출 +70%로 1위</b> 등극. ③ 패키징 공정제어 인텐시티가 2022년 ~1% → 현재 ~5~6%로 구조적 상승. ④ 전체 AP 장비시장 2026년 ~$13B(+~30%), KLA는 시장보다 빠르게 성장.
+  </div>
+
+  <!-- 데이터 테이블 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (GAAP, 12개 회계분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>회계분기</th><th>분기말</th><th>매출 $M</th><th>매출총이익 $M</th><th>GPM</th>
+          <th>영업이익 $M</th><th>OPM</th><th>순이익 $M</th><th>NPM</th><th>희석 EPS</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">비GAAP 참고(FQ3'26): GPM 62.2% · OPM 42.6% · 희석 EPS $9.40. FQ2'24·FQ2'25는 PCB 손상차손($219M·$239M)으로 GAAP 대비 비GAAP 괴리가 큼.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Rick Wallace</b> · President & CFO <b>Bren Higgins</b>(FY26 중 President 겸직으로 승격). 각 분기 실적·가이던스 / CEO·CFO / Q&A, <b>첨단 패키징</b>은 별도 블록. 모두 실제 트랜스크립트·보도자료 기반.</p>
+
+  <div class="appendix">
+
+    <!-- FQ3'26 -->
+    <details open>
+      <summary><span class="q-badge">FQ3'26</span> 매출 $3.42B — AP 공정제어 ~$1B 가이드 <span class="q-meta">Mar'26 분기 · 2026.4.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$3.415B</span>(YoY +11%, QoQ +4%, 가이드 상단). GAAP EPS <span class="num">$9.12</span> / 비GAAP <span class="num">$9.40</span>(컨센 ~$9.15 상회).</li>
+          <li>비GAAP GPM <span class="num">62.2%</span>(중간값 +45bp), 비GAAP OPM 42.6%. FCF $622M.</li>
+          <li><b>FQ4'26 가이드</b>: 매출 <span class="num">$3.575B ±$200M</span>, 비GAAP GPM 61.75%±1%p, 비GAAP EPS $9.87±$1.00.</li>
+          <li>신규 <b>2030 모델</b>: 매출 <span class="num">$26B ±$2.5B</span>(13~17% CAGR), 영업이익률 45~47%, 비GAAP EPS $84±$8.</li>
+        </ul>
+        <h4>CEO (Wallace)</h4>
+        <ul>
+          <li>AI가 지배적 성장동인 — 설계 복잡도·고부가 웨이퍼 증가로 "훨씬 더 많은 공정제어" 필요.</li>
+          <li><b>WFE: 2026년 $140B 초과, 2027년 성장률은 2026보다 높을 것</b>(그린필드 팹 + 광범위 메모리·로직 증설).</li>
+          <li>공정제어 점유율 ~58%(2021년 이후 +360bp). FQ4 믹스: 파운드리·로직 ~82% / 메모리 ~18%(DRAM 84% / NAND 16%).</li>
+        </ul>
+        <h4>CFO (Higgins)</h4>
+        <ul>
+          <li>CY26 비GAAP GPM ~62%±50bp. 역풍: DRAM 부품가 ~100bp + 관세 ~50~100bp(둘 다 완화 전망), DRAM 공급 "내년까지 확보".</li>
+          <li>배당 +21% $2.30(17년 연속), 신규 <b>$70억</b> 자사주. Q3 자사주 $626M, LTM 환원 ~$3.15B.</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>AI capex 지속성: 하이퍼스케일러 수요 대비 용량 "심각한 공급부족, 격차 오히려 확대" → 고마진 장비투자 지속.</li>
+          <li>중국/화웨이 규제 영향 "상당히 미미".</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — FQ3'26</span>
+          <ul>
+            <li><b>첨단 패키징 공정제어 매출 CY25 ~$635M → CY26 ~$1B.</b> 성장률 상향: "30% 초과로 봤는데 이제 upper-50%대(~57%)."</li>
+            <li><b>AWLP(첨단 웨이퍼레벨 패키징) 공정제어 2025년 1위</b> — 점유율 +14%p, 매출 +70%.</li>
+            <li>전체 AP 장비시장 2026년 ~$13B(+~30%), KLA는 시장 대비 초과성장.</li>
+            <li>기술: 나노 수준 검사 확대, <b>하이브리드 본딩·SoIC</b> 채택, 다이 스태킹.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- FQ2'26 -->
+    <details>
+      <summary><span class="q-badge">FQ2'26</span> 사상 최대 $3.30B — 중국 매출 반등 <span class="q-meta">Dec'25 분기 · 2026.1.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$3.297B</span>(사상최대, 컨센 ~$3.25B 상회). GAAP EPS <span class="num">$8.68</span> / 비GAAP <span class="num">$8.85</span>.</li>
+          <li>사상최대 FCF <span class="num">$1.262B</span>. CY2025 매출 +17% $12.745B(기록), 비GAAP EPS YoY +29%.</li>
+          <li><b>FQ3'26 가이드</b>: 매출 $3.35B±$150M, 비GAAP GPM 61.75%±1%p(연중 <b>저점</b>), 비GAAP EPS $9.08±$0.78.</li>
+        </ul>
+        <h4>CEO (Wallace)</h4>
+        <ul>
+          <li>"2026 산업 전망 강화." 프레임: <b>코어 WFE ~$120B + 첨단 패키징 ~$12B = 130달러 중반대</b> 시장.</li>
+          <li>DRAM/HBM이 AI 연계 핵심 성장동인. 중국 매출 비중 20% 중후반. 2027 셋업 "상당히 놀라운 수준" — 제약은 툴이 아니라 고객 공간(floor-space).</li>
+        </ul>
+        <h4>CFO (Higgins)</h4>
+        <ul>
+          <li>CY26 GPM ~62%±50bp, 3월분기 저점. DRAM 원가 역풍 ~75~100bp(완화 예정). 관세 50~100bp(상단 근접).</li>
+          <li><b>중국 매출 YoY 증가로 전환</b>(계열사 수출규제 해제로 ~$3.3B 물량 회복 반영). "대부분 제품 상반기 사실상 매진", 광학부품이 최장 리드 제약.</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>Lam 대비 WFE 성장 낮아 보이는 이유 → 분류 차이(코어 ~$110B와 AP ~$11B 분리, 합치면 130 중반대로 동일).</li>
+          <li>계열사 규제 해제로 중국 ~$3.3B 복원. DRAM 원가 ~75~100bp GM 역풍. 2027로 성장 이연(공간 제약).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — FQ2'26</span>
+          <ul>
+            <li><b>CY2025 첨단 패키징 시스템 매출 ~$950M, YoY +70% 초과.</b> 2026 전망 총 AP "mid-to-high teens %" 성장, 공정제어는 "시장보다 빠르게".</li>
+            <li>TAM ~$11~12B. <b>점유율 2021년 ~10% → 2025년 "시장의 절반 가까이".</b></li>
+            <li>인텐시티 동인(Higgins): HBM은 "리던던시 감소 + 금속층 증가 → 검사 증가", EUV 등 첨단 리소 사용 확대. "AP가 코어 장비시장의 일부로 편입, 샘플링율 높음."</li>
+            <li>근단기 제약: KLA 툴이 아니라 고객 설비 공간.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- FQ1'26 -->
+    <details>
+      <summary><span class="q-badge">FQ1'26</span> 매출 ~$3.21B — 메모리 강세 전환 <span class="q-meta">Sep'25 분기 · 2025.10.30 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">~$3.21B</span>(YoY +11~12%). GAAP EPS <span class="num">$8.47</span> / 비GAAP <span class="num">$8.81</span>(가이드 상회).</li>
+          <li>비GAAP GPM <span class="num">62.5%</span>(중간값 +50bp). 사상최대 분기 FCF $1.067B, TTM FCF $3.9B(~31% 마진).</li>
+          <li><b>FQ2'26 가이드</b>: 매출 $3.225B±$150M, 비GAAP GPM 62%±1%p, 비GAAP EPS $8.70±$0.78. 믹스: 파운드리·로직 59% / 메모리 41%(DRAM 78%/NAND 22%).</li>
+        </ul>
+        <h4>CEO (Wallace)</h4>
+        <ul>
+          <li>"AI 인프라 스케일링 투자 가속이 리딩엣지 기술개발 견인." 세 성장축: 공정제어 인텐시티 · HBM · 첨단 패키징.</li>
+          <li>2025 WFE 중고한자릿수 성장, KLA "유의미한 초과". 2026 상반기 "대체로 플랫~소폭 증가", 하반기 가속. <b>N2(2nm)에서 공정제어 점유율 +~100bp</b>. 메모리 톤 상향(3대 DRAM 고객 모두 2026 성장).</li>
+        </ul>
+        <h4>CFO (Higgins)</h4>
+        <ul>
+          <li>GM은 "누구에게 파느냐보다 무엇을 파느냐"가 좌우. 관세 ~50~100bp/분기 + 메모리 부품가 역풍. 장기 증분 영업레버리지 40~50%.</li>
+          <li>배당 +12% $1.90(16년 연속), 신규 $50억 자사주. 분기 환원 $799M. 중국: 신규 수출규제로 2026말까지 누적 <b>$300~350M 매출 감소</b> 추정(상·하반기 균등).</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>DRAM 공정제어 YoY +~50%(DRAM WFE는 소폭인데도) — EUV 삽입(+~1%p 인텐시티) + HBM(+~1%p) + 신규 설계룰 + 스택드 DRAM 신뢰성.</li>
+          <li>상반기 플랫~소폭, 하반기 가속. 마진은 제품 믹스 주도, 관세는 구조적 역풍.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — FQ1'26</span>
+          <ul>
+            <li><b>CY2025 첨단 패키징 매출 $925M 초과 전망, YoY +~70%.</b> TAM ~$11B, 코어 WFE보다 빠르게 성장(AP 시장 &gt;20% YoY).</li>
+            <li>동인: 이종집적, HBM, 백엔드 검사/계측 샘플링 상승("샘플링율 꽤 높음").</li>
+            <li>고객 풀: "패키징 수율실패 비용이 크니 이 능력을 제공해 달라"(Wallace).</li>
+            <li><b>주의:</b> 이 분기 "~6% 근접"은 <b>패키징 공정제어 인텐시티</b>(패키징 지출의 ~5~6%)이지 점유율이 아님. ~$1B/2026 수치는 이 콜의 직접 가이드가 아니라 이후 FQ3 콜에서 공식화.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- FQ4'25 -->
+    <details>
+      <summary><span class="q-badge">FQ4'25</span> 매출 $3.175B(+24% YoY) — FY25 마감 <span class="q-meta">Jun'25 분기 · 2025.7.31 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>Q4 매출 <span class="num">$3.175B</span>(YoY +~24%, 가이드 상회). GAAP EPS <span class="num">$9.06</span> / 비GAAP <span class="num">$9.38</span>. 비GAAP GPM <span class="num">63.2%</span>, OPM ~43%.</li>
+          <li><b>FY2025</b>: 매출 $12.156B, GAAP EPS $30.37 / 비GAAP $33.28, FCF $3.75B, 환원 $3.055B.</li>
+          <li><b>FQ1'26 가이드</b>: 매출 $3.15B±$150M, 비GAAP GPM 62%±1%p, 비GAAP EPS $8.53±$0.77. 믹스: 파운드리·로직 ~75% / 메모리 ~25%.</li>
+        </ul>
+        <h4>CEO (Wallace)</h4>
+        <ul>
+          <li>"매출 YoY +24% — 리딩엣지 파운드리·로직과 HBM 투자 지속." 성장축: 파운드리·로직 · HBM · 첨단 패키징 + 공정제어 인텐시티 구조적 상승.</li>
+          <li>중국 매출 ~30%, 연간 10~15% 감소 예상(우려한 15~20%보다 양호). 웨이퍼 검사 YTD +~50%, 레티클 검사 기록적.</li>
+        </ul>
+        <h4>CFO (Higgins)</h4>
+        <ul>
+          <li>Q4 비GAAP GPM 63.2%, 9월분기 가이드 62%±1%p(약한 시스템 믹스 + 관세 50~100bp), CY25 GPM ~62.5%.</li>
+          <li>배당 +12% $1.90(16년 연속), 신규 $50억 자사주. 분기 환원 $679.7M.</li>
+        </ul>
+        <h4>Q&A 핵심</h4>
+        <ul>
+          <li>2026은 HPC/AI 주도 성장의 해, DRAM·NAND로 확산. 중국 정상화 하향.</li>
+          <li>검사 YTD +~50%(광학 패턴검사 정상화 + 패키징). <b>첨단 패키징 전망 $850M→$925M 상향.</b></li>
+          <li>DRAM 공정제어 인텐시티 EUV 후 +~200bp, HBM에서 추가 +~100bp. <b>2026 계획은 WFE $125B 불필요</b> — 점유율(패키징 제외 ~8%)+인텐시티+패키징으로 상쇄.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — FQ4'25</span>
+          <ul>
+            <li><b>CY2025 AP 시스템 매출 "$925M 초과"로 상향</b>(기존 $850M), CY2024 "$500M 초과" 대비 ~85% 성장(세 번째 상향: ~$500M→$850M→$925M+).</li>
+            <li>"WFE 외부(outside of WFE)" 별도 성장축 — 2026 목표가 WFE $125B 도달에 덜 의존.</li>
+            <li><b>패키징 공정제어 인텐시티 2022년 ~1% → 현재 ~5~6%.</b> 패키징 제외 WFE 점유율 "8% 근접", 패키징은 그 위에 가산.</li>
+            <li>기술 믹스: <b>CoWoS(2.5D) 로직 + HBM 메모리</b> — "점유율 확대는 지금까진 CoWoS 로직 중심, HBM 모멘텀 증가 중". 패키징은 검사(결함) 비중 큼 — "샘플링율 매우 높음(결함 놓치면 안 되니까)".</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <!-- 출처 -->
+  <div class="disc">
+    <b>데이터 출처(전부 1차 자료).</b><br>
+    · 재무: KLA 분기 실적 보도자료(8-K Ex-99.1) 및 10-Q/10-K — SEC EDGAR, CIK 0000319201. FQ4'23(2023.6)~FQ3'26(2026.3). 전 분기 GAAP, 영업이익 = 매출총이익 − 영업비용으로 재검산 일치. FQ4'26(2026.6분기)은 2026.7.28 발표 예정으로 미포함.<br>
+    · 세그먼트: 분기 보도자료 "Information by Segment"(매출), 10-Q·10-K(세그먼트 이익). 연간 이익은 FY2025 10-K.<br>
+    · 컨콜: FQ3'26·FQ1'26·FQ4'25 Motley Fool/Investing.com, FQ2'26 Investing.com/Motley Fool 트랜스크립트, SEC 8-K 및 Seeking Alpha 교차확인. CEO Rick Wallace, CFO Bren Higgins.<br>
+    · 통화 USD. 회계연도 6월 결산. 마진 %는 보고 달러 기준. 비GAAP은 인수·구조조정·손상차손 등 제외.<br>
+    · 첨단 패키징 매출은 스코프 병기 필수(총 AP 시스템 vs 공정제어 한정) — 상단 주석 참조.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요. 최종 확인일 2026-07-13.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+// 회계분기 라벨 (6월 결산): FQ4'23(Jun'23) ~ FQ3'26(Mar'26)
+const Q = ["FQ4'23","FQ1'24","FQ2'24","FQ3'24","FQ4'24","FQ1'25","FQ2'25","FQ3'25","FQ4'25","FQ1'26","FQ2'26","FQ3'26"];
+const QEND = ["'23.6","'23.9","'23.12","'24.3","'24.6","'24.9","'24.12","'25.3","'25.6","'25.9","'25.12","'26.3"];
+// GAAP 재무 (단위 $M / %)
+const revenue = [2355.137,2396.956,2486.726,2359.830,2568.735,2841.541,3076.851,3063.029,3174.741,3209.696,3297.146,3415.078];
+const opInc   = [750.730,899.206,733.318,702.347,974.519,1119.923,1003.052,1300.392,1351.760,1337.177,1362.146,1407.509];
+const gpm = [59.11,60.50,60.72,57.88,60.66,59.62,60.30,61.62,61.97,61.27,61.44,61.12];
+const opm = [31.88,37.51,29.49,29.76,37.94,39.41,32.60,42.45,42.58,41.66,41.31,41.22];
+const npm = [29.07,30.93,23.43,25.49,32.56,33.29,26.80,35.53,37.89,34.93,34.75,35.17];
+const gp  = [1392.188,1450.065,1509.980,1365.945,1558.184,1694.110,1855.390,1887.340,1967.455,1966.626,2025.936,2087.406];
+const ni  = [684.654,741.375,582.534,601.541,836.446,945.851,824.527,1088.416,1202.849,1121.040,1145.682,1200.990];
+const eps = [4.97,5.41,4.28,4.43,6.18,7.01,6.16,8.16,9.06,8.47,8.68,9.12];
+// 세그먼트 매출 $M (12개 회계분기) — SPC / Specialty / PCB
+// FQ4'23~FQ3'24 3번째 세그먼트는 'PCB, Display & Component'(디스플레이 포함), 2024.3 디스플레이 철수 후 'PCB & Component'
+const segSPC = [2097.479,2135.478,2194.079,2096.005,2307.994,2575.151,2755.743,2738.817,2877.647,2899.392,3004.648,3083.912];
+const segSpec= [129.008,126.719,150.065,130.649,121.268,128.334,160.407,156.500,141.866,119.755,140.577,164.028];
+const segPCB = [128.977,136.043,143.032,133.399,140.017,137.983,161.080,168.552,154.106,189.488,152.175,167.642];
+// 연간 세그먼트 영업이익 $M
+const FY = ["FY23","FY24","FY25"];
+const fySPC  = [4100.150,3767.573,5002.746];
+const fySpec = [81.475,90.839,98.952];
+const fyPCB  = [-142.413,-470.273,-281.157];
+// 첨단 패키징 매출 (캘린더연도 $M) — 2026E는 공정제어 한정 스코프
+const APyr = ["CY24","CY25","CY26E"];
+const APrev= [500,950,1000];
+// FQ3'26 제품군 $M
+const prodLbl = ["웨이퍼검사","서비스","패터닝","Specialty","PCB","기타"];
+const prodVal = [1739.671,774.791,615.076,144.199,95.148,46.193];
+// FQ3'26 지역 $M
+const geoLbl = ["대만","중국","한국","북미","유럽·이스라엘","기타아시아","일본"];
+const geoVal = [869.110,829.583,681.060,410.241,247.323,197.387,180.374];
+
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;
+Chart.defaults.font.size=11;
+Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+// 1) 전사 재무
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'영업이익',data:opInc,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GPM',data:gpm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'OPM',data:opm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'NPM',data:npm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{
+      title:items=>Q[items[0].dataIndex]+' ('+QEND[items[0].dataIndex]+')',
+      label:c=>{const p=['GPM','OPM','NPM'].includes(c.dataset.label);return c.dataset.label+': '+(p?c.parsed.y.toFixed(1)+'%':'$'+c.parsed.y.toFixed(0)+'M');}}}},
+    scales:{
+      y:{position:'left',title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:70,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}
+    }}
+});
+
+// 2) 세그먼트 매출 (그룹 막대)
+new Chart(document.getElementById('chartSegRev'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'Semiconductor Process Control',data:segSPC,backgroundColor:CLR.blue},
+    {label:'Specialty Semi',data:segSpec,backgroundColor:CLR.green},
+    {label:'PCB & Component',data:segPCB,backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y==null?c.dataset.label+': 조사중':c.dataset.label+': $'+c.parsed.y.toFixed(0)+'M'}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+// 2b) 연간 세그먼트 영업이익
+new Chart(document.getElementById('chartSegProfit'),{
+  type:'bar',
+  data:{labels:FY,datasets:[
+    {label:'Semiconductor Process Control',data:fySPC,backgroundColor:CLR.blue},
+    {label:'Specialty Semi',data:fySpec,backgroundColor:CLR.green},
+    {label:'PCB & Component',data:fyPCB,backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toFixed(0)+'M'}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr}},x:{grid:{display:false}}}}
+});
+
+// 3) 세그먼트 구성비 (100% 누적)
+const segTot=Q.map((_,i)=>(segSPC[i]==null?null:segSPC[i]+segSpec[i]+segPCB[i]));
+function mixPct(arr){return arr.map((v,i)=>segTot[i]==null?null:v/segTot[i]*100);}
+new Chart(document.getElementById('chartMix'),{
+  type:'bar',
+  data:{labels:Q,datasets:[
+    {label:'Semiconductor Process Control',data:mixPct(segSPC),backgroundColor:CLR.blue},
+    {label:'Specialty Semi',data:mixPct(segSpec),backgroundColor:CLR.green},
+    {label:'PCB & Component',data:mixPct(segPCB),backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>c.parsed.y==null?'조사중':c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},
+    scales:{y:{stacked:true,max:100,title:{display:true,text:'%'},grid:{color:gridClr},ticks:{callback:v=>v+'%'}},x:{stacked:true,grid:{display:false}}}}
+});
+
+// 4) 첨단 패키징 매출 (연도)
+new Chart(document.getElementById('chartAP'),{
+  type:'bar',
+  data:{labels:APyr,datasets:[
+    {label:'첨단 패키징 매출',data:APrev,backgroundColor:[CLR.green,CLR.teal,CLR.gray],barPercentage:.6},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'~$'+c.parsed.y+'M'+(c.dataIndex===2?' (공정제어 한정)':' (총 AP 시스템)')}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+// 5) 제품군 도넛
+new Chart(document.getElementById('chartProd'),{
+  type:'doughnut',
+  data:{labels:prodLbl,datasets:[{data:prodVal,backgroundColor:[CLR.blue,CLR.acc,CLR.teal,CLR.green,CLR.orange,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},
+      tooltip:{callbacks:{label:c=>c.label+': $'+c.parsed.toFixed(0)+'M'}}}}
+});
+
+// 6) 지역 도넛
+new Chart(document.getElementById('chartGeo'),{
+  type:'doughnut',
+  data:{labels:geoLbl,datasets:[{data:geoVal,backgroundColor:[CLR.blue,CLR.magenta,CLR.acc,CLR.teal,CLR.green,CLR.orange,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},
+      tooltip:{callbacks:{label:c=>c.label+': $'+c.parsed.toFixed(0)+'M'}}}}
+});
+
+// 테이블
+const tb=document.getElementById('tblBody');
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${QEND[i]}</td><td>${revenue[i].toFixed(0)}</td><td>${gp[i].toFixed(0)}</td><td>${gpm[i].toFixed(1)}%</td>`+
+    `<td>${opInc[i].toFixed(0)}</td><td>${opm[i].toFixed(1)}%</td><td>${ni[i].toFixed(0)}</td><td>${npm[i].toFixed(1)}%</td><td>$${eps[i].toFixed(2)}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
