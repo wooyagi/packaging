@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DISCO (6146) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / DISCO</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · 다이싱·그라인딩 · 후공정 필수장비</div>
+    <h1>DISCO</h1>
+    <div class="tick">TSE: 6146 · 정밀 다이싱·그라인딩 장비 & 소모재 (일본) · JPY · 3월 결산</div>
+    <p>웨이퍼 <b>절단(다이싱)·박막화(그라인딩)·연마</b> 장비·소모재 글로벌 압도적 1위. HBM 스택용 초박막 웨이퍼 그라인딩과 AI 로직 싱귤레이션의 필수 관문. 6년 연속 사상최대 — FYE3/26 매출 ¥436.9B, 영업이익률 42.3%, GPM 70%+. 최근 12개 회계분기 재무와 4개 실적 브리핑을 tanshin·IR 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">¥133.1B</div><div class="l">4Q(1–3월'26) 매출</div></div>
+      <div class="hstat"><div class="v">44.2%</div><div class="l">4Q 영업이익률</div></div>
+      <div class="hstat"><div class="v">70.9%</div><div class="l">4Q 매출총이익률</div></div>
+      <div class="hstat"><div class="v">¥132.0B</div><div class="l">차분기 출하 가이드(사상최대)</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    DISCO는 반도체 후공정의 <b>Kiru(절단·다이싱)·Kezuru(깎기·그라인딩)·Migaku(연마)</b> 3대 공정 장비와 <b>소모재(블레이드·휠)</b>에서 글로벌 압도적 점유율을 가진 일본 기업입니다.
+    특히 <b>그라인더는 HBM 스택용 DRAM 다이 초박막화</b>, <b>다이서/레이저소는 AI 로직 싱귤레이션</b>의 핵심 장비로 AI·첨단 패키징 수혜가 큽니다.
+    <b>회계상 단일 세그먼트</b>라 제품별 ¥ 매출·영업이익은 미공시(출하 기준 구성비 %만 공개). 통화 JPY, 3월 결산(DISCO는 시작연도로 FY 표기 — 본 페이지는 캘린더 분기말로 라벨).
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Precision Processing Equipment (~62%)</div>
+      <div class="bd">다이서(블레이드+레이저소, ~31%)·그라인더(~28%)·부속장비. 그라인더가 HBM 웨이퍼 박막화의 핵심. 출하 기준.</div>
+      <span class="tag" style="background:var(--blue);">장비</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Precision Processing Tools (~21%)</div>
+      <div class="bd">블레이드·휠 등 소모재. 고객 가동률에 연동돼 <b>선행지표</b> 역할. FYE3/26 사상최대 — 높은 가동률 방증.</div>
+      <span class="tag" style="background:var(--teal);">소모재</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Others (~16%) · 단일 세그먼트</div>
+      <div class="bd">유지보수·부품 등. 제품별 ¥ 매출·영업이익은 <b>미공시(N/A)</b> — 출하 구성비 %만 공개. 지역별 ¥는 공시.</div>
+      <span class="tag" style="background:var(--gray);">N/A 유의</span>
+    </div>
+  </div>
+  <div class="callout warn" style="margin-top:16px;">
+    <b>⚠ DISCO 특유의 공시 3가지.</b> ① <b>수주잔고·book-to-bill 미공시</b> — 회사는 대신 <b>'출하(出荷)'를 수요 프록시</b>로 보라고 안내. ② <b>매출은 고객 검수(acceptance) 시 인식</b>해 출하보다 후행·불규칙 → 출하와 매출이 분기마다 괴리. ③ <b>가이던스는 1개 분기만</b> 제시(고객 투자의욕 급변). 또한 tanshin·브리핑에서 "HBM·TAIKO·SK하이닉스·TSMC" 등 <b>고유명사를 쓰지 않음</b> — "메모리/로직/생성형AI/OSAT"로만 언급하므로, HBM 관련은 '메모리·생성형AI' 코멘트를 프록시로 해석.
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·영업익·마진 (최근 12개 회계분기, J-GAAP)</h2>
+  <p class="lead">막대=매출·영업이익(좌축, ¥B) · 선=GPM/OPM/NPM(우축, %). '23.6~'26.3(분기말 기준). 매출 6년 연속 사상최대, 영업이익률이 연중 38%→44%로 확대.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>영업이익</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GPM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>OPM</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>NPM</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: DISCO 분기 tanshin(決算短信) — disco.co.jp/eg/ir. 일본기준(J-GAAP). <b>각 분기는 누계 차분으로 도출한 파생값</b>(연간·누계는 보고값과 일치). NM은 순이익/매출(전기 특별손실 등 반영).</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Product Mix (출하 기준)</p>
+  <h2>제품 구성 — 출하 기준 (FYE3/26)</h2>
+  <div class="callout">
+    <b>제품별 ¥ 매출·영업이익은 단일 세그먼트라 미공시(N/A).</b> DISCO는 제품 믹스를 <b>출하(shipment) 기준 구성비 %</b>로만 공개합니다(매출 아님). FYE3/26 연간 기준.
+  </div>
+  <div class="card">
+    <div class="chart-wrap chart-sm"><canvas id="chartProd"></canvas></div>
+    <div class="chart-note">출처: FYE3/26 실적 브리핑 자료(부록). 장비 62%(다이서 31%·그라인더 28%·부속 3%) + 소모재 21% + 기타 16%. 반올림. IC(생성형AI) 비중이 다이서·그라인더에서 급등.</div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · Region</p>
+  <h2>지역별 매출 — 대만 급증 (¥, 공시)</h2>
+  <p class="lead">유일하게 ¥로 공시되는 분해. <b>중국이 최대(~31%)</b>이나, FYE3/26 <b>대만이 18.9%→26.9%로 급증</b>(TSMC·AI 파운드리). 최대 단일고객 TSMC ~11%. 해외비중 ~88%.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--magenta)"></i>중국</span>
+      <span><i class="dot" style="background:var(--blue)"></i>대만</span>
+      <span><i class="dot" style="background:var(--orange)"></i>한국</span>
+      <span><i class="dot" style="background:var(--teal)"></i>일본</span>
+      <span><i class="dot" style="background:var(--green)"></i>기타아시아</span>
+      <span><i class="dot" style="background:var(--accent)"></i>미주</span>
+      <span><i class="dot" style="background:var(--gray)"></i>유럽</span>
+    </div>
+    <div class="chart-wrap chart-sm"><canvas id="chartGeo"></canvas></div>
+    <div class="chart-note">출처: tanshin 지역별 주석(고객 소재지, ¥B). FYE3/25 vs FYE3/26. 대만 74.4→117.4, 한국 42.3→33.1, 미주 48.4→34.9.</div>
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Advanced Packaging & Alpha</p>
+  <h2>첨단 패키징·AI 알파</h2>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>그라인더 = HBM 스택용 초박막 웨이퍼 가공</b>의 핵심 관문, 다이서/레이저소 = AI 로직 싱귤레이션. ② FYE3/26 출하가 생성형AI 로직·메모리로 사상최대(6년 연속), <b>차분기 출하 가이드 ¥132.0B(+18.8%, 사상최대)</b>. ③ 회사 전망: "첨단 패키징 기술의 광범위 채택·본격 램프업 기대", 4Q OSAT 수요를 신규 동력으로 지목. ④ GPM 70% 돌파·영업이익률 44%, 압도적 점유율·내재화·효율로 마진 확대.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>HBM 정량 미공시</b>(메모리·생성형AI 코멘트가 프록시, 고유명사 미사용). ② <b>출하≠매출</b>(검수 기준 인식으로 후행·불규칙) — 분기 매출만으로 수요 판단 금물, 출하 병행. ③ 메모리 출하는 분기별 lumpy(FYE3/26: 강한 1Q→2·3Q 소화→4Q 반등). ④ 전력반도체(EV)·PC·스마트폰·자동차는 약세 지속. ⑤ 중국 ~31% 집중.
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (J-GAAP, ¥M)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기(분기말)</th><th>매출 ¥M</th><th>매출총이익 ¥M</th><th>GPM</th><th>영업이익 ¥M</th><th>OPM</th><th>순이익 ¥M</th><th>NPM</th><th>출하 ¥B</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">순이익=모회사 소유주 귀속. 출하(出荷)는 수요 프록시(연결 기준, 일부 분기만 확보 시 —). FYE3/26 연간: 매출 ¥436,889M·영업익 ¥184,989M·순익 ¥135,521M·EPS ¥1,249.84·배당 ¥505(사상최대, 7년 연속 증배).</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Results Briefings</p>
+  <h2>별첨 — 최근 4개 분기 실적 브리핑 요약</h2>
+  <p class="lead">DISCO는 공식 컨콜 트랜스크립트를 상시 게시하지 않아, tanshin·영문 실적 브리핑 자료(speaker notes 포함) 기반으로 정리했습니다. <b>첨단 패키징·메모리(HBM 프록시)</b>는 별도 블록. DISCO는 고유명사(HBM 등)를 쓰지 않으므로 회사 표현("메모리/로직/생성형AI/OSAT")을 그대로 인용합니다.</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">4Q(1–3월'26)</span> 분기·연간 사상최대 — 출하 신기록 <span class="q-meta">FYE3/26 4Q · 2026.4.22 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">¥133.1B</span>(YoY +10.3%, QoQ +21.8%, 기록), 영업이익 ¥58.8B(<b>OM 44.2%</b>, 연중 최고), 순이익 ¥42.9B. <b>연결 출하 ¥121.6B(+31.5%, 분기 사상최대)</b>.</li>
+          <li><b>차분기(Q1 FYE3/27) 출하 가이드 ¥132.0B(+18.8%, 사상최대)</b>, 매출 가이드 ¥106.1B(+18.0%). FX 157엔 가정. 차기 연간 전망은 미제시(정책).</li>
+          <li>FYE3/26 연간: 매출 ¥436.9B(+11.1%)·영업익 ¥185.0B·순익 ¥135.5B, 6년 연속 사상최대. GPM 70% 돌파.</li>
+        </ul>
+        <h4>경영진 코멘트</h4>
+        <ul>
+          <li>"생성형AI向 장비 출하 증가, <b>패키징 기술의 복잡·고도화가 순풍</b>. 고부가 제품이 메모리·로직 출하 견인." 약세: PC·스마트폰·자동차·<b>전력반도체</b>. 해외비중 87.6%.</li>
+          <li>배당 <b>¥505(사상최대, 7년 연속 증배)</b>, 배당성향 40.4%.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 · 메모리 — 4Q</span>
+          <ul>
+            <li>"<b>첨단 패키징 기술의 광범위 채택·본격 램프업 기대</b>." <b>메모리 출하 반등</b>: "IC — 메모리 출하 증가, 로직도 생성형AI·<b>OSAT 수요</b>로 높은 수준." 그라인더(HBM 다이 박막화)·다이서 IC/생성형AI 강세, 전력반도체 그라인딩은 감소.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">3Q(10–12월'25)</span> 매출 ¥109.3B — 로직 AI 견인 <span class="q-meta">2026.1.21 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">¥109.3B</span>(+16.8% YoY), 영업이익 ¥47.3B(OM 43.3%), 순이익 ¥36.7B. 연결 출하 ¥113.6B(당시 분기 사상최대). 연간 전망 상향(매출 ¥419B).</li>
+          <li>Q4 출하 가이드 ¥116.9B·매출 ¥115.2B(둘 다 이후 상회). 배당 가이드 상향(연 ¥437).</li>
+        </ul>
+        <h4>경영진 코멘트</h4>
+        <ul>
+          <li>"생성형AI 견고한 수요가 전체 매출 견인 + 비IC 응용 증가." 그라인더 "IC 증가, 주로 로직·생성형AI"(메모리는 이 분기 소프트). GPM 71.4%(연중 최고).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 · 메모리 — 3Q</span>
+          <ul>
+            <li>사상최대 출하는 <b>생성형AI 로직</b>이 주도, 메모리 그라인딩/다이싱은 일시 소프트(타이밍). 웨이퍼 제조용 그라인더 지속 성장. HBM 정량 미공시(로직/메모리·생성형AI로만).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">2Q(7–9월'25)</span> 매출 ¥104.6B — 소화 국면 <span class="q-meta">2025.10.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">¥104.6B</span>(+8.7% YoY, +16.4% QoQ), 영업이익 ¥44.4B(OM 42.4%). 연결 출하 ¥96.3B(<b>1Q ¥111.1B 대비 감소</b> — 전분기 집중출하의 반작용). H1 출하 ¥207.5B 반기 사상최대.</li>
+          <li>Q3 출하 가이드 ¥101.6B. 중간배당 ¥129. 중국 ~28%, 해외 89.9%.</li>
+        </ul>
+        <h4>경영진 코멘트</h4>
+        <ul>
+          <li>"PC·스마트폰·자동차 약세에도 생성형AI로 <b>메모리·로직 출하 높은 수준</b> 유지." QoQ 출하 감소는 "전분기 집중출하의 반작용"(수요 손실 아님). "<b>첨단 패키징의 응용 확대·본격 램프업 기대</b>." 소모재 사상최대(높은 가동률).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 · 메모리 — 2Q</span>
+          <ul>
+            <li>가장 뚜렷한 <b>메모리 소화 분기</b> — 그라인딩/다이싱 메모리 QoQ 감소, 로직/AI는 높은 수준. 그라인더 IC ~71%, 웨이퍼제조용 그라인더 ~+104% YoY. HBM 수치 미공시.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">1Q(4–6월'25)</span> 매출 ¥89.9B — 메모리 출하 피크 <span class="q-meta">2025.7.17 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">¥89.9B</span>(+8.6% YoY), 영업이익 ¥34.5B(OM 38.4%, 연중 저점), 순이익 ¥23.8B. 연결 출하 ¥111.1B(당시 분기 사상최대).</li>
+          <li>Q2 출하 가이드 <b>보수적 ¥83.6B</b>(그라인더·다이서 −35%) → 이후 상회.</li>
+        </ul>
+        <h4>경영진 코멘트</h4>
+        <ul>
+          <li>다이서·그라인더 "IC 증가, 주로 생성형AI". 그라인더 "<b>메모리·로직 출하 유의하게 증가, 주로 생성형AI</b>" — 출하 라인 기준 <b>연중 최강 메모리/AI 분기</b>. 전력반도체는 약세.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 · 메모리 — 1Q</span>
+          <ul>
+            <li>메모리 출하 피크 분기 — 그라인더·다이서 "메모리·로직 유의 증가, 주로 생성형AI"(HBM DRAM 다이 박막화·싱귤레이션이 IC-메모리/생성형AI 버킷에 포함). 이후 2Q 소화는 이 분기 집중출하의 반작용.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(전부 1차 자료).</b><br>
+    · 재무: DISCO 분기 tanshin(決算短信) 및 영문 실적 브리핑 자료 — disco.co.jp/eg/ir. '23.6~'26.3. 일본기준(J-GAAP). <b>12개 표준 분기는 누계 차분 도출(파생)</b>, 연간·누계는 보고값.<br>
+    · 세그먼트: 단일 보고부문(제품별 ¥ 매출·영업이익 미공시). 제품 믹스는 출하 기준 %, 지역은 tanshin 지역별 주석(¥).<br>
+    · 실적 브리핑: 공식 트랜스크립트 미게시 → 회사 자료·speaker notes 기반. DISCO는 HBM/TAIKO/고객사명 등 고유명사 미사용 — 회사 표현 그대로 인용.<br>
+    · 통화 JPY. 출하(出荷)와 매출은 상이(검수 기준 인식). 마진 %는 보고 기준.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 원문(IR·공시)으로 재확인하세요. 최종 확인일 2026-07-13.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["'23.6","'23.9","'23.12","'24.3","'24.6","'24.9","'24.12","'25.3","'25.6","'25.9","'25.12","'26.3"];
+const revenue=[53.961,72.299,76.995,104.299,82.799,96.244,93.553,120.717,89.914,104.623,109.291,133.061];
+const opInc=[16.972,28.037,30.354,46.127,33.376,42.576,39.146,51.736,34.480,44.391,47.341,58.777];
+const gpm=[65.2,68.4,68.4,68.4,69.7,71.7,71.2,69.8,68.1,69.5,71.4,70.9];
+const opm=[31.5,38.8,39.4,44.2,40.3,44.2,41.8,42.9,38.3,42.4,43.3,44.2];
+const npm=[23.5,27.7,20.9,34.0,28.6,30.9,34.0,32.0,26.4,30.7,33.6,32.2];
+const gp=[35.182,49.480,52.655,71.325,57.699,69.029,66.623,84.219,61.261,72.748,78.065,94.403];
+const ni=[12.682,20.026,16.072,35.425,23.713,29.730,31.809,38.639,23.767,32.146,36.726,42.882];
+const ship=[null,null,null,null,null,null,null,null,111.1,96.3,113.6,121.6];
+
+// 제품 믹스(출하 기준 %)
+const prodLbl=["다이서","그라인더","부속장비","소모재(블레이드·휠)","기타"];
+const prodVal=[31,28,3,21,16];
+// 지역 ¥B
+const geoLbl=["중국","대만","한국","일본","기타아시아","미주","유럽"];
+const geo25=[125.375,74.404,42.341,41.043,33.888,48.383,27.876];
+const geo26=[134.975,117.378,33.069,45.606,44.115,34.903,26.839];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'영업이익',data:opInc,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GPM',data:gpm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'OPM',data:opm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'NPM',data:npm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=['GPM','OPM','NPM'].includes(c.dataset.label);return c.dataset.label+': '+(p?c.parsed.y.toFixed(1)+'%':'¥'+c.parsed.y.toFixed(1)+'B');}}}},
+    scales:{y:{position:'left',title:{display:true,text:'¥B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:80,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartProd'),{
+  type:'doughnut',
+  data:{labels:prodLbl,datasets:[{data:prodVal,backgroundColor:[CLR.blue,CLR.magenta,CLR.gray,CLR.teal,'#c9ccd1'],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:8}},tooltip:{callbacks:{label:c=>c.label+': ~'+c.parsed+'% (출하)'}}}}
+});
+
+new Chart(document.getElementById('chartGeo'),{
+  type:'bar',
+  data:{labels:geoLbl,datasets:[
+    {label:'FYE3/25',data:geo25,backgroundColor:CLR.gray},
+    {label:'FYE3/26',data:geo26,backgroundColor:CLR.blue},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>c.dataset.label+': ¥'+c.parsed.y.toFixed(1)+'B'}}},
+    scales:{y:{title:{display:true,text:'¥B'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+const f0=v=>v==null?'—':Math.round(v*1000).toLocaleString();
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${f0(revenue[i])}</td><td>${f0(gp[i])}</td><td>${gpm[i].toFixed(1)}%</td>`+
+    `<td>${f0(opInc[i])}</td><td>${opm[i].toFixed(1)}%</td><td>${f0(ni[i])}</td><td>${npm[i].toFixed(1)}%</td><td>${ship[i]==null?'—':ship[i].toFixed(1)}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
