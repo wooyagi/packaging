@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tokyo Electron (8035) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Tokyo Electron</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · WFE 종합 · 코터/디벨로퍼 세계 1위</div>
+    <h1>Tokyo Electron</h1>
+    <div class="tick">TSE: 8035 · WFE 종합장비(식각·증착·코터·세정·본더) · JPY · 3월 결산</div>
+    <p>일본 최대·글로벌 3위 WFE 종합장비사. <b>코터/디벨로퍼 세계 점유율 91%</b>, 식각·증착·세정 상위. AI·HBM·선단로직 투자로 FY26 매출 ¥2.44조. <b>첨단 패키징(본더·레이저 포함)이 신성장 축</b> — FY26 AP 매출 ~¥200B, FY27 &gt;+60% 목표. 최근 12개 회계분기 재무와 4개 실적 브리핑을 tanshin·IR 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">¥711.8B</div><div class="l">4Q(1–3월'26) 매출</div></div>
+      <div class="hstat"><div class="v">28.9%</div><div class="l">4Q 영업이익률</div></div>
+      <div class="hstat"><div class="v">91%</div><div class="l">코터/디벨로퍼 점유율</div></div>
+      <div class="hstat"><div class="v">~¥200B</div><div class="l">FY26 첨단 패키징 매출</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Tokyo Electron(TEL)은 <b>WFE(웨이퍼 팹 장비) 종합</b> 기업으로, <b>코터/디벨로퍼(세계 91%)</b>·식각(27%)·증착(23%, ALD 38%)·세정·산화확산·웨이퍼 프로버에서 상위 점유율을 가집니다.
+    회계상 <b>단일 세그먼트(반도체 생산장비, SPE)</b>로 세그먼트별 영업이익은 미공시. 대신 <b>신규장비(New Equipment) vs 필드솔루션(서비스)</b>과 <b>디바이스별(로직/DRAM/NAND)·지역별</b> 매출을 공시합니다. 통화 JPY, 3월 결산, 일본기준(J-GAAP).
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">New Equipment (신규장비)</div>
+      <div class="bd">식각·코터/디벨로퍼·증착·세정·프로버·본더. FY26 ¥1,775B. 디바이스: 로직/파운드리 59%·DRAM 31%·NAND 10%. AI·HBM·선단로직이 견인.</div>
+      <span class="tag" style="background:var(--blue);">장비</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Field Solutions (필드솔루션)</div>
+      <div class="bd">부품·서비스 + 중고·개조. FY26 ¥626B(+16%). 장비 설치기반 확대로 안정 성장하는 수익 쿠션.</div>
+      <span class="tag" style="background:var(--teal);">서비스</span>
+    </div>
+    <div class="biz">
+      <div class="bt">단일 세그먼트 (주의)</div>
+      <div class="bd">SPE 단일 보고부문 → 세그먼트별 영업이익 미공시(N/A). 첨단 패키징 매출은 별도 목표치로 공개. 통화 JPY, 환영향 "경미"(엔화 수출).</div>
+      <span class="tag" style="background:var(--gray);">N/A 유의</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>자본정책 · 이벤트.</b> 배당 성향 ~50% 정책 — FY26 연 ¥628(중간 ¥264+기말 ¥364). FY26 자사주 ¥150B 완료, FY27 신규 ¥150B. <b>2026.10.1 5:1 주식분할</b>(2024.4 3:1에 이어). FY27부터 <b>반기 가이던스만</b> 제시(연간 미공개). 중기목표(2022): 매출 ≥¥3조·영업이익률 ≥35%·ROE ≥30%. CEO Toshiki Kawai.
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·영업익·마진 (최근 12개 회계분기, J-GAAP)</h2>
+  <p class="lead">막대=매출·영업이익(좌축, ¥B) · 선=GPM/OPM/NPM(우축, %). '23.6~'26.3(분기말). <b>4Q('26.3) 순이익률 30.1%</b>는 영업외·세금 등 below-the-line 효과(파생값). FY26 매출은 FY25와 유사하나 마진은 소폭 압축.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>영업이익</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GPM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>OPM</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>NPM</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: TEL 분기 tanshin(決算短信, 일본기준) — tel.com/ir. <b>Q1만 표준, Q2~Q4는 누계 차분 도출(파생)</b>. 연간·누계는 보고값과 일치.</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · New Equipment vs Field / Product Line</p>
+  <h2>매출 구조 — 신규장비/필드솔루션 & 제품라인</h2>
+  <div class="callout">
+    <b>세그먼트별 영업이익은 단일 세그먼트라 미공시(N/A).</b> TEL은 SPE 단일 부문이라, 매출을 <b>신규장비 vs 필드솔루션</b>과 <b>제품라인</b>으로 분해 공개합니다(영업이익 분해는 없음).
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">신규장비 vs 필드솔루션 (연간, ¥B)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>신규장비</span>
+        <span><i class="dot" style="background:var(--teal)"></i>필드솔루션</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartNF"></canvas></div>
+      <div class="chart-note">출처: FY26 4Q 자료. FY24~FY26. 필드솔루션 안정 성장(+16%).</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">신규장비 제품라인 믹스 (연간, %)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartProd"></canvas></div>
+      <div class="chart-note">출처: FY26 4Q 자료. 식각 36% · 코터/디벨로퍼 28% · 증착 20% · 세정 9% · 프로버 5% · 기타 2%. 코터/디벨로퍼 세계 점유율 91%.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · Device & Region</p>
+  <h2>디바이스별 · 지역별 — AI/HBM & 중국 축소</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">신규장비 디바이스 믹스 (8개 분기, %)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>비메모리(로직/파운드리)</span>
+        <span><i class="dot" style="background:var(--magenta)"></i>DRAM</span>
+        <span><i class="dot" style="background:var(--orange)"></i>NAND</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartDev"></canvas></div>
+      <div class="chart-note">출처: 분기 자료(신규장비 %). <b>DRAM 비중 상승</b>(HBM), NAND도 회복. 로직/파운드리 여전 과반.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">지역별 매출 비중 (연간, %)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartGeo"></canvas></div>
+      <div class="chart-note">출처: 연간. <b>중국 44%→34%로 축소</b>, 한국(15.6→22.3)·대만(11.2→20.4) 상승 — HBM·선단엣지 이동.</div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Advanced Packaging & Alpha</p>
+  <h2>첨단 패키징·AI 알파</h2>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>첨단 패키징 매출 FY26 ~¥200B → FY27 &gt;+60% YoY</b>(코터/디벨로퍼·식각·증착 + 본더·레이저). ② <b>본딩 관련 FY26 ~¥30B</b>, 본더+레이저 1–2년 내 연 ¥100B 돌파, <b>2026–30 누적 ¥500B 목표</b>. ③ 웨이퍼 본더 점유율 ~20%(Synapse 임시/영구/하이브리드, Ulucus 박막화·레이저). ④ 프로버 FY27 ¥100B 돌파 전망. ⑤ HBM 인터커넥트 식각 고점유·DRAM 캐패시터 PORs 확보. ⑥ WFE CY26 ~$150B, CY27 $150–170B 전망.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>중국 매출 ~34% 여전히 최대</b> — 규제·수요 변동 리스크. ② FY26 GPM·OPM 소폭 압축(믹스). ③ 세그먼트별 이익 미공시. ④ 표준 분기는 Q1뿐(Q2~Q4 파생). ⑤ FY27부터 반기 가이던스만(가시성 축소).
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (J-GAAP, ¥B)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기(분기말)</th><th>매출 ¥B</th><th>매출총이익 ¥B</th><th>GPM</th><th>영업이익 ¥B</th><th>OPM</th><th>순이익 ¥B</th><th>NPM</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">순이익=모회사 소유주 귀속. Q2~Q4 파생(누계 차분). FY26 연간: 매출 ¥2,443.5B·영업익 ¥624.9B(25.6%)·순익 ¥574.5B·EPS ¥1,254.57·배당 ¥628. ROE 29.6%.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Results Briefings</p>
+  <h2>별첨 — 최근 4개 분기 실적 브리핑 요약</h2>
+  <p class="lead">FY26(2025.4~2026.3) 4개 분기 실적·시장 전망 요약. TEL은 공식 트랜스크립트를 상시 게시하지 않아 tanshin·실적 프레젠테이션·IR Day 자료 기반으로 정리했습니다. <b>첨단 패키징·HBM</b>은 별도 블록. CEO Toshiki Kawai.</p>
+
+  <div class="appendix" id="apxBody">
+
+    <details open>
+      <summary><span class="q-badge">4Q FY26(1–3월'26)</span> 매출 ¥711.8B 기록 — FY27 강한 반등 가이드 <span class="q-meta">2026.4.30 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>4Q 매출 <span class="num">¥711.8B</span>(분기 기록), 영업이익 ¥205.6B(OM 28.9%), 순이익 ¥214.3B. FY26 연간: 매출 ¥2,443.5B·영업익 ¥624.9B(25.6%)·순익 ¥574.5B·EPS ¥1,254.57·ROE 29.6%.</li>
+          <li><b>FY27 반기 가이드(~9월)</b>: 매출 <span class="num">¥1,570B(+33.1%)</span>, 영업익 ¥431B(OM 27.5%), 순익 ¥328B. FY27부터 <b>반기 가이던스만</b> 제시(연간 미공개).</li>
+          <li>WFE: CY26 ~$150B, CY27 $150–170B(CY25 대비 +20%↑, 선단엣지 +30%). 배당 FY26 연 ¥628, 자사주 ¥150B 완료. 2026.10 5:1 분할.</li>
+        </ul>
+        <h4>시장 · 경영진 코멘트</h4>
+        <ul>
+          <li>"AI서버용 <b>선단로직·DRAM/HBM</b> 적극 투자"가 성장 견인. 식각이 "HBM 인터커넥트 공정에서 매우 높은 점유율", 선도 고객 전반 <b>DRAM 캐패시터 공정 PORs</b> 확보. GAA/등방성 식각 기회(2nm~).</li>
+          <li>디바이스 믹스(신규장비): 비메모리 58%·DRAM 34%·NAND 8%. 지역: 중국 34%로 축소, 한국·대만 상승.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 4Q FY26 / FY27 목표</span>
+          <ul>
+            <li><b>첨단 패키징 매출 FY26 ~¥200B → FY27 &gt;+60% YoY</b>(코터/디벨로퍼·식각·증착 + <b>본더·레이저</b>).</li>
+            <li><b>본딩 관련 FY26 ~¥30B</b>, 본더+레이저 1–2년 내 연 ¥100B 돌파, <b>2026–30 누적 ¥500B 목표</b>. 웨이퍼 본더 점유율 ~20%. Synapse(임시/영구/하이브리드)·Ulucus(박막화·레이저). 프로버 FY27 ¥100B 돌파 전망.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">3Q FY26(10–12월'25)</span> 매출 ¥552.0B — 마진 일시 저하 <span class="q-meta">2026.1 발표</span></summary>
+      <div class="call-body">
+        <h4>실적</h4>
+        <ul>
+          <li>매출 <span class="num">¥552.0B</span>, 영업이익 ¥116.1B(<b>OM 21.0%</b>, 연중 저점), 순이익 ¥118.5B. GPM 42.7%(믹스로 압축).</li>
+          <li>디바이스 믹스: 비메모리 56%·<b>DRAM 36%</b>·NAND 8% — DRAM 비중 연중 고점(HBM).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 · HBM — 3Q FY26</span>
+          <ul>
+            <li>DRAM 신규장비 비중 상승이 HBM·선단 DRAM 투자를 반영. 첨단 패키징(코터/디벨로퍼·식각·증착)과 본더 수요 확대 기조 지속.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">2Q FY26(7–9월'25)</span> 매출 ¥630.1B <span class="q-meta">2025.10 발표</span></summary>
+      <div class="call-body">
+        <h4>실적</h4>
+        <ul>
+          <li>매출 <span class="num">¥630.1B</span>, 영업이익 ¥158.5B(OM 25.1%), 순이익 ¥123.8B. GPM 45.2%.</li>
+          <li>디바이스 믹스: 비메모리 59%·DRAM 27%·<b>NAND 14%</b>(NAND 회복). 필드솔루션 ¥160.3B.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 2Q FY26</span>
+          <ul>
+            <li>NAND 몰리브덴 전환·3D 적층 등 신규장비 수요, 첨단 패키징 본더·레이저 매출 성장 기조. 코터/디벨로퍼 세계 91% 점유 유지.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">1Q FY26(4–6월'25)</span> 매출 ¥549.6B <span class="q-meta">2025.7 발표</span></summary>
+      <div class="call-body">
+        <h4>실적</h4>
+        <ul>
+          <li>매출 <span class="num">¥549.6B</span>, 영업이익 ¥144.7B(OM 26.3%), 순이익 ¥117.8B. GPM 46.2%.</li>
+          <li>디바이스 믹스: 비메모리 64%·DRAM 26%·NAND 10%. 신규장비 ¥395.0B·필드솔루션 ¥141.2B.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 1Q FY26</span>
+          <ul>
+            <li>선단로직·HBM向 식각·증착·코터 수요 지속. 첨단 패키징/본딩 프랜차이즈(Synapse·Ulucus) 확대 초기.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <div style="padding:14px 24px 18px;font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.6;">
+      ※ 본 별첨은 이번 세션에서 상세 컨콜 트랜스크립트 확보가 제한되어, <b>tanshin·실적 프레젠테이션·IR Day(2025.2) 자료의 확정 수치·목표치</b> 중심으로 정리했습니다. 분기별 CEO/CFO 상세 Q&A는 추후 보강 예정.
+    </div>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(전부 1차 자료).</b><br>
+    · 재무: TEL 분기 tanshin(決算短信) 및 실적 프레젠테이션 — tel.com/ir. '23.6~'26.3. 일본기준(J-GAAP, IFRS 미공시). <b>Q1만 표준, Q2~Q4는 누계 차분 도출(파생)</b>, 연간·누계는 보고값.<br>
+    · 세그먼트: 단일 보고부문(SPE) — 세그먼트별 영업이익 미공시. 신규장비/필드솔루션·제품라인·디바이스·지역 매출은 공시.<br>
+    · 첨단 패키징: FY26 4Q 프레젠테이션·트랜스크립트·IR Day(2025.2) 목표치.<br>
+    · 통화 JPY. 마진 %는 보고 기준. 주식분할(2024.4 3:1, 2026.10 5:1) 반영 주당지표.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 원문(IR·공시)으로 재확인하세요. 최종 확인일 2026-07-13.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["'23.6","'23.9","'23.12","'24.3","'24.6","'24.9","'24.12","'25.3","'25.6","'25.9","'25.12","'26.3"];
+const revenue=[391.7,427.8,463.7,547.3,555.1,566.6,654.5,655.4,549.6,630.1,552.0,711.8];
+const opInc=[82.4,96.1,132.5,145.2,165.7,148.2,199.6,183.8,144.7,158.5,116.1,205.6];
+const gpm=[41.4,44.3,47.9,46.8,47.6,45.9,47.6,47.4,46.2,45.2,42.7,46.8];
+const opm=[21.0,22.5,28.6,26.5,29.9,26.2,30.5,28.0,26.3,25.1,21.0,28.9];
+const npm=[16.4,17.1,21.9,22.8,22.7,20.8,24.0,21.8,21.4,19.7,21.5,30.1];
+const gp=[162.3,189.7,222.1,256.1,264.0,259.9,311.7,310.6,254.0,284.9,235.8,333.2];
+const ni=[64.3,73.2,101.5,124.9,126.2,117.7,157.3,143.0,117.8,123.8,118.5,214.3];
+
+// 신규장비 vs 필드 (연간)
+const yr3=["FY24","FY25","FY26"];
+const newEq=[1372.7,1861.1,1775.4];
+const field=[428.5,538.3,626.0];
+// 제품라인 (연간 %)
+const prodLbl=["식각","코터/디벨로퍼","증착","세정","프로버","기타"];
+const prodFY26=[36,28,20,9,5,2];
+// 디바이스 (8분기 %)
+const devQ=["'24.6","'24.9","'24.12","'25.3","'25.6","'25.9","'25.12","'26.3"];
+const nonMem=[72,71,57,51,64,59,56,58];
+const dram=[26,26,35,37,26,27,36,34];
+const nand=[2,3,8,12,10,14,8,8];
+// 지역 (연간 %)
+const geoRows=["중국","한국","대만","일본","북미","유럽","동남아·기타"];
+const geoFY24=[44.4,15.6,11.2,10.1,9.2,6.5,3.0];
+const geoFY25=[41.7,16.8,16.9,7.8,10.0,3.1,3.7];
+const geoFY26=[34.1,22.3,20.4,9.8,6.8,2.8,3.8];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'영업이익',data:opInc,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GPM',data:gpm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'OPM',data:opm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'NPM',data:npm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=['GPM','OPM','NPM'].includes(c.dataset.label);return c.dataset.label+': '+(p?c.parsed.y.toFixed(1)+'%':'¥'+c.parsed.y.toFixed(1)+'B');}}}},
+    scales:{y:{position:'left',title:{display:true,text:'¥B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:60,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartNF'),{
+  type:'bar',
+  data:{labels:yr3,datasets:[
+    {label:'신규장비',data:newEq,backgroundColor:CLR.blue},
+    {label:'필드솔루션',data:field,backgroundColor:CLR.teal},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': ¥'+c.parsed.y.toFixed(0)+'B'}}},
+    scales:{y:{stacked:true,title:{display:true,text:'¥B'},grid:{color:gridClr},beginAtZero:true},x:{stacked:true,grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartProd'),{
+  type:'doughnut',
+  data:{labels:prodLbl,datasets:[{data:prodFY26,backgroundColor:[CLR.blue,CLR.acc,CLR.teal,CLR.orange,CLR.green,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+
+new Chart(document.getElementById('chartDev'),{
+  type:'bar',
+  data:{labels:devQ,datasets:[
+    {label:'비메모리',data:nonMem,backgroundColor:CLR.blue},
+    {label:'DRAM',data:dram,backgroundColor:CLR.magenta},
+    {label:'NAND',data:nand,backgroundColor:CLR.orange},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},
+    scales:{y:{stacked:true,max:100,title:{display:true,text:'%'},grid:{color:gridClr},ticks:{callback:v=>v+'%'}},x:{stacked:true,grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartGeo'),{
+  type:'bar',
+  data:{labels:yr3,datasets:geoRows.map((r,ri)=>({
+    label:r,
+    data:[geoFY24[ri],geoFY25[ri],geoFY26[ri]],
+    backgroundColor:[CLR.magenta,CLR.blue,CLR.teal,CLR.green,CLR.orange,CLR.gray,'#c9ccd1'][ri],
+  }))},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:8,font:{size:10}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},
+    scales:{y:{stacked:true,max:100,title:{display:true,text:'%'},grid:{color:gridClr},ticks:{callback:v=>v+'%'}},x:{stacked:true,grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(1)}</td><td>${gp[i].toFixed(1)}</td><td>${gpm[i].toFixed(1)}%</td>`+
+    `<td>${opInc[i].toFixed(1)}</td><td>${opm[i].toFixed(1)}%</td><td>${ni[i].toFixed(1)}</td><td>${npm[i].toFixed(1)}%</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
