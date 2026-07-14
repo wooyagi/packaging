@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4. 검사 · 계측</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--kfont:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Nanum Gothic",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 16px;background:#F1EFE9;font-family:var(--kfont);display:flex;flex-direction:column;align-items:center}
+.crumb{max-width:680px;width:100%;margin:0 0 12px;font-size:12px;color:#8A8880}
+.crumb a{color:#8A8880;text-decoration:none}
+.crumb a:hover{color:#2C2C2A}
+.pk{background:#fff;border:1px solid #E4E2DA;border-radius:14px;padding:20px 22px;font-family:var(--kfont);color:#2C2C2A;max-width:680px;width:100%}
+.pk h3{margin:0 0 2px;font-size:17px;font-weight:500;color:#2C2C2A}
+.pk .sub{margin:0 0 16px;font-size:11px;color:#8A8880}
+.pk .pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.pk .pill{flex:1;min-width:96px;border:1px solid #E4E2DA;background:#F7F6F1;border-radius:9px;padding:7px 8px;cursor:pointer;text-align:center;transition:all .15s}
+.pk .pill .n{font-size:10px;color:#A3A199;font-weight:500}
+.pk .pill .l{font-size:11px;color:#5F5E5A;margin-top:2px}
+.pk .pill.on{background:#2C2C2A;border-color:#2C2C2A}
+.pk .pill.on .n,.pk .pill.on .l{color:#fff}
+.pk .panel{display:none;grid-template-columns:minmax(0,250px) 1fr;gap:22px;align-items:center}
+.pk .panel.on{display:grid}
+.pk .scene{background:#FAF9F5;border:1px solid #EDECE6;border-radius:10px;padding:8px}
+.pk .info .t{font-size:14px;font-weight:500;color:#2C2C2A;margin-bottom:6px}
+.pk .info .d{font-size:12.5px;color:#4A4A46;line-height:1.65;margin-bottom:12px}
+.pk .lab{font-size:10px;color:#A3A199;font-weight:500;letter-spacing:.02em;margin-bottom:4px}
+.pk .insp{font-size:12px;color:#5F5E5A;margin-bottom:12px;line-height:1.55}
+.pk .chips{display:flex;gap:6px;flex-wrap:wrap}
+.pk .chip{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500}
+.pk .wlgd{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:10px;color:#5F5E5A;justify-content:center}
+.pk .wlgd span{display:flex;align-items:center;gap:4px}
+.pk .sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.pk .ctrl{display:flex;justify-content:space-between;align-items:center;margin-top:18px;border-top:1px solid #EDECE6;padding-top:14px}
+.pk .btn{font-size:12px;padding:6px 14px;border:1px solid #DAD8CE;background:#fff;border-radius:8px;cursor:pointer;color:#3D3D3A;font-family:var(--kfont)}
+.pk .btn:hover{background:#F7F6F1}
+.pk .cnt{font-size:11px;color:#A3A199}
+@media(prefers-reduced-motion:no-preference){
+.pk .scan{animation:pkscan 2.4s ease-in-out infinite alternate}
+.pk .blink{animation:pkblink 1.2s ease-in-out infinite}
+.pk .pop{animation:pkpop .5s ease-out both}
+.pk .fill{transform-box:fill-box;transform-origin:top;animation:pkfill 1.8s ease-in-out infinite}
+.pk .stk{animation:pkstack .6s ease-out both}
+.pk .draw{stroke-dasharray:180;animation:pkdraw 2s ease-out infinite alternate}
+.pk .wflex{transform-box:fill-box;transform-origin:bottom;animation:pkflex 3.4s ease-in-out infinite}
+}
+@keyframes pkscan{from{transform:translateY(0)}to{transform:translateY(96px)}}
+@keyframes pkblink{0%,100%{opacity:1}50%{opacity:.18}}
+@keyframes pkpop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pkfill{0%{transform:scaleY(0)}55%{transform:scaleY(1)}100%{transform:scaleY(1)}}
+@keyframes pkstack{0%{transform:translateY(-26px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes pkdraw{from{stroke-dashoffset:180}to{stroke-dashoffset:0}}
+@keyframes pkflex{0%,100%{transform:scaleY(.9)}50%{transform:scaleY(1.14)}}
+</style>
+</head>
+<body>
+<div class="crumb"><a href="./">← CoWoS 밸류체인</a></div>
+<div class="pk">
+<h3>4. 검사 · 계측</h3>
+<p class="sub">단계를 눌러 이동 · 애니메이션으로 각 공정을 확인</p>
+<div class="pills" id="pkPills"></div>
+
+<div class="panel on">
+<div class="scene"><svg viewBox="0 0 220 128" width="100%">
+<circle cx="110" cy="64" r="52" fill="#E6F1FB" stroke="#B5D4F4"/>
+<g stroke="#B5D4F4" stroke-width="1">
+<line x1="70" y1="24" x2="70" y2="104"/><line x1="90" y1="18" x2="90" y2="110"/><line x1="110" y1="14" x2="110" y2="114"/><line x1="130" y1="18" x2="130" y2="110"/><line x1="150" y1="24" x2="150" y2="104"/>
+<line x1="62" y1="44" x2="158" y2="44"/><line x1="60" y1="64" x2="160" y2="64"/><line x1="62" y1="84" x2="158" y2="84"/></g>
+<rect class="blink" x="132" y="66" width="16" height="16" rx="2" fill="#E24B4A"/>
+<rect class="scan" x="60" y="14" width="100" height="3" rx="1.5" fill="#378ADD" opacity="0.85"/>
+<text x="110" y="124" font-size="9" fill="#8A8880" text-anchor="middle">웨이퍼 위 다이 스캔</text>
+</svg></div>
+<div class="info">
+<div class="t">① 웨이퍼·Die 결함검사</div>
+<div class="d">패키징에 들어가기 전, 웨이퍼와 개별 다이를 스캔해 결함을 걸러낸다. 양품 다이(KGD, Known Good Die)만 다음 공정으로 넘겨야 값비싼 패키지 폐기를 막는다.</div>
+<div class="lab">검사 포인트</div>
+<div class="insp">패턴 결함 · 파티클 · 스크래치 · 다이 양불 선별</div>
+<div class="lab">이 단계의 주요 플레이어</div>
+<div class="chips"><span class="chip" style="background:#E6F1FB;color:#185FA5">KLA</span><span class="chip" style="background:#EEEDFE;color:#534AB7">Onto</span></div>
+</div></div>
+
+<div class="panel">
+<div class="scene"><svg viewBox="0 0 220 128" width="100%">
+<rect x="34" y="34" width="152" height="44" rx="4" fill="#EEEDFE" stroke="#CECBF6"/>
+<g fill="#7F77DD"><circle class="pop" style="animation-delay:.1s" cx="52" cy="30" r="6"/><circle class="pop" style="animation-delay:.25s" cx="80" cy="30" r="6"/><circle class="pop" style="animation-delay:.4s" cx="108" cy="30" r="6"/><circle class="pop" style="animation-delay:.55s" cx="136" cy="30" r="6"/><circle class="pop" style="animation-delay:.7s" cx="164" cy="30" r="6"/></g>
+<g stroke="#7F77DD" stroke-width="1.5" fill="none" opacity="0.7"><path class="draw" d="M52 78 V96 H108"/><path class="draw" style="animation-delay:.3s" d="M164 78 V96 H108 V112"/></g>
+<text x="110" y="58" font-size="10" fill="#534AB7" text-anchor="middle">Die 표면</text>
+<text x="110" y="124" font-size="9" fill="#8A8880" text-anchor="middle">범프(위) + RDL 배선(아래)</text>
+</svg></div>
+<div class="info">
+<div class="t">② 범프·RDL 형성</div>
+<div class="d">칩 표면에 마이크로 범프(초소형 땜납 돌기)를 세우고, 재배선층(RDL)으로 신호를 원하는 위치로 끌어낸다. 수천 개의 초미세 배선이 만들어지는 단계.</div>
+<div class="lab">검사 포인트</div>
+<div class="insp">범프 높이·공면성(coplanarity) · RDL 선폭 · 미세 결함</div>
+<div class="lab">이 단계의 주요 플레이어</div>
+<div class="chips"><span class="chip" style="background:#E6F1FB;color:#185FA5">KLA</span><span class="chip" style="background:#EEEDFE;color:#534AB7">Onto</span><span class="chip" style="background:#FAECE7;color:#993C1D">Camtek</span></div>
+</div></div>
+
+<div class="panel">
+<div class="scene"><svg viewBox="0 0 220 128" width="100%">
+<rect x="34" y="44" width="152" height="48" rx="4" fill="#E6F1FB" stroke="#85B7EB"/>
+<text x="110" y="108" font-size="10" fill="#185FA5" text-anchor="middle">실리콘 인터포저</text>
+<g fill="#378ADD"><rect class="fill" x="58" y="44" width="8" height="48" rx="1"/><rect class="fill" style="animation-delay:.3s" x="90" y="44" width="8" height="48" rx="1"/><rect class="fill" style="animation-delay:.6s" x="122" y="44" width="8" height="48" rx="1"/><rect class="fill" style="animation-delay:.9s" x="154" y="44" width="8" height="48" rx="1"/></g>
+<line x1="34" y1="44" x2="186" y2="44" stroke="#185FA5" stroke-width="1"/>
+<text x="110" y="124" font-size="9" fill="#8A8880" text-anchor="middle">수직 관통 배선(TSV)</text>
+</svg></div>
+<div class="info">
+<div class="t">③ 인터포저·TSV</div>
+<div class="d">실리콘 인터포저에 수직 관통 배선(TSV)을 뚫어 위·아래 층을 연결한다. 여러 칩을 초근접·초고밀도로 잇는 CoWoS의 '고속도로' 역할.</div>
+<div class="lab">검사 포인트</div>
+<div class="insp">TSV 깊이·정렬 · 인터포저 두께 · 휨(warpage)</div>
+<div class="lab">이 단계의 주요 플레이어</div>
+<div class="chips"><span class="chip" style="background:#E6F1FB;color:#185FA5">KLA</span><span class="chip" style="background:#EEEDFE;color:#534AB7">Onto</span></div>
+</div></div>
+
+<div class="panel">
+<div class="scene"><svg viewBox="0 0 220 128" width="100%">
+<rect x="26" y="94" width="168" height="16" rx="3" fill="#E6F1FB" stroke="#85B7EB"/>
+<text x="110" y="106" font-size="9" fill="#185FA5" text-anchor="middle">인터포저</text>
+<rect x="42" y="62" width="52" height="30" rx="3" fill="#CECBF6" stroke="#7F77DD"/>
+<text x="68" y="81" font-size="10" fill="#534AB7" text-anchor="middle">GPU</text>
+<g>
+<rect class="stk" style="animation-delay:.1s" x="126" y="80" width="52" height="10" rx="2" fill="#FAC775" stroke="#BA7517"/>
+<rect class="stk" style="animation-delay:.35s" x="126" y="68" width="52" height="10" rx="2" fill="#FAC775" stroke="#BA7517"/>
+<rect class="stk" style="animation-delay:.6s" x="126" y="56" width="52" height="10" rx="2" fill="#FAC775" stroke="#BA7517"/>
+<rect class="stk" style="animation-delay:.85s" x="126" y="44" width="52" height="10" rx="2" fill="#EF9F27" stroke="#854F0B"/>
+</g>
+<text x="152" y="122" font-size="10" fill="#854F0B" text-anchor="middle">HBM 스택</text>
+</svg></div>
+<div class="info">
+<div class="t">④ 칩적층·본딩 (CoWoS·HBM)</div>
+<div class="d">GPU 로직과 HBM 메모리 스택을 인터포저 위에 나란히 초근접 배치·접합한다(Chip-on-Wafer). HBM은 다이를 수직으로 여러 장 쌓아 대역폭을 확보한다.</div>
+<div class="lab">검사 포인트</div>
+<div class="insp">범프 접합 불량 · HBM 스택 정렬 · 보이드(void)</div>
+<div class="lab">이 단계의 주요 플레이어</div>
+<div class="chips"><span class="chip" style="background:#FAECE7;color:#993C1D">Camtek</span><span class="chip" style="background:#E6F1FB;color:#185FA5">KLA</span></div>
+</div></div>
+
+<div class="panel">
+<div class="scene"><svg viewBox="0 0 240 128" width="100%">
+<line x1="40" y1="104" x2="200" y2="104" stroke="#A3A199" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="200" y="116" font-size="9" fill="#A3A199" text-anchor="end">평면 기준(flat)</text>
+<g class="wflex">
+<path d="M44 104 Q120 64 196 104 L196 92 Q120 52 44 92 Z" fill="#C0DD97" stroke="#639922" stroke-width="1"/>
+<path d="M70 80 Q120 64 170 80 L170 66 Q120 50 70 66 Z" fill="#CECBF6" stroke="#7F77DD" stroke-width="1"/>
+<g fill="#888780"><circle cx="60" cy="96" r="4"/><circle cx="90" cy="87" r="4"/><circle cx="120" cy="84" r="4"/><circle cx="150" cy="87" r="4"/><circle cx="180" cy="96" r="4"/></g>
+</g>
+<line x1="120" y1="84" x2="120" y2="104" stroke="#E24B4A" stroke-width="1.2"/>
+<path d="M116 88 L120 84 L124 88" fill="none" stroke="#E24B4A" stroke-width="1.2"/>
+<path d="M116 100 L120 104 L124 100" fill="none" stroke="#E24B4A" stroke-width="1.2"/>
+<text x="128" y="97" font-size="10" fill="#A32D2D">휨(warpage)</text>
+</svg>
+<div class="wlgd"><span><span class="sw" style="background:#CECBF6"></span>CoWoS 패키지</span><span><span class="sw" style="background:#C0DD97"></span>FC-BGA 기판</span><span><span class="sw" style="background:#888780;border-radius:50%"></span>솔더볼</span></div>
+</div>
+<div class="info">
+<div class="t">⑤ FC-BGA 기판·최종 외관</div>
+<div class="d">휨(warpage)은 특정 부품 하나가 아니라, <b style="font-weight:500">CoWoS 패키지 + FC-BGA 기판이 붙은 조립체 전체</b>가 열팽창 차이(CTE mismatch)로 휘는 현상이다. 그림의 점선(평면 기준)에서 벗어난 편차가 곧 휨량 — 실리콘(패키지)과 유기 기판의 소재 차이가 클수록, 패키지가 커질수록 커진다.</div>
+<div class="lab">검사 포인트</div>
+<div class="insp">조립체 warpage(평면도) · 외관 결함 · 기판 외층</div>
+<div class="lab">이 단계의 주요 플레이어</div>
+<div class="chips"><span class="chip" style="background:#E1F5EE;color:#0F6E56">인텍플러스</span><span class="chip" style="background:#FAECE7;color:#993C1D">Camtek</span></div>
+</div></div>
+
+<div class="ctrl">
+<button class="btn" id="pkPrev">← 이전</button>
+<span class="cnt" id="pkCnt">1 / 5</span>
+<button class="btn" id="pkNext">다음 →</button>
+</div>
+</div>
+<script>
+(function(){
+var labels=["웨이퍼 결함","범프·RDL","인터포저·TSV","칩적층·본딩","기판·최종"];
+var panels=document.querySelectorAll('.pk .panel');
+var pillWrap=document.getElementById('pkPills');
+var cur=0;
+labels.forEach(function(l,i){
+var b=document.createElement('div');b.className='pill'+(i===0?' on':'');
+b.innerHTML='<div class="n">'+(i+1)+'</div><div class="l">'+l+'</div>';
+b.onclick=function(){go(i)};pillWrap.appendChild(b);
+});
+var pills=pillWrap.querySelectorAll('.pill');
+function go(i){cur=(i+panels.length)%panels.length;
+panels.forEach(function(p,j){p.classList.toggle('on',j===cur);});
+pills.forEach(function(p,j){p.classList.toggle('on',j===cur);});
+document.getElementById('pkCnt').textContent=(cur+1)+' / '+panels.length;}
+document.getElementById('pkPrev').onclick=function(){go(cur-1)};
+document.getElementById('pkNext').onclick=function(){go(cur+1)};
+})();
+</script>
+</body>
+</html>

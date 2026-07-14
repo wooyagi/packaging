@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoWoS 밸류체인 · 첨단 패키징 리서치</title>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  /* 히어로 */
+  .hero{background:var(--ink);color:#fff;padding:56px 24px 48px;}
+  .hero-inner{max-width:860px;margin:0 auto;}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+  .hero h1{font-size:32px;font-weight:800;margin:0 0 12px;letter-spacing:-.5px;line-height:1.2;}
+  .hero p{font-size:15px;color:#9aa6b7;margin:0;max-width:560px;line-height:1.6;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;}
+  .crumb a:hover{color:var(--accent);}
+
+  /* 메인 카드 그리드 */
+  main{max-width:860px;margin:0 auto;padding:36px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:0 0 14px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:40px;}
+
+  .main-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s,border-color .15s,transform .15s;}
+  .main-card:hover{border-color:var(--accent);box-shadow:0 6px 24px rgba(0,0,0,.08);transform:translateY(-2px);}
+  .main-card.feature{background:linear-gradient(135deg,#ffffff,#faf8ff);border-color:#d9cdf5;border-left:4px solid var(--accent);}
+  .main-card.soon{background:#fbfbfc;border-style:dashed;cursor:default;}
+  .main-card.soon:hover{border-color:var(--line);box-shadow:none;transform:none;}
+  .main-card.soon .card-icon,.main-card.soon .card-title,.main-card.soon .card-desc{opacity:.55;}
+  .main-card.soon .card-arrow{color:#c9ced6;}
+  .step-no{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--accent);letter-spacing:.6px;}
+  .main-card.soon .step-no{color:#9ca3af;}
+  .card-icon{font-size:28px;line-height:1;}
+  .card-title{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-.3px;}
+  .card-desc{font-size:13px;color:#555;line-height:1.6;}
+  .card-meta{display:flex;gap:8px;flex-wrap:wrap;}
+  .card-tag{font-size:11px;font-weight:700;color:#fff;border-radius:4px;padding:2px 8px;}
+  .card-arrow{font-size:20px;color:var(--muted);margin-top:auto;transition:transform .15s,color .15s;}
+  .main-card:hover .card-arrow{transform:translateX(4px);color:var(--accent);}
+
+  footer{max-width:860px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+
+  @media(max-width:560px){
+    .hero h1{font-size:24px;}
+    .cards{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / CoWoS 밸류체인</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Value Chain · CoWoS</div>
+    <h1>CoWoS 밸류체인</h1>
+    <p>웨이퍼에서 최종 패키지까지, CoWoS 공정 흐름을 단계별로 따라갑니다. 각 단계에서 무엇을 하고, 무엇을 검사하며, 누가 그 자리를 차지하고 있는지.</p>
+  </div>
+</div>
+
+<main>
+
+  <p class="section-label">Chip on Wafer</p>
+  <div class="cards">
+
+    <div class="main-card soon">
+      <div class="step-no">STEP 01</div>
+      <div class="card-icon">🧵</div>
+      <div class="card-title">CoW — 미세배선 · 인터포저</div>
+      <div class="card-desc">칩을 얹기 전에 깔아두는 판. 실리콘 인터포저에 TSV를 뚫고 RDL 미세배선과 마이크로 범프를 형성해, 칩과 칩을 잇는 초고밀도 배선망을 만드는 단계.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#9ca3af;">준비 중</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="main-card soon">
+      <div class="step-no">STEP 02</div>
+      <div class="card-icon">🧱</div>
+      <div class="card-title">CoW — GPU·HBM 정밀 실장·접합</div>
+      <div class="card-desc">인터포저 위에 GPU 로직 다이와 HBM 스택을 마이크로미터 단위로 정렬해 접합한다. 본딩·몰딩·그라인딩 등 CoWoS 수율을 좌우하는 핵심 구간.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#9ca3af;">준비 중</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </div>
+
+  </div>
+
+  <p class="section-label">on Substrate</p>
+  <div class="cards">
+
+    <div class="main-card soon">
+      <div class="step-no">STEP 03</div>
+      <div class="card-icon">🟩</div>
+      <div class="card-title">oS — 대형 패키지 기판</div>
+      <div class="card-desc">완성된 CoW 조립체를 대형 FC-BGA 기판에 실장한다. 패키지가 커질수록 기판 대면적화·층수 증가·휨 제어가 병목으로 떠오르는 단계.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#9ca3af;">준비 중</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </div>
+
+  </div>
+
+  <p class="section-label">검사 · 테스트</p>
+  <div class="cards">
+
+    <a class="main-card feature" href="step4.html">
+      <div class="step-no">STEP 04</div>
+      <div class="card-icon">🔬</div>
+      <div class="card-title">검사 · 계측</div>
+      <div class="card-desc">웨이퍼 결함검사 → 범프·RDL → 인터포저·TSV → 칩적층·본딩 → FC-BGA 기판까지, 5개 공정 구간별 검사 포인트와 주요 플레이어(KLA·Onto·Camtek·인텍플러스)를 애니메이션으로 확인합니다.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#0f766e;">검사·계측</span>
+        <span class="card-tag" style="background:#2563a8;">KGD · Warpage</span>
+        <span class="card-tag" style="background:#7c3aed;">인터랙티브</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </a>
+
+    <div class="main-card soon">
+      <div class="step-no">STEP 05</div>
+      <div class="card-icon">⚡</div>
+      <div class="card-title">전기적 테스트</div>
+      <div class="card-desc">모양이 아니라 동작을 본다. 프로브 카드로 전기 신호를 찔러 넣어 다이·패키지가 실제로 규격대로 동작하는지 판정하는 단계.</div>
+      <div class="card-meta">
+        <span class="card-tag" style="background:#9ca3af;">준비 중</span>
+      </div>
+      <div class="card-arrow">→</div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+</body>
+</html>
