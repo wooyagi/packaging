@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>King Yuan Electronics (2449) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .callout.danger{border-color:#c0392b;background:#fdf0ee;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / King Yuan Electronics</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · Semiconductor Test · AI/HPC</div>
+    <h1>King Yuan Electronics (京元電子)</h1>
+    <div class="tick">TWSE: 2449 · 세계 최대 독립 테스트 하우스 · NT$(신대만달러) · 12월 결산 · IFRS</div>
+    <p>대만 최대·세계 최대 독립(순수) <b>반도체 테스트</b> 전문 기업. 웨이퍼 프로브·최종 테스트·<b>고전력 번인</b>이 주력(매출 ~97%가 테스트). <b>AI/HPC가 2026 매출의 ~75~77%</b> — GPU·ASIC 테스트 급증으로 1Q26 매출 첫 <b>&gt;NT$100억(+39% YoY)</b>. 2026 capex <b>NT$500억(사상최대)</b>, 미국 &lt;US$1.4B 투자 계획(NVIDIA 공급사). <b>단, 소형 대만주로 분기별 세부 재무는 1차 검증 제약</b> — 확보 가능한 월별 매출·EPS·연간·1Q26 상세 중심으로 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">NT$10.19B</div><div class="l">1Q26 매출 (첫 &gt;100억, +39% YoY)</div></div>
+      <div class="hstat"><div class="v">39.74%</div><div class="l">1Q26 GM (+6.25pp YoY)</div></div>
+      <div class="hstat"><div class="v">NT$50B</div><div class="l">2026 capex (사상최대)</div></div>
+      <div class="hstat"><div class="v">~75–77%</div><div class="l">AI 관련 매출비중(2026)</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 데이터 가용성 배너 -->
+  <div class="callout danger" style="margin-top:0;">
+    <b>⚠ 데이터 가용성 고지 — 반드시 읽으세요.</b> KYEC는 소형 대만 상장사로, 이 리서치 환경에서 <b>1차 소스(kyec.com.tw IR·TWSE/MOPS 공시·stockanalysis)가 접근 차단(403)</b>되었습니다. 아래 수치는 <b>MOPS/TWSE 공시를 재게재하는 대만 2차 집계</b>(財報狗·Yahoo奇摩股市·Goodinfo·鉅亨·經濟日報 등) 기반이며, 원문 PDF로 라인 검증하지 못했습니다. <b>2023–2025 대부분 분기의 매출·마진·순이익은 검증 불가 → 12개 분기 표준 차트를 만들지 않았습니다</b>(날조 금지 원칙). 대신 <b>검증 가능한 월별 매출·EPS 시계열·연간·1Q26 상세</b>만 제시하고 공백은 "데이터 없음"으로 둡니다. 인용 전 KYEC IR·MOPS 원문 재확인 필수.
+  </div>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    KYEC(1987년 설립, 대만 신주/주난)는 <b>세계 최대 독립(순수) 반도체 테스트 하우스</b>입니다. 전공정 <b>웨이퍼 프로브(웨이퍼 테스트)</b>, 후공정 <b>최종 IC 테스트</b>, <b>번인(고전력 포함)</b>이 주력이며 조립/패키징은 소규모. 통화 NT$, 12월 결산, IFRS. <b>2025 매출 구조: 테스트 ~97%</b>(최종테스트 59%·웨이퍼테스트 31%·번인 8%), 조립 ~3%. <span style="color:var(--muted)">(구성비는 2차 단일 소스 — 원문 재확인 권장.)</span>
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">최종 테스트 (~59%)</div>
+      <div class="bd">완성 IC 최종 검사. AI GPU·ASIC의 <b>테스트 복잡도 급증</b>(장비 3종·최종테스트 2회 필요)으로 플로어·테스터 집약도·ASP 상승. SLT(시스템레벨테스트) 확대.</div>
+      <span class="tag" style="background:var(--blue);">핵심</span>
+    </div>
+    <div class="biz">
+      <div class="bt">웨이퍼 테스트 (~31%)</div>
+      <div class="bd">웨이퍼 상태 프로브/소트. GPU·ASIC 웨이퍼 프로브 수요.</div>
+      <span class="tag" style="background:var(--teal);">프로브</span>
+    </div>
+    <div class="biz">
+      <div class="bt">번인 — 고전력 (~8%)</div>
+      <div class="bd"><b>고전력 번인이 고마진 핵심 동력</b>. ASIC 고객 연계, <b>NVIDIA가 선호</b>하는 것으로 보도. AI 신뢰성 검증 필수 관문.</div>
+      <span class="tag" style="background:var(--magenta);">AI·고마진</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>포지션 · 고객(공개 범위).</b> 공개 프로파일·언론상 고객: <b>NVIDIA·MediaTek·Broadcom·Marvell·Realtek·Winbond·Macronix</b> 등. 2026.7 로이터 등은 KYEC를 <b>"NVIDIA 공급사"</b>로 지칭. <b>고객별 구체 비중은 미공시</b>(단정 금지). AI 관련 ~75~77%(2026), ASIC 물량 램프는 4Q25 개시(보도).
+  </div>
+  <div class="callout danger">
+    <b>⚠ 재무 해석의 핵심 — 중국사업 매각 일회성.</b> KYEC는 자회사 통해 중국 King Long(京隆科技, 쑤저우) 지분 <b>92.16%를 전량 매각</b>(이사회 2024.4.26 승인, <b>2025.2.13 종결</b>, ~RMB48.85억≈NT$217억). <b>처분이익 ~NT$38.27억(EPS +NT$3.13)이 1Q25에 반영</b>돼 그해 실적을 크게 부풀렸습니다. 따라서 <b>FY25 EPS 9.01·1Q25 EPS 3.51은 일회성 포함</b>, 1Q26의 −47% YoY는 <b>기저효과 착시</b>(영업이익은 +82% YoY). 이후 손익은 대만 사업만 반영(중국 비연결).
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Monthly Revenue (2026)</p>
+  <h2>월별 매출 — 가장 잘 공시되는 데이터 (2026)</h2>
+  <p class="lead">대만 상장사는 <b>월별 매출</b>을 MOPS에 공시 — KYEC에서 가장 신뢰도 높은 시계열입니다. 2026 상반기 누적 <b>NT$213.34억(+36.1% YoY)</b>로 AI 테스트 수요 급증을 반영. <span style="color:var(--muted)">(월별 자기공시 기준 합계는 분기 연결재무 매출과 ~3% 차이 — 동일시 금지.)</span></p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>월매출(NT$B)</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>YoY(%)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+    <div class="chart-note">출처: KYEC 월별 매출 공시(MOPS) — 鉅亨/cnyes·財報狗·TechNews 재게재. 2026.1~6. 1H26 누적 NT$213.34억(+36.1% YoY).</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · EPS & Annual</p>
+  <h2>분기 EPS 시계열 & 연간 재무</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">분기 EPS (NT$) — 검증 시계열</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartEps"></canvas></div>
+      <div class="chart-note">출처: Yahoo奇摩股市(MOPS 집계). <b>1Q25(3.51)은 중국매각 일회성 포함</b>. <b>2Q25·3Q25는 개별값 데이터 없음</b>(2Q+3Q 합산 ~3.66). 4Q24(~1.73)는 파생.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">연간 재무 (FY23–FY25)</h3>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>FY</th><th>매출 NT$B</th><th>GM</th><th>지배순이익 NT$B</th><th>EPS</th></tr></thead>
+          <tbody>
+            <tr><td>2023</td><td>~24 (모호)</td><td>~33%</td><td>데이터 없음</td><td>~4.77</td></tr>
+            <tr><td>2024</td><td>~26.85</td><td>데이터 없음</td><td>4.44</td><td>6.36</td></tr>
+            <tr class="hl"><td>2025</td><td>34.933 (+30%)</td><td>35.84%</td><td>11.015</td><td>9.01*</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart-note">*FY25 EPS 9.01·순이익 11.015B은 <b>중국매각 일회성 ~NT$3.827B(≈+3.13 EPS) 포함</b> → 코어 EPS ~5.9. FY23 매출은 중국 연결/별도 기준 모호(데이터 없음). FY24는 중국 연중 비연결화.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · 1Q26 Snapshot</p>
+  <h2>1Q26 상세 — 사상 첫 분기 매출 &gt;NT$100억</h2>
+  <div class="card">
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>항목</th><th>1Q26</th><th>YoY</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr class="hl"><td>매출</td><td>NT$10.192B</td><td>+39.32%</td><td>사상 첫 분기 &gt;100억</td></tr>
+          <tr><td>매출총이익</td><td>NT$4.05B</td><td>+65.3%</td><td>—</td></tr>
+          <tr><td>매출총이익률(GM)</td><td>39.74%</td><td>+6.25pp</td><td>—</td></tr>
+          <tr><td>영업이익</td><td>NT$2.772B</td><td>+82.04%</td><td>OM 27.2%</td></tr>
+          <tr><td>지배순이익</td><td>NT$2.286B</td><td>−47.21%</td><td>기저효과(1Q25 일회성)</td></tr>
+          <tr><td>EPS</td><td>NT$1.87</td><td>−46.7% (QoQ +1.7%)</td><td>영업은 급성장, 순이익만 기저착시</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-note">출처: 財報狗(statementdog) 등 MOPS 집계. 영업이익 +82% YoY가 실제 운영 강도. 순이익 −47%는 1Q25 중국매각 이익(~NT$3.827B) 소멸에 따른 기저효과.</div>
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · AI/HPC & Capex</p>
+  <h2>AI/HPC 알파 & 캐파 증설</h2>
+  <p class="lead">2026을 경영진은 "수확의 해"로 표현 — AI GPU·ASIC이 성장 견인. AI 테스트는 <b>장비 3종·최종테스트 2회</b>가 필요할 만큼 복잡해 플로어·테스터 집약도와 ASP를 끌어올립니다. 특히 <b>고전력 번인</b>이 ASIC·NVIDIA 연계 고마진 동력.</p>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>AI ~75~77%(2026 매출)</b> — GPU+ASIC+웨이퍼 프로브. ASIC 램프 4Q25 개시. ② <b>2026 capex NT$500억(사상최대)</b> — 당초 NT$393.7억에서 2회 상향, 클린룸·고전력 번인 테스터에 집중, <b>2026 캐파 +30~50%</b>. ③ 가동률 3Q25 ~60% → 2026 &gt;70%(고급 테스트 &gt;80%) 모델(애널리스트). ④ Miaoli 頭份·Taoyuan 楊梅 신규 임차(~35,000평 클린룸), Tongluo AI 캐파 확대. ⑤ <b>미국 &lt;US$1.4B 투자 계획</b>(NVIDIA 공급사, 2026.7 발표).
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>순이익 YoY는 2026 내내 기저착시</b>(1Q25 일회성) — 영업이익·매출로 판단 권장. ② <b>고객 집중</b>(AI 소수 대형 고객 의존, 구체 비중 미공시). ③ 대규모 capex의 감가상각·초기가동 부담. ④ <b>미국 US$1.4B는 "계획/의향" 단계</b>(부지·일정·이사회 확정 미확인) — 구속력 있는 확정 프로젝트 아님. ⑤ 소형주 유동성·환율. ⑥ 본 페이지 재무는 2차 집계 기반 — 원문 재확인 필수.
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Valuation</p>
+  <h2>밸류에이션 (2026.7.14 경)</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> AI 테스트 기대로 급등·재평가 중 — <b>소스·시점 간 편차 큼</b>. 발행일 실시간 시세로 재확인 필요. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr><td>주가</td><td>~NT$291.5 (당일 +5%)</td><td>winvest/Yahoo, 2026.7.14 (일중 변동 큼)</td></tr>
+        <tr class="hl"><td>시가총액</td><td>~NT$377.2B (3,772억)</td><td>winvest, 2026.7.14</td></tr>
+        <tr><td>P/E (TTM)</td><td>~40x (35~42x, 시점차)</td><td>winvest/財報狗</td></tr>
+        <tr><td>P/B</td><td>~7~8x (상충)</td><td>2026.5 경; "3.1x"는 stale로 판단</td></tr>
+        <tr><td>EV/EBITDA</td><td>~13~16x (약한 신뢰)</td><td>시점 의존</td></tr>
+        <tr><td>배당(FY25)</td><td>현금 NT$1.0 + 주식 0.5</td><td>이사회 결의, 배당락 2026.7.28</td></tr>
+        <tr><td>배당수익률</td><td>~0.3%</td><td>재평가로 매우 낮음</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="chart-note">중국매각 대금으로 2025–26 특별배당(~NT$1.5/년) 계획 언급됐으나, 확인된 FY25 결의는 현금 1.0+주식 0.5. 일부 소스의 "현금 4.0"·"수익률 3.77%"는 미확인 → 채택하지 않음.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · IR Events</p>
+  <h2>별첨 — IR 이벤트 (국문/영문 전문 미확보)</h2>
+  <p class="lead">KYEC는 대만 법인설명회(法說會)를 <b>중국어로</b> 진행 — <b>영문 어닝콜 전문 없음</b>(자료 미확보). 아래는 확인된 이벤트·요지(2차 요약)이며 축어 인용 불가.</p>
+
+  <div class="appendix">
+    <details open>
+      <summary><span class="q-badge">1Q26</span> 매출 첫 &gt;NT$100억 · 영업이익 +82% YoY <span class="q-meta">2026.4~5 · 법설·실적</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>1Q26 매출 <span class="num">NT$10.192B</span>(+39.32% YoY), GM 39.74%, 영업이익 NT$2.772B(+82% YoY). 순이익 −47% YoY는 1Q25 중국매각 일회성 기저.</li>
+          <li>~2026.5.11 1Q 실적 반응: "1Q 이익 기대 하회"(일회성 착시)에도 <b>외국계 4곳 목표가 상향</b>(예: NT$338 언급). 2026 매출 ~+40% YoY, ~NT$500억 방향 가이드.</li>
+          <li><span style="color:var(--muted)">출처: 工商時報/ctee·旺得富·UDN. 영문 전문 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary><span class="q-badge">4Q25</span> 법설 — 2026 "수확의 해" <span class="q-meta">2025.11.28 · 12.3 법설 메모</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>2026 = "수확의 해", AI GPU+ASIC 주도 성장. <b>캐파·플로어스페이스가 핵심 제약</b>, 가동률 &gt;70%(고급 &gt;80%) 지향. 2026 capex 연말 이사회 확정 예정(이후 NT$50억대→NT$500억 상향).</li>
+          <li><span style="color:var(--muted)">출처: 富果(Fugle) 법설 메모. 영문 전문 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary><span class="q-badge">3Q25</span> 매출 ~NT$9.29B · 영업이익 +40.94% YoY <span class="q-meta">2025.10 · 실적/법인</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>3Q25 매출 ~NT$9.29B(+11% QoQ), 영업이익 +40.94% YoY. 가동률 ~59.5%(고급 테스트 훨씬 높음). AI 테스트 모멘텀 지속.</li>
+          <li><span style="color:var(--muted)">출처: vocus·財報狗. 영문 전문 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary><span class="q-badge">1Q25</span> 중국매각 종결 — 일회성 이익 반영 <span class="q-meta">2025.2.13 종결 · 1Q25 반영</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>King Long(쑤저우) 92.16% 매각 <b>2025.2.13 종결</b>, 처분이익 ~NT$3.827B(EPS +3.13) 1Q25 반영 → 1Q25 EPS 3.51. 대금은 특별배당 재원.</li>
+          <li><span style="color:var(--muted)">출처: 이사회 공시(2024.4.26)·MOPS·언론. 영문 전문 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처 &amp; 한계(투명 고지).</b><br>
+    · <b>1차 소스(KYEC IR·TWSE/MOPS·stockanalysis)는 이 환경에서 접근 차단(403)</b> — 아래 2차 집계로 대체: 財報狗(statementdog)·Yahoo奇摩股市·Goodinfo·鉅亨(cnyes)·經濟日報(UDN)·自由時報·Digitimes·Fugle. MOPS 공시 재게재본으로 신뢰도는 있으나 원문 PDF 라인검증 미완.<br>
+    · <b>2023–2025 대부분 분기의 매출·마진·순이익은 검증 불가 → 12분기 표준 차트 미작성</b>(날조 금지). 월별 매출(2026)·분기 EPS·연간·1Q26 상세만 제시. 2Q25·3Q25 EPS 개별값, FY23 매출 등은 데이터 없음.<br>
+    · <b>FY25 EPS 9.01·순이익 11.015B은 중국매각 일회성 ~NT$3.827B 포함</b> — 코어 EPS ~5.9. 순이익 YoY 비교는 2026 내내 기저착시 유의.<br>
+    · 미국 US$1.4B 투자는 "계획/의향" 단계(구속력·부지·일정 미확인). 밸류에이션·배당은 소스 편차 — 실시간 재확인 필수.<br>
+    · IR: KYEC는 중국어 법설만 진행, 영문 어닝콜 전문 없음(자료 미확보). 상기 요지는 2차 요약.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 KYEC IR·MOPS 원문으로 재확인하세요. 최종 확인일 2026-07-14.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+// 월별 매출 2026 (NT$B)
+const mLbl=["26.1","26.2","26.3","26.4","26.5","26.6"];
+const mRev=[3.695,3.225,3.598,3.743,3.777,3.622];
+const mYoY=[41.41,41.04,36.06,34.56,36.61,28.64];
+// 분기 EPS (NT$) — 2Q25/3Q25 데이터 없음(null), 1Q25 일회성 포함
+const eQ=["2Q23","3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26"];
+const eps=[1.26,1.26,1.28,1.12,1.56,2.03,1.73,3.51,null,null,1.84,1.87];
+const epsClr=eps.map((v,i)=>i===7?CLR.orange:(i===8||i===9?'#d9d9d9':CLR.blue));
+
+new Chart(document.getElementById('chartMonthly'),{
+  data:{labels:mLbl,datasets:[
+    {type:'bar',label:'월매출',data:mRev,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:2,barPercentage:.7},
+    {type:'line',label:'YoY',data:mYoY,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:3,borderWidth:2.5,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='YoY'?'YoY: +'+c.parsed.y.toFixed(1)+'%':'월매출: NT$'+c.parsed.y.toFixed(2)+'B'}}},
+    scales:{y:{position:'left',title:{display:true,text:'NT$B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'YoY %'},grid:{drawOnChartArea:false},min:0,max:60,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartEps'),{
+  type:'bar',
+  data:{labels:eQ,datasets:[{label:'EPS',data:eps,backgroundColor:epsClr,barPercentage:.75}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y==null?'데이터 없음':'EPS: NT$'+c.parsed.y.toFixed(2)+(c.dataIndex===7?' (일회성 포함)':'')}}},
+    scales:{y:{title:{display:true,text:'NT$'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+</script>
+
+</body>
+</html>

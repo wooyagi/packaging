@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amkor Technology (AMKR) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Amkor</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · OSAT · Advanced Packaging &amp; Test</div>
+    <h1>Amkor Technology</h1>
+    <div class="tick">NASDAQ: AMKR · 세계 2위 OSAT · USD · 12월 결산 · GAAP</div>
+    <p>세계 2위 OSAT(외주 조립·테스트, 점유율 ~15%). <b>HDFO(고밀도 팬아웃)·2.5D</b>가 AI 데이터센터 패키징 핵심 — 2개 HDFO 프로그램 최종 인증, 2H26 한국 양산. <b>애플이 최대 고객(FY24 ~31%)</b>. <b>애리조나 ~$7B 캠퍼스 + TSMC 10년 패키징 계약</b>으로 미국 첨단 패키징 확장. 2026 capex $2.5–3.0B, 2030 매출 &gt;$11B 목표. 12개 분기 재무와 4개 컨콜을 실적 발표 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$1.685B</div><div class="l">1Q26 매출 (+27% YoY)</div></div>
+      <div class="hstat"><div class="v">~31%</div><div class="l">애플 매출비중 (FY24)</div></div>
+      <div class="hstat"><div class="v">$2.5–3.0B</div><div class="l">2026 capex 가이드</div></div>
+      <div class="hstat"><div class="v">&gt;$11B</div><div class="l">2030 매출 목표(투자자의날)</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Amkor는 팹리스·IDM·파운드리의 완성 웨이퍼를 <b>패키징·테스트</b>하는 순수 OSAT(외주 조립·테스트)로, <b>세계 2위</b>(2024 점유율 ~15%, ASE ~45% 다음). 통화 USD, 12월 결산. <b>단일 영업부문</b>으로 보고하되 매출을 <b>4개 전방시장</b>(Communications / Computing / Automotive·Industrial / Consumer)으로 공시. <b>GAAP만 보고</b>(미국식 비GAAP 손익 미공시, EBITDA만 별도 제공).
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Communications (~44%)</div>
+      <div class="bd">스마트폰·태블릿 SiP. <b>애플이 최대 고객(FY24 ~31%)</b>, 프리미엄 SiP 리더. 1Q26 +42% YoY(프리미엄 스마트폰).</div>
+      <span class="tag" style="background:var(--blue);">최대·애플</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Computing (~21%)</div>
+      <div class="bd">데이터센터·인프라·PC·스토리지. <b>HDFO·2.5D 기반 AI/HPC</b> 성장 축. HDFO CPU 디바이스 2Q26 램프.</div>
+      <span class="tag" style="background:var(--magenta);">AI·HPC</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Auto·Ind (~21%) / Consumer (~14%)</div>
+      <div class="bd">차량·산업 반도체 패키징 / 웨어러블·게이밍·AR. Auto 1Q26 +25% YoY대. 4개 전방 모두 1Q26 YoY 성장.</div>
+      <span class="tag" style="background:var(--gray);">분산</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경쟁력 · 해자(근거).</b> ① <b>규모·기술 폭</b> — 2위 OSAT, HDFO·2.5D·WLP 등 첨단 패키징 IP 광범위(한국이 HDFO/2.5D 고량 기지). ② <b>애플 관계</b> — FY24 ~31%·상위 10고객 72%(집중 리스크이자 진입장벽). ③ <b>TSMC 애리조나 10년 패키징 계약(2026)</b> — 파운드리가 패키징 구매를 약정 = 기술 신뢰·전환비용의 직접 증거. ④ <b>사업모델 전환</b>(2026 투자자의 날) — 거래형 → 고객 캐파 약정 동반 다년 전략 파트너십. <span style="color:var(--muted)">(점유율·순위는 3자 추정.)</span>
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·영업익·마진 (최근 12개 분기, GAAP)</h2>
+  <div class="callout warn">
+    <b>⚠ 기준·주의.</b> Amkor는 <b>GAAP 단일 기준</b>(비GAAP EPS 미공시). 통화 USD, 차트 $M. <b>마진 저점은 1Q25(GM 11.9%·OM 2.4%)</b> — 베트남 신공장 램프·환율·계절성. 이후 <b>4Q25 GM 16.7%</b>(단, ~$30M 자산매각 이익 포함)까지 회복, 1Q26 14.2%. OSAT 특성상 GM 12~17%로 장비주 대비 낮음. <b>영업이익 3Q23·4Q23·4Q25는 저신뢰/파생</b>(원문 8-K 재확인 권장).
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출</span>
+      <span><i class="dot" style="background:var(--blue)"></i>영업이익</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GM</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>OM</span>
+      <span><i class="dot line" style="background:var(--magenta)"></i>NM</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: Amkor 분기 실적 보도자료(8-K Ex-99.1) 및 10-Q/10-K — SEC EDGAR CIK 1047127. 2Q23~1Q26. GAAP. 순이익=Amkor 귀속(희석 EPS 기준). FY 합계와 정합(FY23 $6.50B·FY24 $6.32B·FY25 $6.71B).</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · End-Markets</p>
+  <h2>전방시장 — Communications가 최대</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">1Q26 전방시장 매출 비중 (%)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartEnd"></canvas></div>
+      <div class="chart-note">출처: 1Q26 실적. Communications 44%(애플·프리미엄 폰) · Computing 21%(AI/HPC) · Auto·Industrial 21% · Consumer 14%. 4개 전방 모두 YoY 성장.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">전방시장 비중 추이 (%)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>Comm</span>
+        <span><i class="dot" style="background:var(--magenta)"></i>Comp</span>
+        <span><i class="dot" style="background:var(--orange)"></i>Auto·Ind</span>
+        <span><i class="dot" style="background:var(--gray)"></i>Cons</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartEndTrend"></canvas></div>
+      <div class="chart-note">출처: 각 분기·FY 공시. <b>4Q25 분기 세부 비중 미공시(N/A)</b> → FY25 값 표시. Communications 비중이 폰 성수기(3Q25 51%)에 확대.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · Advanced Packaging & Long-term</p>
+  <h2>첨단 패키징(HDFO)·AI & 장기 목표</h2>
+  <p class="lead"><b>HDFO(고밀도 팬아웃)</b> = Amkor의 AI/데이터센터 2.5D급 대표 플랫폼. 첨단 패키징 매출은 FY25·1Q26 연속 사상최대(단, 회사가 첨단 패키징 매출 $ 절대값은 미공시 → 데이터 없음). 2026 투자자의 날(5.21)에서 <b>2028 매출 $9B·GM 17.5%, 2030 매출 &gt;$11B·GM &gt;22%·EPS &gt;$5</b> 장기 목표 제시.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출 목표($B)</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GM 목표(%)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartLT"></canvas></div>
+    <div class="chart-note">출처: Amkor 2026 투자자의 날 덱(8-K, 2026.5.21). 2025 실적 → 2028·2030 <b>회사 목표치(가이던스 아님)</b>. 서버시장 2025–30 &gt;20% CAGR 가정. 애리조나 Phase 1이 2030 ~$1B·GM &gt;30% 기여 목표.</div>
+  </div>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>HDFO 2개 프로그램 AI 데이터센터 최종 인증</b>, 2H26 한국 양산. HDFO CPU 디바이스 2Q26 램프→3Q26 유의미 기여→2027+ 확대. ② <b>애리조나 ~$7B 캠퍼스</b>(최대 75만 sq ft 클린룸) + <b>TSMC 10년 패키징 계약</b> + CHIPS ~$407M 확정 지원. ③ <b>2026 capex $2.5–3.0B</b>(65–70% 애리조나 Phase1, 30–35% HDFO 장비) — 첨단 패키징 캐파가 병목. ④ 장기 목표 GM 14%→22%(2030)로 믹스 개선. ⑤ 베트남(Bac Ninh, ~$1.6B)이 저비용 SiP 램프.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>고객 집중</b> — 애플 ~31%·상위10 72%(수요 변동·가격 압박 노출). ② OSAT GM 12~17%로 낮음·계절성 큼(1Q 통상 저점). ③ 첨단 패키징 매출 절대값 미공시로 AI 익스포저 정량화 제한. ④ 대규모 capex·애리조나 초기비용이 단기 마진·현금흐름 부담. ⑤ 2028/2030 목표는 <b>가이던스 아닌 목표치</b>. ⑥ 2026.1 CEO 교체(Giel Rutten→Kevin Engel).
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Valuation</p>
+  <h2>밸류에이션 (2026.7 경)</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> AMKR은 AI 첨단 패키징 기대로 2026.6 사상최고(~$96.68) 등 변동성 큼 — <b>소스 간 시세·배당수익률 불일치</b>. 아래는 2·3차 집계 기준이며 <b>발행일 실시간 시세로 재확인 필요</b>. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr><td>주가</td><td>~$65~83 (변동·소스 상충)</td><td>2026.6 ATH $96.68</td></tr>
+        <tr class="hl"><td>시가총액</td><td>~$17.5B</td><td>companiesmarketcap / stockanalysis, 2026.7</td></tr>
+        <tr><td>P/E (TTM)</td><td>~39.7x</td><td>public.com / macrotrends, 2026.7.2</td></tr>
+        <tr><td>Forward P/E</td><td>~30.9x</td><td>public.com</td></tr>
+        <tr><td>EV/EBITDA</td><td>~11.3x</td><td>집계, 2026.7</td></tr>
+        <tr><td>배당</td><td>$0.33/년, 수익률 ~0.5~0.7%</td><td>소스 상충 — 재확인</td></tr>
+        <tr><td>P/B</td><td>데이터 없음(대략 ~4x 추정)</td><td>최신 10-Q 대차대조표 확인 필요</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (12개 분기, GAAP)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기</th><th>매출 $M</th><th>GM</th><th>영업익 $M</th><th>OM</th><th>순이익 $M</th><th>NM</th><th>희석 EPS</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">순이익=Amkor 귀속. 영업이익 3Q23(~155)·4Q23(159)·4Q25(~185, OM×매출 파생)은 저신뢰 — 원문 8-K 재확인 권장. 4Q25 GM 16.7%는 ~$30M 자산매각 이익 포함.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Kevin Engel</b>(2026.1~, 이전 Giel Rutten) · CFO <b>Megan Faust</b>. 실적·가이던스 / 경영진 / <b>첨단 패키징(HDFO)</b>은 별도 블록. 수치는 GAAP.</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">1Q26</span> 매출 $1.685B(분기 최대) — 4개 전방 전부 YoY 성장 <span class="q-meta">2026.4.27 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$1.685B</span>(분기 최대, +27% YoY). GM 14.2%(전년 11.9%↑), 영업이익 $100M(6.0%), 순이익 $83M, 희석 EPS <span class="num">$0.33</span>(컨센 ~$0.22 상회). EBITDA $285M(16.9%). Communications +42% YoY.</li>
+          <li><b>Q2'26 가이드</b>: 매출 $1.75–1.85B(~+7% QoQ), GM 14.5–15.5%, 순이익 $105–130M, EPS $0.42–0.52.</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO Engel: 첨단 패키징 고객 프로그램 진전, 가동률·마진 개선. 메인스트림 4개 분기 연속 QoQ·YoY 성장. 애리조나·한국 첨단 패키징 빌드아웃 순항.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 1Q26</span>
+          <ul>
+            <li><b>HDFO CPU 디바이스 2Q26 램프 개시</b> → 3Q26 유의미 매출 → 2027+ 확대. 첨단 패키징 매출 사상최대(절대값 미공시).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">4Q25</span> 매출 $1.89B(Q4 최대) · GM 16.7% — HDFO 첫 출하 <span class="q-meta">2026.2.9 발표 (Engel 첫 콜)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$1.89B</span>(Q4 최대, +16% YoY). GM 16.7%(GP $315M, ~$30M 자산매각 이익 포함), OM 9.8%(~$185M), 순이익 $172M, 희석 EPS <span class="num">$0.69</span>(컨센 ~$0.44, +57%). Adj. EBITDA $369M(19.5%). FY25 매출 $6.71B(+6%).</li>
+          <li><b>Q1'26 가이드</b>: 매출 $1.6–1.7B(~+25% YoY), GM 12.5–13.5%, 순이익 $45–70M, EPS $0.18–0.28. <b>2026 capex $2.5–3.0B.</b></li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO Engel(첫 콜): <b>첨단 패키징 캐파가 병목</b> → 2026 대규모 투자. FY25 컴퓨팅·첨단 패키징 사상최대. Q1은 계절적 최저 분기.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 4Q25</span>
+          <ul>
+            <li><b>HDFO 2개 프로그램 AI 데이터센터 최종 인증</b>, 2H26 한국 양산. HDFO CPU 1개 이미 양산, 2번째 2H26 램프(연내 유의미 기여).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">3Q25</span> 매출 $1.99B(사상최대) — Comm·Comp 동반 기록 <span class="q-meta">2025.10.27 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$1.99B</span>(사상최대, +31% QoQ·+7% YoY). GM ~14.3%(GP $284M), 영업이익 $159M, 희석 EPS <span class="num">$0.51</span>(상회). EBITDA $340M.</li>
+          <li><b>Q4'25 가이드</b>: 매출 $1.775–1.875B(+12% YoY), EPS $0.38–0.48.</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>Communications·Computing <b>동반 사상최대</b>. <b>HDFO 첫 제품 4Q25 출하</b>. 애리조나 $7B 캠퍼스·최대 3,000명 부각. <b>CEO 교체 발표</b>(Rutten 은퇴→Engel 2026.1). 투자자의 날 2026 중반 예고.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 3Q25</span>
+          <ul>
+            <li>HDFO 첫 제품 4Q25 출하 개시, AI/HPC 컴퓨팅 프로젝트 모멘텀.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">2Q25</span> 매출 $1.51B — 전 전방 QoQ 두자릿수 성장 <span class="q-meta">2025.7.28 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$1.51B</span>(+14% QoQ·+3% YoY, 가이드 상회). GM 12.0%, 영업이익 $92M, 희석 EPS <span class="num">$0.22</span>(컨센 ~$0.16 상회). EBITDA $259M.</li>
+          <li><b>Q3'25 가이드</b>: 매출 +27% QoQ(중간값), EPS $0.34–0.48.</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>CEO Rutten/CFO Faust: GM ~125bp 압박(<b>베트남 램프+환율</b>), 가동률 최적화로 개선 전망. 전 전방 QoQ 두자릿수. AI/HPC 컴퓨팅 모멘텀. 재무구조: $1B 리볼버+$500M 텀론으로 리파이낸싱(증설 재원).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">첨단 패키징 — 2Q25</span>
+          <ul>
+            <li>전략: 베트남=저비용 SiP, <b>한국+애리조나=첨단 패키징 차별화</b>. AI 솔루션에 2.5D 활용.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(1차 자료 기반).</b><br>
+    · 재무: Amkor 분기 실적 보도자료(8-K Ex-99.1) 및 10-Q/FY2025 10-K — SEC EDGAR CIK 1047127. 2Q23~1Q26. GAAP. 12개 분기 헤드라인은 2개 이상 소스 교차확인·FY 합계와 정합(FY23 $6.50B·FY24 $6.32B·FY25 $6.71B).<br>
+    · 전방시장: 각 분기 10-Q/실적 슬라이드. 4Q25 분기 비중 미공시(FY25 값 표시). 2023–24 초기 분기 비중은 별도 미수집.<br>
+    · 첨단 패키징·장기목표: Q4'25·Q1'26 컨콜 및 2026.5.21 투자자의 날 덱. 애리조나·TSMC·CHIPS는 회사 보도자료·NIST·언론.<br>
+    · 컨콜: Motley Fool·Seeking Alpha·Investing.com·Benzinga 교차확인. CEO Kevin Engel(2026.1~)/Giel Rutten(~2025), CFO Megan Faust.<br>
+    · <b>주의</b>: 본 리서치는 웹검색으로 원문을 추출했으나 SEC EDGAR 원본을 직접 재검증하진 못했습니다(환경 접근 제한). 영업이익 3Q23·4Q23·4Q25 저신뢰, 밸류에이션 소스 편차 큼 — 인용 전 8-K·10-Q·실시간 시세로 재확인 필수.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 최종 확인일 2026-07-14.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["2Q23","3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26"];
+// $M, GAAP
+const revenue=[1460,1820,1750,1370,1460,1860,1630,1320,1510,1990,1890,1685];
+const opInc=[76,155,159,73,82,149,134,32,92,159,185,100];
+const gm=[12.8,15.5,15.9,14.8,14.5,14.6,15.1,11.9,12.0,14.3,16.7,14.2];
+const om=[5.2,8.5,9.1,5.3,5.6,8.0,8.3,2.4,6.1,8.0,9.8,6.0];
+const nm=[4.4,7.3,6.7,4.3,4.6,6.6,6.5,1.6,3.6,6.4,9.1,4.9];
+const ni=[64,133,118,59,67,123,106,21,54,127,172,83];
+const eps=[0.26,0.54,0.48,0.24,0.27,0.49,0.43,0.09,0.22,0.51,0.69,0.33];
+// 전방시장 1Q26 %
+const endLbl=["Communications","Computing","Automotive·Industrial","Consumer"];
+const endVal=[44,21,21,14];
+// 전방시장 추이 % (4Q25 분기 미공시 → FY25 값)
+const endQ=["2Q25","3Q25","4Q25*","1Q26"];
+const eComm=[40,51,46,44], eComp=[22,19,20,21], eAuto=[20,16,19,21], eCons=[18,14,15,14];
+// 장기 목표
+const ltLbl=["2025(실적)","2028(목표)","2030(목표)"];
+const ltRev=[6.7,9.0,11.0];
+const ltGm=[14,17.5,22];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'bar',label:'영업이익',data:opInc,backgroundColor:'rgba(37,99,168,.85)',yAxisID:'y',order:3,barPercentage:.9,categoryPercentage:.72},
+    {type:'line',label:'GM',data:gm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'OM',data:om,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+    {type:'line',label:'NM',data:nm,borderColor:CLR.magenta,backgroundColor:CLR.magenta,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const p=['GM','OM','NM'].includes(c.dataset.label);return c.dataset.label+': '+(p?c.parsed.y.toFixed(1)+'%':'$'+c.parsed.y+'M');}}}},
+    scales:{y:{position:'left',title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'%'},grid:{drawOnChartArea:false},min:0,max:20,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartEnd'),{
+  type:'doughnut',
+  data:{labels:endLbl,datasets:[{data:endVal,backgroundColor:[CLR.blue,CLR.magenta,CLR.orange,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:7,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+
+new Chart(document.getElementById('chartEndTrend'),{
+  type:'bar',
+  data:{labels:endQ,datasets:[
+    {label:'Comm',data:eComm,backgroundColor:CLR.blue},
+    {label:'Comp',data:eComp,backgroundColor:CLR.magenta},
+    {label:'Auto·Ind',data:eAuto,backgroundColor:CLR.orange},
+    {label:'Cons',data:eCons,backgroundColor:CLR.gray},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},
+    scales:{y:{stacked:true,title:{display:true,text:'%'},grid:{color:gridClr},beginAtZero:true,max:100},x:{stacked:true,grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartLT'),{
+  data:{labels:ltLbl,datasets:[
+    {type:'bar',label:'매출 목표',data:ltRev,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:2,barPercentage:.55},
+    {type:'line',label:'GM 목표',data:ltGm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.2,pointRadius:4,borderWidth:2.5,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='GM 목표'?c.dataset.label+': '+c.parsed.y+'%':c.dataset.label+': $'+c.parsed.y+'B'}}},
+    scales:{y:{position:'left',title:{display:true,text:'$B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'GM %'},grid:{drawOnChartArea:false},min:0,max:30,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i]}</td><td>${gm[i].toFixed(1)}%</td><td>${opInc[i]}</td><td>${om[i].toFixed(1)}%</td><td>${ni[i]}</td><td>${nm[i].toFixed(1)}%</td><td>$${eps[i].toFixed(2)}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
