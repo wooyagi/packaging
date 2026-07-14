@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teradyne (TER) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Teradyne</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · ATE · Semiconductor Test + Robotics</div>
+    <h1>Teradyne</h1>
+    <div class="tick">NASDAQ: TER · 반도체 테스트 장비(ATE) 세계 2위 + 로보틱스 · USD · 12월 결산</div>
+    <p>반도체 테스트 장비(ATE) <b>세계 2위</b>(Advantest와 ~80%+ 듀오폴리). <b>AI 컴퓨트(VIP)·HBM 메모리 테스트</b>가 폭발 — 1Q26 매출 $1,282M(+87% YoY, 사상최대), <b>AI 관련 ~70%</b>, 비GAAP OPM 37.5%(사상최대). 하이퍼스케일러 커스텀 실리콘(VIP) 컴퓨트 테스트 점유 ~50%. HBM4용 Magnum 7H, 실리콘 포토닉스 Photon 100. 로보틱스(Universal Robots·MiR)도 보유. 12개 분기 재무와 4개 컨콜을 실적 발표·10-Q 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$1,282M</div><div class="l">1Q26 매출 (+87% YoY, 최대)</div></div>
+      <div class="hstat"><div class="v">37.5%</div><div class="l">1Q26 비GAAP OPM (사상최대)</div></div>
+      <div class="hstat"><div class="v">~70%</div><div class="l">AI 관련 매출비중(1Q26)</div></div>
+      <div class="hstat"><div class="v">~$6B</div><div class="l">중기 목표 매출 모델</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Teradyne은 <b>반도체 테스트 장비(ATE) 세계 2위</b>이자 로보틱스 사업을 보유합니다. 통화 USD, 12월 결산(캘린더 정렬 회계연도). <b>2025년 세그먼트 재편</b>으로 기존 System Test·Wireless(LitePoint)가 <b>Product Test</b>로 통합, IST(SLT)는 2024년 Semi Test로 이동 → 현재 <b>3개 부문(Semiconductor Test / Product Test / Robotics)</b>.
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Semiconductor Test (~87%)</div>
+      <div class="bd">SoC 테스터(AI GPU·커스텀 ASIC) + 메모리 테스터(<b>HBM/DRAM</b>) + IST(SLT). <b>AI 컴퓨트가 폭증</b> — 1Q26 $1,111M. Magnum 7H가 HBM4 대응.</div>
+      <span class="tag" style="background:var(--blue);">핵심·AI</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Robotics (~7%)</div>
+      <div class="bd"><b>Universal Robots</b>(협동로봇) + <b>MiR</b>(자율이동로봇). NVIDIA Isaac·Jetson 기반 AI 액셀러레이터. 매출 대체로 횡보($69~98M/분기).</div>
+      <span class="tag" style="background:var(--teal);">협동로봇·AMR</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Product Test (~6%)</div>
+      <div class="bd">방산·항공, 생산 보드테스트, LitePoint 무선테스트. 안정적($74~110M/분기).</div>
+      <span class="tag" style="background:var(--gray);">방산·무선</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경쟁력 · 해자(근거).</b> ① <b>구조적 듀오폴리</b> — Teradyne+Advantest 반도체 테스트 ~80%+ 합산(3자 추정 Advantest ~31%·Teradyne ~23%). ② <b>높은 전환비용</b> — 테스터는 신규 칩 설계와 공동개발·양산라인 인증. ③ <b>VIP 컴퓨트 테스트 점유 ~50%</b>(2025, CEO) — 하이퍼스케일러 커스텀 실리콘(TPU·Trainium 등). ④ HBM 메모리 테스트·실리콘 포토닉스(Photon 100) 신규 레그. <span style="color:var(--muted)">(점유율은 3자 추정, 고객명 대부분 미공시.)</span>
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·EPS (최근 12개 분기)</h2>
+  <div class="callout warn">
+    <b>⚠ 기준·주의.</b> Teradyne은 <b>GAAP + 비GAAP</b> 병행 보고(헤드라인은 비GAAP). 통화 USD. AI 램프로 <b>매출 $684M(2Q23)→$1,282M(1Q26)</b>, 비GAAP EPS $0.79→$2.56 급증. <b>분기 마진 %는 일부만 공시</b>(비GAAP GM/OM 표에 가용분기만). <b>2Q24 GAAP EPS $1.14&gt;비GAAP $0.86</b>은 일회성 이익(GAAP 순익 $186.3M) — 운영추세는 비GAAP로 판단. <b>1Q26 비GAAP OPM 37.5%는 사상최대</b>.
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출($M)</span>
+      <span><i class="dot line" style="background:var(--green)"></i>비GAAP EPS($)</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>GAAP EPS($)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: Teradyne 실적 보도자료(8-K) 및 10-Q — SEC EDGAR CIK 97210. 2Q23~1Q26(캘린더 정렬). 비GAAP EPS·매출은 FY 합계와 정합(FY24 $2.82B/$3.22·FY25 $3.19B/$3.96). 2Q23 GAAP EPS 미확보(공백).</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Segments</p>
+  <h2>세그먼트 — Semi Test가 AI로 폭증</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">세그먼트 매출 (2025 재편 기준, $M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>Semi Test</span>
+        <span><i class="dot" style="background:var(--gray)"></i>Product Test</span>
+        <span><i class="dot" style="background:var(--teal)"></i>Robotics</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartSeg"></canvas></div>
+      <div class="chart-note">출처: 각 분기 실적. <b>2025 재편 기준(3부문)으로 1Q25~1Q26만</b> 일관 표기(그 이전은 4부문·비가역 → 제외). Semi Test $543M→$1,111M로 AI 램프.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">1Q26 세그먼트 비중 (%)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartMix"></canvas></div>
+      <div class="chart-note">출처: 1Q26 실적($1,282M). Semi Test 86.7% · Robotics 7.1% · Product Test 6.2%. 2023년 Semi ~72~75%에서 AI로 집중도 상승.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · AI/HBM Thesis</p>
+  <h2>AI·HBM 알파 & 중기 목표 모델</h2>
+  <p class="lead">AI 관련 매출 비중 <b>3Q25 40~50% → 4Q25 &gt;60% → 1Q26 ~70%</b>. 컴퓨트 제품 매출 <b>2025 +90% YoY</b>, SoC 매출의 &gt;50%가 컴퓨트(2023 10%). 메모리 테스트는 <b>3Q25 $128M(QoQ 2배+)</b>로 HBM 견인. 경영진은 4Q25에 <b>중기 목표 모델(매출 ~$6B·비GAAP EPS $9.50~11)</b>과 ATE TAM $12~14B를 제시.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출($B)</span>
+    </div>
+    <div class="chart-wrap chart-sm"><canvas id="chartTarget"></canvas></div>
+    <div class="chart-note">출처: FY 실적 및 4Q25 목표 모델 슬라이드. FY23 $2.68B·FY24 $2.82B·FY25 $3.19B → <b>중기 목표 ~$6B</b>(≈2.5×, 목표연도 미명시=중기). ATE TAM ~$9B(2025)→$12~14B 가정.</div>
+  </div>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>AI ~70%(1Q26)</b>, 컴퓨트 +90% YoY(2025). ② <b>VIP 컴퓨트 테스트 ~50% 점유</b>(하이퍼스케일러 커스텀 실리콘). ③ <b>HBM4 Magnum 7H</b> 최대 HBM 제조사에서 볼륨 램프, 메모리 테스트 3Q25 $128M. ④ <b>실리콘 포토닉스/CPO Photon 100</b>(양면 웨이퍼 프로브) TAM $300~700M/년. ⑤ 중기 매출 ~$6B 목표. ⑥ MultiLane(MLTP) JV(2026.4.8 종결)로 800G 데이터센터 인터커넥트 테스트.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>VIP 매출은 lumpy·집중</b>(예측난이·분기 변동) — 1Q26 호실적에도 2Q26 순차 둔화 가이드로 주가 −19%. ② <b>밸류에이션 극단</b>(아래, P/E 50~88x). ③ 로보틱스 성장 정체. ④ 모바일 SoC 사이클 약세. ⑤ 목표 모델은 <b>목표치(가이던스·연도 미확정)</b>. ⑥ 백로그 미공시, 고객명 대부분 미공시.
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Valuation</p>
+  <h2>밸류에이션 (2026.7 경) — 극단적 멀티플</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> 주가 변동성 큼(2025 +242%, 2026 YTD +~140% 보도) — <b>후행 멀티플이 소스·시점별로 크게 상충</b>. 발행일 실시간 시세로 재확인 필수. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>시가총액</td><td>~$56.9B</td><td>stockanalysis, 2026.7.9</td></tr>
+        <tr><td>P/E (TTM)</td><td>~53x~88x (상충)</td><td>소스·TTM 창 차이</td></tr>
+        <tr><td>Forward P/E</td><td>~49x~53x</td><td>stockanalysis/GuruFocus</td></tr>
+        <tr><td>EV/EBITDA</td><td>~60x (근사)</td><td>집계, 시점 부정확</td></tr>
+        <tr><td>P/B</td><td>데이터 없음</td><td>미확인</td></tr>
+        <tr><td>배당</td><td>$0.13/분기(~$0.52/년), 수익률 ~0.15%</td><td>1Q26 인상</td></tr>
+        <tr><td>자사주</td><td>$1.0B 승인(~2026말), 1Q26 사실상 중단</td><td>고가에 매입 축소($5.5M만)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (12개 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기</th><th>매출 $M</th><th>GAAP EPS</th><th>비GAAP EPS</th><th>비GAAP GM</th><th>비GAAP OM</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">비GAAP GM/OM은 <b>공시 확인된 분기만</b> 표기(나머지 "–"=미확보, 추정 안 함). 2Q24 GAAP EPS $1.14는 일회성 이익 포함. 매출·비GAAP EPS는 FY 합계와 정합.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Greg Smith</b>. 실적·가이던스 / 경영진 / <b>AI·HBM·VIP</b>는 별도 블록. 수치는 비GAAP 중심.</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">1Q26</span> 매출 $1,282M(사상최대) · OPM 37.5% — AI ~70% <span class="q-meta">2026.4.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$1,282M</span>(+87% YoY, 사상최대, 가이드 상단 상회). 비GAAP EPS <span class="num">$2.56</span>(GAAP $2.53). GAAP GM 60.9%(+370bp QoQ), <b>비GAAP OPM 37.5%·op inc $480M 사상최대</b>. AI 관련 ~70%.</li>
+          <li><b>Q2'26 가이드</b>: 매출 $1.15~1.25B, 비GAAP EPS $1.86~2.15, GM 58~59%(순차 둔화 — VIP lumpiness).</li>
+        </ul>
+        <h4>CEO (Smith)</h4>
+        <ul>
+          <li>Semi Test $1,111M로 AI 램프 견인. MLTP JV 4.8 종결. Photon 100(실리콘 포토닉스)·Magnum 7H(HBM4) 차기 레그. 호실적에도 2Q 순차둔화 가이드로 주가 −19%.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 1Q26</span>
+          <ul>
+            <li><b>AI 관련 ~70%</b>. VIP 컴퓨트 테스트 ~50% 점유. HBM4 Magnum 7H 볼륨 램프.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">4Q25</span> 매출 $1,083M — 목표모델 $6B 공개 <span class="q-meta">2026.2월 초 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$1,083M</span>(+44% YoY, 가이드 $920~1,000M 상회). 비GAAP EPS <span class="num">$1.80</span>(GAAP $1.63). 순익 GAAP $257.2M(비GAAP $283.0M).</li>
+          <li><b>Q1'26 가이드</b>: 매출 $1.15~1.25B(~+75% YoY, 실제 상회).</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>내러티브 "데이터센터·피지컬 AI"로 전환. <b>2025 VIP 컴퓨트 테스트 ~50% 점유</b>(단, lumpy). AI 4Q &gt;60%→1Q26 "~70%" 가이드. <b>중기 목표 모델 매출 ~$6B·비GAAP EPS $9.50~11</b>, ATE TAM $12~14B 제시.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 4Q25</span>
+          <ul>
+            <li>목표 모델 ~$6B(≈2.5× 2025). MLTP JV로 800G 인터커넥트 테스트 확장.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">3Q25</span> 매출 $769M — 메모리(HBM) 2배+ <span class="q-meta">2025.10.28 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$769M</span>. 비GAAP EPS <span class="num">$0.85</span>(GAAP $0.75). AI 가속 "striking".</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li><b>메모리 테스트 QoQ 2배+ $128M</b>(HBM). <b>컴퓨트가 SoC 매출 &gt;50%</b>(2023 10%), 컴퓨트 +90% YoY. AI가 파워·SLT·ICT·광테스트로 확산.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 3Q25</span>
+          <ul>
+            <li>HBM 메모리 테스트 급증, AI 컴퓨트 SoC 과반. 2026 낙관.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">2Q25</span> 매출 $652M — AI 컴퓨트 계획 상회 <span class="q-meta">2025.7.29 경 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$652M</span>. 비GAAP EPS <span class="num">$0.57</span>(GAAP $0.49). 비GAAP GM 57.3%.</li>
+        </ul>
+        <h4>CEO / CFO</h4>
+        <ul>
+          <li>Semi Test $492M가 업사이드 견인. <b>AI 컴퓨트 SoC 매출의 ~20%</b>(내부계획 상회). 모바일 업그레이드도 기여. 반도체 사이클 둔화 배경을 AI가 상쇄.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 2Q25</span>
+          <ul>
+            <li>AI 컴퓨트 SoC ~20%로 계획 상회, HBM 메모리 테스트 확대 초입.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(1차 자료 기반).</b><br>
+    · 재무: Teradyne 실적 보도자료(8-K Ex-99) 및 10-Q/10-K — SEC EDGAR CIK 97210. 2Q23~1Q26(캘린더 정렬 회계연도). GAAP·비GAAP 병기. 분기 매출·비GAAP EPS는 FY 합계와 정합(FY23 $2.68B/$2.93·FY24 $2.82B/$3.22·FY25 $3.19B/$3.96).<br>
+    · 세그먼트: 2025 재편(Semi Test/Product Test/Robotics)으로 1Q25~1Q26만 일관 표기. IST는 2024년 Semi로 이동.<br>
+    · AI·목표모델: 3Q25·4Q25·1Q26 컨콜 및 목표 모델 슬라이드. MLTP JV(2026.4.8 종결), NVIDIA 로보틱스 협업(파트너십).<br>
+    · 컨콜: Motley Fool·Seeking Alpha·GuruFocus 교차확인. CEO Greg Smith.<br>
+    · <b>주의</b>: 본 리서치는 웹검색으로 원문을 추출했으나 SEC EDGAR·IR 원본을 직접 재검증하진 못했습니다(환경 접근 제한). 2023~2024 다수 분기 비GAAP 마진, 백로그, P/B는 미확보("데이터 없음"). 밸류에이션 소스 편차 큼 — 인용 전 8-K·10-Q·실시간 시세로 재확인 필수.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 최종 확인일 2026-07-14.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["2Q23","3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26"];
+const revenue=[684,704,671,600,730,737,753,686,652,769,1083,1282];
+const gaapEps=[null,0.78,0.72,0.40,1.14,0.89,0.90,0.61,0.49,0.75,1.63,2.53];
+const ngEps=[0.79,0.80,0.79,0.51,0.86,0.90,0.95,0.75,0.57,0.85,1.80,2.56];
+const ngGm=[null,57.5,null,null,null,null,59.4,60.6,57.3,null,null,null];
+const ngOm=[null,null,null,null,null,null,null,20.5,null,null,null,37.5];
+// 세그먼트 (2025 재편, 1Q25~1Q26)
+const segQ=["1Q25","2Q25","3Q25","4Q25","1Q26"];
+const segSemi=[543,492,606,883,1111];
+const segProd=[74,85,88,110,80];
+const segRobo=[69,75,75,89,91];
+// 1Q26 믹스
+const mixLbl=["Semi Test","Robotics","Product Test"];
+const mixVal=[86.7,7.1,6.2];
+// 목표 모델
+const tLbl=["FY23","FY24","FY25","중기목표"];
+const tVal=[2.68,2.82,3.19,6.0];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:3,barPercentage:.82},
+    {type:'line',label:'비GAAP EPS',data:ngEps,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2.5,order:1},
+    {type:'line',label:'GAAP EPS',data:gaapEps,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2,spanGaps:false,order:2},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='매출'?'매출: $'+c.parsed.y+'M':(c.parsed.y==null?c.dataset.label+': 데이터 없음':c.dataset.label+': $'+c.parsed.y.toFixed(2))}}},
+    scales:{y:{position:'left',title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'EPS $'},grid:{drawOnChartArea:false},beginAtZero:true},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSeg'),{
+  type:'bar',
+  data:{labels:segQ,datasets:[
+    {label:'Semi Test',data:segSemi,backgroundColor:CLR.blue},
+    {label:'Product Test',data:segProd,backgroundColor:CLR.gray},
+    {label:'Robotics',data:segRobo,backgroundColor:CLR.teal},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y+'M'}}},
+    scales:{y:{stacked:true,title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{stacked:true,grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartMix'),{
+  type:'doughnut',
+  data:{labels:mixLbl,datasets:[{data:mixVal,backgroundColor:[CLR.blue,CLR.teal,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+
+new Chart(document.getElementById('chartTarget'),{
+  type:'bar',
+  data:{labels:tLbl,datasets:[{label:'매출',data:tVal,backgroundColor:[CLR.gray,CLR.gray,CLR.blue,CLR.acc],barPercentage:.6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>(c.dataIndex===3?'~$':'$')+c.parsed.y.toFixed(2)+'B'+(c.dataIndex===3?' (목표)':'')}}},
+    scales:{y:{title:{display:true,text:'$B'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+const dash=v=>v==null?'–':v;
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i]}</td><td>${gaapEps[i]==null?'–':'$'+gaapEps[i].toFixed(2)}</td><td>$${ngEps[i].toFixed(2)}</td><td>${ngGm[i]==null?'–':ngGm[i].toFixed(1)+'%'}</td><td>${ngOm[i]==null?'–':ngOm[i].toFixed(1)+'%'}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
