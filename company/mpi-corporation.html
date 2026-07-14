@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPI Corporation (6223) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .callout.danger{border-color:#c0392b;background:#fdf0ee;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / MPI Corporation</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · Probe Cards · Test Systems</div>
+    <h1>MPI Corporation (旺矽科技)</h1>
+    <div class="tick">TPEx(櫃買/OTC): 6223 · 프로브카드 & 프로브 스테이션 · NT$(신대만달러) · 12월 결산 · IFRS</div>
+    <p>대만의 <b>프로브카드(수직 VPC·MEMS)</b> + <b>프로브 스테이션·열/포토닉스 테스트 장비</b> 전문 기업. 글로벌 프로브카드 상위권(3자 추정 ~3위). <b>AI ASIC·HBM/DRAM 테스트가 성장 견인</b> — VPC 수주 B/B&gt;1로 2H25부터 풀로드, 가시성 Q3'26. 1Q26 GM 59.45%·EPS NT$12.53, 2Q26 매출 NT$5,226M(+58.7% YoY, 월별 잠정). CPO(공정광학) 양면 테스트로 장비 신영역. <b>단, TPEx 중형주로 초기 분기 세부 재무는 검증 제약</b> — 확보 데이터 중심 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">NT$5,226M</div><div class="l">2Q26 매출 (+58.7% YoY, 잠정)</div></div>
+      <div class="hstat"><div class="v">59.45%</div><div class="l">1Q26 GM</div></div>
+      <div class="hstat"><div class="v">B/B &gt;1</div><div class="l">VPC · Q3'26까지 풀로드</div></div>
+      <div class="hstat"><div class="v">NT$2.7B</div><div class="l">2026 capex</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 데이터 가용성 배너 -->
+  <div class="callout danger" style="margin-top:0;">
+    <b>⚠ 데이터 가용성 고지 — 반드시 읽으세요.</b> MPI는 TPEx(OTC) 상장 중형주로, 이 리서치 환경에서 <b>1차 소스(mpi-corporation.com IR PDF·MOPS·stockanalysis)가 접근 차단(403)</b>되었습니다. 아래 수치는 <b>MOPS/법설 공시를 재게재하는 대만 2차 집계</b>(財報狗·Yahoo奇摩股市·鉅亨·自由財經·永豐·vocus 법설 메모) 기반이며 원문 PDF 라인검증 미완. <b>2023~1Q24 분기 마진·EPS는 검증 불가 → 그 구간 표준 차트를 만들지 않았습니다</b>(날조 금지). 분기 매출(1Q24~2Q26)·최근 EPS·1Q26 마진 스냅샷·연간·세그먼트만 제시하고 공백은 "데이터 없음". 인용 전 MPI IR·MOPS 원문 재확인 필수.
+  </div>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    MPI는 반도체 <b>테스트 인터페이스·테스트 장비</b> 밸류체인의 대만 공급사입니다. 통화 NT$, 12월 결산, IFRS. <b>2개 핵심 사업</b>: (a) <b>프로브카드</b>(캔틸레버 CPC, <b>수직 VPC</b>, 저하중 <b>MEMS</b> + 프로브헤드·기판·PCB 원스톱; 전방 DRAM/HBM·CIS·RF·로직/AI ASIC·HPC), (b) <b>장비/반도체 포토닉스·T&M</b>(프로브 스테이션, 열/TEC 서브시스템·척, LED/포토닉스 자동화, <b>CPO 양면 테스트</b>).
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Probe Card (~72%)</div>
+      <div class="bd">수직 VPC·MEMS 프로브카드. <b>AI ASIC·HBM/DRAM</b> 고핀수·고속 테스트가 성장 견인. VPC B/B&gt;1, 2H25부터 풀로드. HBM 수율↓·핀수↑가 소모품(프로브카드) 출하·ASP 상승 요인.</div>
+      <span class="tag" style="background:var(--blue);">핵심·AI</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Equipment / Photonics (~26%)</div>
+      <div class="bd">엔지니어링 프로브 스테이션, 열/극저온 서브시스템, LED/포토닉스 테스트. <b>CPO(공정광학) 양면 테스트</b>가 신성장 레그.</div>
+      <span class="tag" style="background:var(--teal);">CPO·열</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Other (~2%)</div>
+      <div class="bd">기타. FY25 세그먼트 비중: 프로브카드 72.2% · 장비 26.1% · 기타 1.7%.</div>
+      <span class="tag" style="background:var(--gray);">기타</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경쟁력 · 포지션(근거).</b> ① 글로벌 프로브카드 <b>상위권</b> — 3자 리서치(intelmarketresearch)는 FormFactor 1위·Technoprobe 2위·<b>MPI 3위</b>, 상위 5사 ~73% 점유로 추정(<span style="color:var(--muted)">회사 확인값 아닌 3자 추정</span>). FormFactor가 핵심 MEMS 특허 70%+ 보유. ② MPI는 <b>고속 VPC·저하중 MEMS</b>로 AI/HPC 차별화. ③ 프로브 스테이션·열 서브시스템에서 오랜 입지 + CPO 확장. <b>고객명은 미공시(데이터 없음)</b> — 단정 금지.
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Quarterly Revenue</p>
+  <h2>분기 매출 추이 — AI 프로브카드 급증 (1Q24~2Q26)</h2>
+  <div class="callout warn">
+    <b>⚠ 기준·주의.</b> 통화 NT$, 차트 NT$B. 분기 매출은 확보되나 <b>마진(GM)은 일부 분기만 공시</b>(Q1'25 57.39%·Q2'25 58.3%·Q1'26 59.45%) → 점으로 표기(공백은 미표시). <b>2Q24·3Q24 매출은 파생(derived)</b>, <b>2Q26 매출 NT$5,226M은 월별 공시 기반 잠정</b>(전체 손익 ~2026.8 발표 예정). 2023~1Q24 마진·EPS는 데이터 없음.
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출(NT$B)</span>
+      <span><i class="dot line" style="background:var(--green)"></i>GM(%, 공시 분기만)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartRev"></canvas></div>
+    <div class="chart-note">출처: MPI 분기 실적·월별 매출 공시(MOPS) — 財報狗·Yahoo奇摩股市·鉅亨 재게재. 1Q24~2Q26. 2Q24·3Q24 파생, 2Q26 월별 기반 잠정(손익 미발표). GM은 Q1'25·Q2'25·Q1'26만 공시.</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · EPS & Segments</p>
+  <h2>EPS 시계열 · 세그먼트 · 연간</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">분기 EPS (NT$) — 검증 구간</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartEps"></canvas></div>
+      <div class="chart-note">출처: Yahoo奇摩股市·財報狗(MOPS 집계). Q1'25(~7.69)·Q4'25(~9.87)는 파생, 나머지 공시. <b>2Q26 EPS 미발표(데이터 없음)</b>. 합계 검증: FY25 EPS ~33.5(≈33.49 일치).</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">FY2025 세그먼트 비중 (%)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartSeg"></canvas></div>
+      <div class="chart-note">출처: 2025 연간실적 법설(2026.3.30). 프로브카드 72.2% · 장비 26.1% · 기타 1.7%.</div>
+    </div>
+  </div>
+  <div class="card tbl-scroll">
+    <h3 style="margin-top:0;">연간 재무 (FY23–FY25)</h3>
+    <table>
+      <thead><tr><th>FY</th><th>매출 NT$M</th><th>YoY</th><th>GM</th><th>EPS(NT$)</th></tr></thead>
+      <tbody>
+        <tr><td>2023</td><td>~8,147 (파생)</td><td>—</td><td>데이터 없음</td><td>~13.92 (분기합)</td></tr>
+        <tr><td>2024</td><td>10,172</td><td>+24.85%</td><td>데이터 없음</td><td>24.42</td></tr>
+        <tr class="hl"><td>2025</td><td>13,377</td><td>~+31.5%</td><td>~54~56%</td><td>33.49</td></tr>
+      </tbody>
+    </table>
+    <div class="chart-note">FY23 매출·EPS는 파생(FY24 −24.85% 역산·분기합). FY25 GM은 대략치. 1H2026 누적 매출 NT$9,159M(+49.63% YoY, 사상최대 상반기).</div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · 1Q26 Snapshot</p>
+  <h2>1Q26 상세 — 마진 스냅샷(전체 손익 확보 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>항목</th><th>1Q26</th><th>증감</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>매출</td><td>NT$3,933M</td><td>+39% YoY</td><td>—</td></tr>
+        <tr><td>매출총이익률(GM)</td><td>59.45%</td><td>—</td><td>AI 고핀수 믹스</td></tr>
+        <tr><td>영업이익률(OM)</td><td>32.37%</td><td>—</td><td>—</td></tr>
+        <tr><td>순이익률(NM)</td><td>31.21%</td><td>—</td><td>—</td></tr>
+        <tr><td>EPS</td><td>NT$12.53</td><td>+63% YoY · +27% QoQ</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="chart-note">출처: 財報狗 등 MOPS 집계. AI 칩 고핀수 → ASP·마진 믹스 개선이 GM 59.45%로 반영. 2Q26 매출 NT$5,226M(+32.88% QoQ) 잠정.</div>
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · AI/HBM Thesis & Capacity</p>
+  <h2>AI/HBM 알파 & 캐파 로드맵</h2>
+  <p class="lead">2026.3.30 법설·후속 코멘트 기준: 수요는 <b>AI·첨단 패키징</b>이 견인, 프로브카드 "전년 만재(全年滿載)"·가시성 <b>Q3'26</b>. AI 칩은 <b>핀수 급증</b>으로 ASP·마진 믹스 상승(1Q26 GM 59.45% 요인). CPO 양면 테스트가 차기 장비 성장 레그.</p>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>VPC B/B&gt;1</b>, 2H25부터 풀로드, 가시성 Q3'26. ② <b>캐파 로드맵</b> — VPC 월 캐파 ~1.0M핀 → 1.3~1.5M핀 → 목표 1.8M핀; <b>MEMS 월 2.0M핀(Q1'26)→3.0M핀(2H26)</b>. ③ <b>2026 capex ~NT$2.7B</b>(湖口 신공장·竹北 증설, MEMS+CPO 장비). ④ AI 고핀수 믹스로 <b>GM 57~59%대</b> 유지. ⑤ 현금 ~NT$5.14B로 증설 뒷받침(단일 소스). ⑥ 신제품: HBM/DRAM VPC, 저하중 MEMS, CPO 양면 테스트.
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>밸류에이션 극단적</b>(아래) — P/E 100~180x대, P/B ~89x, 재평가 폭 큼. ② <b>고객명·HBM 전용 매출 비중 미공시</b>(정량화 제한). ③ 장기수주 언급은 <b>코멘트 수준</b>(구속력 계약/MOU 구분 미공시). ④ 대규모 capex의 감가상각·초기가동 부담. ⑤ TPEx 중형주 유동성·환율. ⑥ 재무는 2차 집계 — 원문 재확인 필수. ⑦ HBM4 전용 프로브카드 SKU 등 세부는 데이터 없음.
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Valuation</p>
+  <h2>밸류에이션 (2026.7 경) — 극단적 멀티플, 재확인 필수</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> MPI는 AI 프로브카드 기대로 급등, <b>고가 대만주</b>(주당 ~NT$7,000대)이며 <b>P/E·P/B가 매우 높고 소스별 편차·stale 가능성</b> 큼. 아래는 2·3차 집계 기준 — 발행일 실시간 시세·최신 재무로 재확인 필수. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr><td>주가</td><td>~NT$7,215 (당일 +7.77%)</td><td>Yahoo/cnyes, 2026.7 경</td></tr>
+        <tr class="hl"><td>시가총액</td><td>~NT$656B (6,561억)</td><td>집계 (발행주식 ~9,100만)</td></tr>
+        <tr><td>P/E (TTM)</td><td>~110~190x (소스 편차)</td><td>財報狗 109.5x, TTM EPS ~38.4 기준 ~188x</td></tr>
+        <tr><td>Forward P/E</td><td>~88x (컨센 FY EPS 64.17)</td><td>FactSet 목표가 NT$8,000</td></tr>
+        <tr><td>P/B</td><td>~89x (BVPS NT$80.81)</td><td>⚠ 이례적 고평가 — 재확인</td></tr>
+        <tr><td>배당(FY25)</td><td>현금 NT$22.0 (배당락 2026.7.9)</td><td>전년 16.014</td></tr>
+        <tr><td>배당수익률</td><td>~0.30%</td><td>재평가로 매우 낮음(5년평균 3.04%)</td></tr>
+        <tr><td>EV/EBITDA</td><td>데이터 없음</td><td>미확인</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · IR Events</p>
+  <h2>별첨 — IR 이벤트 (영문 어닝콜 전문 미확보)</h2>
+  <p class="lead">MPI는 대만 법인설명회(法說會)를 진행하며 <b>영문 2페이지 IR 요약 덱</b>을 배포하나(회사 PDF 접근 차단), <b>영문 어닝콜 전문은 미확보</b>(자료 미확보). 아래는 확인된 이벤트·요지(2차 요약)로 축어 인용 불가.</p>
+
+  <div class="appendix">
+    <details open>
+      <summary><span class="q-badge">FY25 법설</span> 2026.3.30 — VPC 풀로드·capex NT$27억 <span class="q-meta">TPEx 연간실적 법설</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>FY2025 매출 NT$133.77억·EPS 33.49. 세그먼트 <b>프로브카드 72.2%·장비 26.1%·기타 1.7%</b>. <b>VPC B/B&gt;1, 전년 만재, 가시성 Q3'26</b>.</li>
+          <li>2026 capex <b>~NT$27억</b>(湖口 신공장·竹北). <b>MEMS 월 캐파 200만핀(Q1'26)</b>, CPO 양면 테스트 개발.</li>
+          <li><span style="color:var(--muted)">출처: vocus·永豐·自由財經 법설 메모. 영문 2p 덱 존재하나 접근 차단.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary><span class="q-badge">EN 덱</span> 2026.3 — BofA/Fubon 테크 트립 <span class="q-meta">투자자 마케팅 2페이지(영문)</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>BofA·Fubon 테크 트립용 영문 2페이지 IR 덱 배포(2026.3.12/16 경). 내용 요지 미확보(회사 PDF 접근 차단).</li>
+          <li><span style="color:var(--muted)">출처: mpi-corporation.com IR(403). 자료 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary><span class="q-badge">2Q25 법설</span> 2025.8.26 — 1H2025 실적 <span class="q-meta">중문 2페이지 덱</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>2Q2025/1H2025 법설, 중문 2페이지 덱 공개. 상세 요지 미확보.</li>
+          <li><span style="color:var(--muted)">출처: mpi.com.tw IR(403). 자료 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary><span class="q-badge">2025.5.27</span> UBS AIC 2025 (영문) <span class="q-meta">투자자 컨퍼런스 덱</span></summary>
+      <div class="call-body">
+        <ul>
+          <li>UBS Asian Investment Conference 2025 투자자 덱. 요지 미확보.</li>
+          <li><span style="color:var(--muted)">출처: mpi-corporation.com IR(403). 자료 미확보.</span></li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처 &amp; 한계(투명 고지).</b><br>
+    · <b>1차 소스(MPI IR PDF·MOPS·stockanalysis)는 이 환경에서 접근 차단(403)</b> — 2차 집계로 대체: 財報狗(statementdog)·Yahoo奇摩股市·鉅亨(cnyes)·自由財經(ltn)·永豐(sinotrade)·vocus 법설 메모. MOPS 공시 재게재본으로 신뢰도는 있으나 원문 PDF 라인검증 미완.<br>
+    · <b>2023~1Q24 분기 마진·EPS는 검증 불가 → 해당 구간 표준 차트 미작성</b>(날조 금지). 분기 매출(1Q24~2Q26)·최근 EPS·1Q26 마진·연간·세그먼트만 제시. 2Q24·3Q24 매출, FY23 매출·EPS, Q1'25·Q4'25 EPS는 파생. 2Q26 매출은 월별 기반 잠정(손익 ~2026.8 발표).<br>
+    · <b>티커 정정</b>: 6223은 <b>TPEx(櫃買/OTC)</b> 상장(6223.TWO), TWSE 메인보드 아님.<br>
+    · 밸류에이션(P/E 110~190x·P/B ~89x)은 소스·시점 편차 크고 이례적으로 높음 — 실시간 재확인 필수. 고객명·HBM 전용 매출·EV/EBITDA는 데이터 없음.<br>
+    · IR: 영문 어닝콜 전문 없음(중문 법설 + 영문 2p 덱, 접근 차단). 상기 요지는 2차 요약.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 인용 전 MPI IR·MOPS 원문으로 재확인하세요. 최종 확인일 2026-07-14.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+// 분기 매출 NT$B (1Q24~2Q26)
+const rQ=["1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26","2Q26"];
+const rev=[2.047,2.390,2.729,3.003,2.829,3.293,3.414,3.841,3.933,5.226];
+const gm=[null,null,null,null,57.39,58.3,null,null,59.45,null];
+// 분기 EPS (NT$)
+const eps=[null,null,null,null,7.69,6.67,9.30,9.87,12.53,null];
+// 세그먼트 FY25
+const segLbl=["프로브카드","장비/포토닉스","기타"];
+const segVal=[72.2,26.1,1.7];
+
+new Chart(document.getElementById('chartRev'),{
+  data:{labels:rQ,datasets:[
+    {type:'bar',label:'매출',data:rev,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:2,barPercentage:.72},
+    {type:'line',label:'GM',data:gm,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:4,borderWidth:2,spanGaps:false,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='GM'?(c.parsed.y==null?'GM: 데이터 없음':'GM: '+c.parsed.y.toFixed(1)+'%'):'매출: NT$'+c.parsed.y.toFixed(2)+'B'+(c.dataIndex===9?' (잠정)':'')}}},
+    scales:{y:{position:'left',title:{display:true,text:'NT$B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'GM %'},grid:{drawOnChartArea:false},min:0,max:80,ticks:{callback:v=>v+'%'}},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartEps'),{
+  type:'bar',
+  data:{labels:rQ,datasets:[{label:'EPS',data:eps,backgroundColor:CLR.blue,barPercentage:.72}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y==null?'데이터 없음':'EPS: NT$'+c.parsed.y.toFixed(2)}}},
+    scales:{y:{title:{display:true,text:'NT$'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSeg'),{
+  type:'doughnut',
+  data:{labels:segLbl,datasets:[{data:segVal,backgroundColor:[CLR.blue,CLR.teal,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+</script>
+
+</body>
+</html>
