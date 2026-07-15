@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lam Research (LRCX) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Lam Research</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · WFE · Etch·Deposition·HBM/TSV Packaging</div>
+    <h1>Lam Research</h1>
+    <div class="tick">NASDAQ: LRCX · 식각·증착 장비 리더 + HBM/TSV 패키징 · USD · 6월 결산</div>
+    <p><b>식각(etch)·증착(deposition)</b> 세계 선두 반도체 장비(WFE)사. 3D NAND·DRAM·선단로직의 핵심 공정장비에 더해 <b>HBM/첨단 패키징</b> 장비(SABRE 3D 구리도금·Syndion TSV 식각)를 보유. AI가 <b>DRAM/HBM·NAND·패키징</b> 투자를 견인 — Q3 FY26(2026.3) 매출 <b>$5.84B(+24% YoY, 사상최대)</b>, 비GAAP GM 49.9%. <b>2026 WFE 전망 $140B로 상향</b>. CSBG(서비스) 리커링이 사이클 방어. 12개 분기 재무와 4개 컨콜을 실적 발표·8-K 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$5.84B</div><div class="l">Mar'26 매출 (+24% YoY, 최대)</div></div>
+      <div class="hstat"><div class="v">49.9%</div><div class="l">Mar'26 비GAAP 매출총이익률</div></div>
+      <div class="hstat"><div class="v">$140B</div><div class="l">2026 WFE 전망(상향)</div></div>
+      <div class="hstat"><div class="v">TSV·HBM</div><div class="l">도금·식각 장비 리더</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Lam Research는 <b>식각·증착 세계 선두 WFE사</b>로, 3D 스케일링(3D NAND 단수·DRAM·GAA)의 핵심 공정장비를 공급하고 <b>HBM/TSV 첨단 패키징</b> 장비까지 보유합니다. 통화 USD, <b>6월 결산</b>(회계연도), GAAP+비GAAP 병행. 매출은 <b>Systems(신규 장비)</b> 와 <b>CSBG(고객지원·리커링)</b> 로 구분.
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Systems — 식각·증착</div>
+      <div class="bd">식각(Kiyo·Flex)·증착(ALTUS·VECTOR·<b>Striker ALD</b>)·세정. 3D NAND 몰리브덴 전환(<b>ALTUS Halo Mo</b>), DRAM(<b>Akara</b>), 파운드리(<b>Striker SPARC</b>).</div>
+      <span class="tag" style="background:var(--blue);">식각·증착</span>
+    </div>
+    <div class="biz">
+      <div class="bt">CSBG — 고객지원 (리커링)</div>
+      <div class="bd">스페어·업그레이드·Reliant·서비스. 설치기반 기반 <b>리커링 ~$1.68B/분기</b>. 다운사이클 방어.</div>
+      <span class="tag" style="background:var(--green);">서비스·리커링</span>
+    </div>
+    <div class="biz">
+      <div class="bt">첨단 패키징 (HBM/TSV)</div>
+      <div class="bd"><b>SABRE 3D</b>(TSV 구리 충전·범프·RDL 도금), <b>Syndion</b>(TSV 딥에칭), <b>VECTOR TEOS 3D</b> — HBM 스태킹·TSV의 핵심 장비.</div>
+      <span class="tag" style="background:var(--magenta);">HBM·TSV</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경쟁력 · 해자(근거).</b> ① <b>식각·증착 리더십</b> — 식각 세계 선두(3자 추정), 증착 상위. Applied·TEL과 3강 구도. ② <b>3D 스케일링 수혜</b> — 3D NAND 단수↑, DRAM 4F²·3D DRAM, GAA 전환이 식각/증착 <b>강도(intensity)↑</b>. ③ <b>HBM/TSV 장비</b> — Syndion(TSV 식각)·SABRE 3D(구리 도금)가 HBM 스택 핵심(일부 보도는 HBM TSV 장비 주요 공급). ④ <b>CSBG 리커링</b>이 완충. <span style="color:var(--muted)">(점유율·"독점" 표현은 3자·과거 보도 기준 — 재확인 권장.)</span>
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·비GAAP EPS (최근 12개 분기)</h2>
+  <div class="callout warn">
+    <b>⚠ 기준·주의.</b> Lam은 <b>GAAP + 비GAAP</b> 병행. <b>6월 결산</b> → 아래 라벨은 <b>분기말 캘린더</b>(Mar'26=Q3 FY2026). AI로 매출 <b>$3.2B(Jun'23)→$5.84B(Mar'26)</b> 급증. <b>2024.10 10:1 액면분할</b> 반영 EPS. 분기 비GAAP EPS·GM은 <b>확인된 분기만</b> 표기(나머지 "–"=미확보, 추정 안 함).
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출($B)</span>
+      <span><i class="dot line" style="background:var(--green)"></i>비GAAP EPS($, 분할조정)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: Lam 실적 보도자료(8-K Ex-99)·10-Q — SEC EDGAR CIK 707549. 분기말 캘린더 Jun'23~Mar'26. 매출은 FY 합계와 정합(FY24 $14.91B·FY25 $18.44B). 비GAAP EPS는 최근 3개 분기만 확인(Sep'25 $1.26·Dec'25 $1.27·Mar'26 $1.47), 이전 공백.</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Segments & Annual</p>
+  <h2>매출 구조 — 시장별 & 연간</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">연간 매출 ($B)</h3>
+      <div class="legend-inline"><span><i class="dot" style="background:var(--blue)"></i>연간 매출</span></div>
+      <div class="chart-wrap chart-sm"><canvas id="chartAnnual"></canvas></div>
+      <div class="chart-note">출처: Lam 연간 실적(6월 결산). FY23 $17.43B → FY24 $14.91B(메모리 다운사이클) → FY25 $18.44B(+24%). AI로 FY26 재차 성장(Mar'26 분기 $5.84B).</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">시스템 매출 시장별 구성 (%)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartSeg"></canvas></div>
+      <div class="chart-note">출처: 2025.3월 분기 시스템 매출 구성. 파운드리 48% · DRAM 23% · NAND(NVM) 20% · 로직/기타 9%. 지역: 중국 31%·대만 24%·한국 24%(동 분기). 최신 분기 믹스는 변동.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · AI/HBM·Packaging Thesis</p>
+  <h2>AI·HBM 알파 — WFE $140B·TSV 장비</h2>
+  <p class="lead">Lam은 AI發 <b>DRAM/HBM·NAND·패키징</b> 투자의 직접 수혜. Mar'26 컨콜에서 <b>2026 WFE 전망을 $140B로 상향</b>(AI 가속·NAND·DRAM·첨단 패키징 모멘텀). HBM/TSV에서 <b>Syndion(TSV 딥에칭)·SABRE 3D(구리 도금)</b>가 핵심. 3D NAND <b>몰리브덴 전환(ALTUS Halo)</b>, DRAM 4F²·3D DRAM, GAA가 식각/증착 강도를 높여 장비 인텐시티 상승.</p>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>2026 WFE $140B로 상향</b>. ② <b>HBM/TSV 장비 리더</b>(Syndion·SABRE 3D·VECTOR TEOS 3D). ③ <b>3D 스케일링</b> — NAND 단수↑·몰리 전환, DRAM 4F²·3D DRAM = 식각/증착 강도↑. ④ DRAM/HBM 모멘텀 확대. ⑤ <b>CSBG 리커링 ~$1.68B/분기</b>. ⑥ 파운드리 48%(선단 GAA — Striker SPARC ALD win).
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>중국 매출 비중 ~31%·수출규제</b> 리스크(축소 전망). ② <b>메모리(특히 NAND) 사이클</b> 변동성. ③ <b>밸류에이션</b>(주가 ~$317, 후행 P/E ~60x). ④ HBM TSV "독점" 보도는 <b>3자·과거 기준</b> — 재확인 필요. ⑤ 분기 <b>비GAAP EPS·마진은 일부만 확보</b>("데이터 없음"), 시장 믹스는 2025.3분기 기준.
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Valuation</p>
+  <h2>밸류에이션 (2026.6~7 경)</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> AI 랠리로 주가 급등 — 후행 멀티플이 소스·시점별로 상충. 2024.10 10:1 액면분할 반영. 발행일 실시간 시세로 재확인 필수. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>시가총액</td><td>~$400B (근사)</td><td>주가 ~$317 × ~1.26B주, 2026.6(집계)</td></tr>
+        <tr><td>P/E (TTM)</td><td>~60x</td><td>TTM EPS $5.32 기준(fullratio, 2026.6)</td></tr>
+        <tr><td>Forward P/E</td><td>데이터 없음</td><td>소스 상충</td></tr>
+        <tr><td>EV/EBITDA</td><td>데이터 없음</td><td>미확인</td></tr>
+        <tr><td>P/B</td><td>데이터 없음</td><td>미확인</td></tr>
+        <tr><td>배당</td><td>분기 배당 지급(주당·수익률 미확보)</td><td>Dec'25 분기 배당 총 $327.5M</td></tr>
+        <tr><td>자사주</td><td>활발(구체 미확보)</td><td>—</td></tr>
+        <tr><td>액면분할</td><td>10:1 (2024.10)</td><td>EPS 분할조정</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (12개 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기(캘린더)</th><th>매출 $B</th><th>비GAAP EPS</th><th>비GAAP GM</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">비GAAP EPS·GM은 <b>확인된 분기만</b> 표기(나머지 "–"=미확보, 추정 안 함). 매출은 FY 합계와 정합. EPS는 2024.10 10:1 분할 반영.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Tim Archer</b> · CFO <b>Doug Bettinger</b>. 실적·가이던스 / 경영진 / <b>AI·HBM·패키징</b>은 별도 블록. 수치는 GAAP·비GAAP 병기(분기말 캘린더).</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">Mar'26</span> 매출 $5.84B(+24% YoY, 사상최대) — WFE $140B로 상향 <span class="q-meta">2026.4.22 발표 (Q3 FY26)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$5.841B</span>(+24% YoY, +9% QoQ, 사상최대). GAAP EPS $1.45 / <b>비GAAP $1.47</b>. 비GAAP GM <b>49.9%</b>(가이드 상단).</li>
+          <li><b>Jun'26 가이드</b>: 매출 $6.60B±$0.4B, GM 50.5%, OM 36.5%, 비GAAP EPS $1.65±$0.15.</li>
+        </ul>
+        <h4>경영진 (CEO Archer)</h4>
+        <ul><li><b>2026 WFE 전망 $140B로 상향</b> — AI 가속 수요, NAND·DRAM·<b>첨단 패키징</b> 전반 모멘텀.</li></ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM·패키징 — Mar'26</span>
+          <ul><li>DRAM(HBM 포함)·첨단 패키징 모멘텀. TSV 식각(Syndion)·구리 도금(SABRE 3D)이 HBM 스택 핵심 장비.</li></ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">Dec'25</span> 매출 $5.345B · GM 49.6% — 실적 상회 <span class="q-meta">2026.1.28 경 발표 (Q2 FY26)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$5.345B</span>. GAAP EPS $1.26 / <b>비GAAP $1.27</b>(컨센 $1.16 상회). GM <b>49.6%</b>.</li>
+          <li><b>Mar'26 가이드</b>: 매출 $5.70B±$0.3B, GM 49%, OM 34%, EPS $1.35±$0.10(실제 상회).</li>
+        </ul>
+        <h4>경영진</h4>
+        <ul><li>DRAM(HBM 포함) 모멘텀 확대. AI 주도 성장 지속, 실적 상회로 주가 상승.</li></ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM·패키징 — Dec'25</span>
+          <ul><li>HBM 포함 DRAM 강세. 첨단 패키징 장비 수요 확대 기조.</li></ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">Sep'25</span> 매출 $5.324B · GM 50.4% <span class="q-meta">2025.10.22 발표 (Q1 FY26)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$5.324B</span>. GAAP EPS $1.24 / <b>비GAAP $1.26</b>. 비GAAP GM <b>50.4%</b>(높은 수준).</li>
+        </ul>
+        <h4>경영진</h4>
+        <ul><li>파운드리·DRAM 강세로 매출 확대. 마진 견조. AI 관련 투자 기조 지속.</li></ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM·패키징 — Sep'25</span>
+          <ul><li>DRAM·파운드리(선단 GAA) 견인. HBM/TSV 패키징 장비 모멘텀 지속.</li></ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">Jun'25</span> 매출 ~$5.17B — FY25 $18.44B(+24%) <span class="q-meta">2025.7월 하순 발표 (Q4 FY25)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">~$5.17B</span>(파생). <b>FY2025 매출 $18.44B(+23.7% YoY)</b>. (분기 세부 마진 일부 미확보.)</li>
+        </ul>
+        <h4>경영진</h4>
+        <ul><li>제품 win 다수: <b>Striker SPARC ALD</b>(선단 파운드리), <b>ALTUS Halo Mo</b>(3D NAND 몰리 전환), <b>Akara</b>(DRAM). 파운드리 48%·메모리 43%(3월 분기 믹스).</li></ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM·패키징 — Jun'25</span>
+          <ul><li>3D NAND 몰리 전환·DRAM 신제품이 식각/증착 강도↑. HBM/TSV 패키징 장비 수요 확대.</li></ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(1차 자료 기반).</b><br>
+    · 재무: Lam 실적 보도자료(8-K Ex-99)·10-Q/10-K — SEC EDGAR CIK 707549, newsroom.lamresearch.com. 분기말 캘린더 Jun'23~Mar'26(6월 결산). GAAP·비GAAP 병기. 매출은 FY 합계와 정합(FY24 $14.91B·FY25 $18.44B). EPS는 2024.10 10:1 액면분할 반영.<br>
+    · 세그먼트: Systems + CSBG(리커링 ~$1.68B/분기). 시장 믹스는 2025.3분기(파운드리 48%·DRAM 23%·NAND 20%·로직 9%), 지역 중국 31%·대만 24%·한국 24%.<br>
+    · AI·패키징: Mar'26 컨콜 — 2026 WFE $140B로 상향. HBM/TSV 장비 SABRE 3D(도금)·Syndion(TSV 식각)·VECTOR TEOS 3D. 제품 win: Striker SPARC·ALTUS Halo Mo·Akara.<br>
+    · 밸류에이션: 주가 ~$317(2026.6)·후행 P/E ~60x(TTM EPS $5.32, fullratio). 시총 ~$400B 근사(주식수·시점 부정확).<br>
+    · 컨콜: Lam IR·보도자료 및 Investing.com·Quartr·PRNewswire 교차확인. CEO Tim Archer · CFO Doug Bettinger.<br>
+    · <b>주의</b>: 본 리서치는 웹검색으로 원문을 추출했으나 SEC EDGAR·IR 원본 PDF를 직접 재검증하진 못했습니다(환경 접근 제한). Jun'23 매출·다수 분기 비GAAP EPS/마진, 시총·배당 세부, EV/EBITDA·P/B, 최신 시장 믹스는 미확보("데이터 없음"). HBM TSV "독점" 표현은 3자·과거 보도. 인용 전 8-K·10-Q·실시간 시세로 재확인 필수.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 최종 확인일 2026-07-15.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["Jun'23","Sep'23","Dec'23","Mar'24","Jun'24","Sep'24","Dec'24","Mar'25","Jun'25","Sep'25","Dec'25","Mar'26"];
+const revenue=[3.21,3.48,3.76,3.79,3.87,4.168,4.376,4.720,5.172,5.324,5.345,5.841];
+const ngEps=[null,null,null,null,null,null,null,null,null,1.26,1.27,1.47];
+const ngGm=[null,null,null,null,null,null,null,null,null,50.4,49.6,49.9];
+// 연간 매출
+const aLbl=["FY23","FY24","FY25"];
+const aVal=[17.43,14.91,18.44];
+// 시장 믹스(2025.3분기)
+const segLbl=["파운드리","DRAM","NAND(NVM)","로직/기타"];
+const segVal=[48,23,20,9];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:2,barPercentage:.82},
+    {type:'line',label:'비GAAP EPS',data:ngEps,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2.5,spanGaps:false,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='매출'?'매출: $'+c.parsed.y+'B':(c.parsed.y==null?c.dataset.label+': 데이터 없음':c.dataset.label+': $'+c.parsed.y.toFixed(2))}}},
+    scales:{y:{position:'left',title:{display:true,text:'$B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'EPS $'},grid:{drawOnChartArea:false},beginAtZero:true},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartAnnual'),{
+  type:'bar',
+  data:{labels:aLbl,datasets:[{label:'연간 매출',data:aVal,backgroundColor:[CLR.gray,CLR.gray,CLR.blue],barPercentage:.6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'B'}}},
+    scales:{y:{title:{display:true,text:'$B'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSeg'),{
+  type:'doughnut',
+  data:{labels:segLbl,datasets:[{data:segVal,backgroundColor:[CLR.blue,CLR.magenta,CLR.orange,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+
+const tb=document.getElementById('tblBody');
+const pct=v=>v==null?'–':v.toFixed(1)+'%';
+const eps=v=>v==null?'–':'$'+v.toFixed(2);
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(2)}</td><td>${eps(ngEps[i])}</td><td>${pct(ngGm[i])}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>

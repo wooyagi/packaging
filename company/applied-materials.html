@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applied Materials (AMAT) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Applied Materials</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · WFE 종합장비 · Etch·Depo·Packaging·eBeam</div>
+    <h1>Applied Materials</h1>
+    <div class="tick">NASDAQ: AMAT · 세계 최대 반도체 장비(WFE) · USD · 10월 결산</div>
+    <p>세계 최대 반도체 장비(WFE)사 — 증착·식각·이온주입·CMP·계측/검사·패키징을 아우르는 <b>'소재공학(materials engineering)' 리더</b>. AI가 <b>선단로직·HBM/DRAM·첨단 패키징</b> 투자를 동시에 가속 — Q2 FY26 매출 <b>$7.91B(사상최대)</b>, GAAP GM 49.9%. <b>첨단 패키징 매출 2026 +50%+ 전망</b>, 반도체 장비 매출 <b>CY26 +30%+ 가이드(상향)</b>, <b>DRAM 사상최대</b>. AGS(서비스) 리커링이 사이클 방어. 12개 분기 재무와 4개 컨콜을 실적 발표·8-K 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$7.91B</div><div class="l">Q2FY26 매출 (사상최대)</div></div>
+      <div class="hstat"><div class="v">&gt;30%</div><div class="l">CY26 장비매출 성장 가이드</div></div>
+      <div class="hstat"><div class="v">&gt;50%</div><div class="l">첨단 패키징 매출 성장(2026E)</div></div>
+      <div class="hstat"><div class="v">49.9%</div><div class="l">Q2FY26 GAAP 매출총이익률</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Applied Materials는 <b>세계 최대 반도체 장비(WFE)사</b>로, 증착·식각·이온주입·CMP·급속열처리·계측/검사·<b>패키징</b>까지 단일사로 가장 넓은 공정을 커버합니다. 통화 USD, <b>10월 결산</b>(회계연도), GAAP+비GAAP 병행 보고. 3개 부문 — <b>Semiconductor Systems(SSG) · Applied Global Services(AGS) · Display</b>.
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">Semiconductor Systems (~76%)</div>
+      <div class="bd">증착·식각·이온주입·CMP·RTP·계측/검사·<b>웨이퍼 패키징</b> 장비. AI 선단로직·<b>DRAM/HBM</b>이 견인 — Q2FY26 $6.0B(+14% YoY), <b>DRAM 사상최대</b>.</div>
+      <span class="tag" style="background:var(--blue);">핵심·AI</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Applied Global Services (~21%)</div>
+      <div class="bd">스페어·업그레이드·서비스·200mm·팹 자동화 SW. 설치기반 기반 <b>리커링</b> — Q2FY26 $1.7B(+6% YoY, 사상최대). 사이클 방어.</div>
+      <span class="tag" style="background:var(--green);">서비스·리커링</span>
+    </div>
+    <div class="biz">
+      <div class="bt">Display (~3%)</div>
+      <div class="bd">OLED·디스플레이 제조 장비. FY25 $1.06B(Q2FY26 ~$0.2B). 변동성 있으나 소규모.</div>
+      <span class="tag" style="background:var(--gray);">디스플레이</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경쟁력 · 해자(근거).</b> ① <b>최광폭 포트폴리오</b> — 증착·식각·이온주입·CMP·eBeam 등 단일사 최다 공정 커버(Lam은 식각·증착 특화, TEL·KLA와 분업). ② <b>소재공학 리더십</b> — 선단로직 트랜지스터·배선, DRAM 캐패시터·GAA(게이트올어라운드). ③ <b>첨단 패키징</b> — 하이브리드 본딩(450nm 피치 20M 인터커넥트 98% 수율 데모, ECTC'26), eBeam 계측(VeritySEM 7AP), 패키징 매출 <b>+50%(2026E)</b>. ④ <b>AGS 리커링</b>이 다운사이클 완충. <span style="color:var(--muted)">(점유율·순위는 3자 추정, 강점 서술은 회사 IR·컨콜 근거.)</span>
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·비GAAP EPS (최근 12개 분기)</h2>
+  <div class="callout warn">
+    <b>⚠ 기준·주의.</b> AMAT는 <b>GAAP + 비GAAP</b> 병행(헤드라인 비GAAP). <b>10월 결산</b> → 분기는 회계분기(2Q26=2026.4 종료). 매출은 완만한 순환 후 AI로 <b>Q2FY26 $7.91B 사상최대</b>. <b>Q2FY26 GAAP EPS $3.51(사상최대)은 비GAAP를 상회</b> → 일부 <b>일회성 이익</b> 포함 가능(운영추세는 비GAAP로 판단). 분기 GM/EPS는 <b>확인된 값만</b> 표기(나머지 "–"=미확보, 추정 안 함).
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출($B)</span>
+      <span><i class="dot line" style="background:var(--green)"></i>비GAAP EPS($)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: AMAT 실적 보도자료(8-K Ex-99)·macrotrends 교차확인 — SEC EDGAR CIK 6951. 회계분기 3Q23~2Q26(2Q26=2026.4.26 종료). 매출·비GAAP EPS는 FY 합계와 정합(FY24 $27.18B/$8.65·FY25 $28.37B/$9.42). 3Q23·4Q23·2Q26 비GAAP EPS 공백(미확보).</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Segments & Annual</p>
+  <h2>세그먼트 — SSG가 AI로 견인</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">연간 매출 ($B)</h3>
+      <div class="legend-inline"><span><i class="dot" style="background:var(--blue)"></i>연간 매출</span></div>
+      <div class="chart-wrap chart-sm"><canvas id="chartAnnual"></canvas></div>
+      <div class="chart-note">출처: AMAT 연간 실적. FY23 $26.52B → FY24 $27.18B → FY25 $28.37B(사상최대). AI로 CY26 반도체 장비 +30%+ 가이드.</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">Q2FY26 세그먼트 비중 (%)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartSeg"></canvas></div>
+      <div class="chart-note">출처: Q2FY26 실적($7.91B). SSG ~75.9%($6.0B) · AGS ~21.5%($1.7B) · Display ~2.5%(~$0.2B). SSG가 AI로 집중도 상승.</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · AI/HBM·Packaging Thesis</p>
+  <h2>AI·패키징 알파 — 장비 +30%·패키징 +50%</h2>
+  <p class="lead">AI가 <b>선단로직·HBM/DRAM·첨단 패키징</b>을 동시에 견인. AMAT는 <b>반도체 장비 매출 CY26 가이드를 +20%→+30%+로 상향</b>(2월→5월), <b>첨단 패키징 매출 +50%+(2026E)</b>, <b>DRAM 사상최대</b>를 제시. 하이브리드 본딩(450nm 피치 98% 수율 데모)·eBeam 계측(VeritySEM 7AP)·DRAM/패키징 신시스템(2026.6 발표)이 첨단 패키징 성장 엔진.</p>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>CY26 반도체 장비 +30%+</b>(가이드 상향). ② <b>첨단 패키징 +50%+</b>(2026E). ③ <b>DRAM 사상최대</b>(HBM·선단 DRAM·GAA 전환). ④ <b>하이브리드 본딩·eBeam 계측</b> 신제품으로 첨단 패키징 확장. ⑤ <b>AGS 리커링</b>($1.7B/분기, 사상최대). ⑥ 배당 <b>9년 연속 증배</b>(+15% → $0.53/분기).
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>중국 매출 비중·수출규제</b> 리스크. ② <b>Q2FY26 GAAP EPS $3.51은 일회성 이익 포함 가능</b>(GAAP&gt;비GAAP) — 운영추세는 비GAAP. ③ <b>밸류에이션 급등</b>(주가 ~$605, 시총 ~$473B, 후행 P/E ~46x). ④ 디스플레이·일부 성숙 수요 변동. ⑤ 패키징 매출 <b>절대액·분기 비GAAP 세부는 일부 미확보</b>("데이터 없음").
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Valuation</p>
+  <h2>밸류에이션 (2026.7 경)</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> AI 랠리로 주가 급등 — 후행 멀티플이 소스·시점별로 상충. 발행일 실시간 시세로 재확인 필수. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>시가총액</td><td>~$473B</td><td>주가 ~$605.46, companiesmarketcap 2026.7</td></tr>
+        <tr><td>P/E (TTM)</td><td>~46x</td><td>macrotrends/집계</td></tr>
+        <tr><td>Forward P/E</td><td>~33x</td><td>GuruFocus 등</td></tr>
+        <tr><td>EV/EBITDA</td><td>데이터 없음</td><td>소스 상충</td></tr>
+        <tr><td>P/B</td><td>데이터 없음</td><td>미확인</td></tr>
+        <tr><td>배당</td><td>$2.12/년($0.53/분기), 수익률 ~0.43%</td><td>+15% 인상, 9년 연속 증배</td></tr>
+        <tr><td>자사주</td><td>활발(구체 미확보)</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (12개 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기(회계)</th><th>매출 $B</th><th>비GAAP EPS</th><th>GAAP GM</th><th>비GAAP GM</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">비GAAP EPS·GM은 <b>확인된 분기만</b> 표기(나머지 "–"=미확보, 추정 안 함). 매출·비GAAP EPS는 FY 합계와 정합. 2Q26 GAAP EPS $3.51(사상최대)은 일회성 이익 포함 가능.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Gary Dickerson</b> · CFO <b>Brice Hill</b>. 실적·가이던스 / 경영진 / <b>AI·패키징</b>은 별도 블록. 수치는 GAAP·비GAAP 병기(회계분기).</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">Q2 FY26</span> 매출 $7.91B(사상최대) · GM 49.9% — 장비 CY26 +30%로 상향 <span class="q-meta">2026.5.14 발표 (2026.4 종료)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$7.91B</span>(사상최대, +11.4% YoY). GAAP GM <b>49.9%</b>, GAAP 영업익 $2.52B(<b>31.9%</b>), <b>GAAP EPS $3.51(사상최대)</b>. SSG $6.0B(+14% YoY), AGS $1.7B(+6% YoY, 사상최대).</li>
+          <li><b>가이드 상향</b>: 반도체 장비 매출 <b>CY26 +30%+</b>(2월 +20%에서 상향). 배당 <b>+15% → $0.53/분기</b>(9년 연속).</li>
+        </ul>
+        <h4>경영진 (CEO Dickerson)</h4>
+        <ul>
+          <li>AI 컴퓨팅 투자 가속 — 고성능·고효율 칩 수요가 선단로직·HBM·첨단 패키징 고성장 견인. "선단로직·DRAM·패키징 리더십이 다년 성장 기반."</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·패키징 — Q2FY26</span>
+          <ul>
+            <li><b>첨단 패키징 매출 +50%+(2026E)</b>. 하이브리드 본딩 450nm 피치 <b>98% 수율</b> 데모(ECTC'26), eBeam <b>VeritySEM 7AP</b> CD 계측(HBM·칩렛 왜곡 기판 대응).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">Q1 FY26</span> 매출 $7.01B — DRAM·AGS 사상최대 <span class="q-meta">2026.2.12 발표 (2026.1 종료)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$7.01B</span>(−2% YoY). GAAP EPS $2.54 / <b>비GAAP $2.38</b>. GAAP GM 49.0%·<b>비GAAP GM 49.1%</b>, 비GAAP OM 30.0%. <b>DRAM 사상최대</b>, AGS 서비스·스페어 사상최대.</li>
+          <li><b>Q2 가이드</b>: 매출 ~$7.65B±$0.5B, 비GAAP EPS $2.64±$0.20(실제 상회).</li>
+        </ul>
+        <h4>경영진 (CEO Dickerson)</h4>
+        <ul>
+          <li>AI 컴퓨팅 투자 가속이 선단로직·HBM·첨단 패키징 고성장 견인. CY26 반도체 장비 <b>+20%+</b> 전망(이후 Q2에서 +30%로 상향).</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·패키징 — Q1FY26</span>
+          <ul><li>HBM·첨단 패키징이 구조적 성장축. DRAM 매출 사상최대(선단 DRAM·GAA 전환 수혜).</li></ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">Q4 FY25</span> 매출 $6.80B — FY25 매출·EPS 사상최대 <span class="q-meta">2025.11.13 발표 (2025.10 종료)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>Q4 매출 <span class="num">$6.80B</span>(−3% YoY). GAAP EPS $2.38 / <b>비GAAP $2.17</b>. <b>FY2025: 매출 $28.37B(+4%, 사상최대)·비GAAP EPS $9.42(사상최대)</b>.</li>
+        </ul>
+        <h4>경영진</h4>
+        <ul><li>2026을 AI·선단노드 주도 성장의 해로 제시. 첨단 패키징·HBM을 신성장 축으로 강조.</li></ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·패키징 — Q4FY25</span>
+          <ul><li>첨단 패키징을 별도 성장축으로 육성. 선단로직·DRAM 투자 지속.</li></ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">Q3 FY25</span> 매출 $7.30B <span class="q-meta">2025.8월 중순 발표 (2025.7 종료)</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$7.30B</span>(당시 분기 최고 수준). <b>비GAAP EPS $2.48</b>. (분기 세부 마진 일부 미확보.)</li>
+        </ul>
+        <h4>경영진</h4>
+        <ul><li>선단로직·DRAM 견조. 중국 성숙노드 수요 정상화, AI 관련 투자 확대 기조.</li></ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·패키징 — Q3FY25</span>
+          <ul><li>DRAM·선단로직 강세. 첨단 패키징 파이프라인 확대 지속.</li></ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(1차 자료 기반).</b><br>
+    · 재무: AMAT 실적 보도자료(8-K Ex-99)·10-Q — SEC EDGAR CIK 6951, macrotrends 교차확인. 회계분기 3Q23~2Q26(10월 결산). GAAP·비GAAP 병기. 매출·비GAAP EPS는 FY 합계와 정합(FY24 $27.18B/$8.65·FY25 $28.37B/$9.42).<br>
+    · 세그먼트: Q2FY26 SSG $6.0B·AGS $1.7B·Display ~$0.2B. Display FY25 $1.06B.<br>
+    · AI·패키징: Q1/Q2 FY26 컨콜 — CY26 반도체 장비 +30%+(상향), 첨단 패키징 +50%+(2026E), DRAM 사상최대. 하이브리드 본딩(ECTC'26 450nm 98% 수율), eBeam VeritySEM 7AP, DRAM/패키징 신시스템(2026.6).<br>
+    · 밸류에이션: 주가 ~$605.46·시총 ~$473B(2026.7, companiesmarketcap), 후행 P/E ~46x·Forward ~33x, 배당 $2.12/년(+15%).<br>
+    · 컨콜: AMAT IR·보도자료 및 Motley Fool·GlobeNewswire 교차확인. CEO Gary Dickerson · CFO Brice Hill.<br>
+    · <b>주의</b>: 본 리서치는 웹검색으로 원문을 추출했으나 SEC EDGAR·IR 원본 PDF를 직접 재검증하진 못했습니다(환경 접근 제한). 3Q23·4Q23·2Q26 비GAAP EPS, 다수 분기 마진, 첨단 패키징 절대 매출액, EV/EBITDA·P/B는 미확보("데이터 없음"). 인용 전 8-K·10-Q·실시간 시세로 재확인 필수.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 최종 확인일 2026-07-15.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26","2Q26"];
+const revenue=[6.43,6.72,6.71,6.65,6.78,7.05,7.17,7.10,7.30,6.80,7.01,7.91];
+const ngEps=[null,null,2.13,2.09,2.12,2.32,2.38,2.39,2.48,2.17,2.38,null];
+// 표 전용
+const gaapGm=[null,null,null,null,null,null,null,null,null,null,49.0,49.9];
+const ngGm=[null,null,null,null,null,null,null,null,null,null,49.1,null];
+// 연간 매출
+const aLbl=["FY23","FY24","FY25"];
+const aVal=[26.52,27.18,28.37];
+// Q2FY26 세그먼트
+const segLbl=["Semi Systems","AGS","Display"];
+const segVal=[75.9,21.5,2.5];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:2,barPercentage:.82},
+    {type:'line',label:'비GAAP EPS',data:ngEps,borderColor:CLR.green,backgroundColor:CLR.green,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2.5,spanGaps:false,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='매출'?'매출: $'+c.parsed.y+'B':(c.parsed.y==null?c.dataset.label+': 데이터 없음':c.dataset.label+': $'+c.parsed.y.toFixed(2))}}},
+    scales:{y:{position:'left',title:{display:true,text:'$B'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'EPS $'},grid:{drawOnChartArea:false},beginAtZero:true},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartAnnual'),{
+  type:'bar',
+  data:{labels:aLbl,datasets:[{label:'연간 매출',data:aVal,backgroundColor:[CLR.gray,CLR.gray,CLR.blue],barPercentage:.6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'B'}}},
+    scales:{y:{title:{display:true,text:'$B'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartSeg'),{
+  type:'doughnut',
+  data:{labels:segLbl,datasets:[{data:segVal,backgroundColor:[CLR.blue,CLR.green,CLR.gray],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+
+const tb=document.getElementById('tblBody');
+const pct=v=>v==null?'–':v.toFixed(1)+'%';
+const eps=v=>v==null?'–':'$'+v.toFixed(2);
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(2)}</td><td>${eps(ngEps[i])}</td><td>${pct(gaapGm[i])}</td><td>${pct(ngGm[i])}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
