@@ -43,6 +43,21 @@
   .card-arrow{font-size:20px;color:var(--muted);margin-top:auto;transition:transform .15s,color .15s;}
   .main-card:hover .card-arrow{transform:translateX(4px);color:var(--accent);}
 
+  /* 종합 정리 피처 카드 */
+  .feature-card{display:block;background:var(--ink);color:#fff;border:1px solid #262d38;border-radius:16px;padding:24px 26px;text-decoration:none;margin-bottom:36px;position:relative;overflow:hidden;transition:box-shadow .15s,transform .15s,border-color .15s;}
+  .feature-card:hover{border-color:var(--accent);box-shadow:0 10px 30px rgba(124,58,237,.18);transform:translateY(-2px);}
+  .feature-card:before{content:"";position:absolute;inset:0;background:radial-gradient(600px 200px at 100% 0,rgba(124,58,237,.22),transparent 70%);pointer-events:none;}
+  .fc-eyebrow{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.8px;color:#b79cf0;text-transform:uppercase;margin-bottom:9px;}
+  .fc-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .fc-title{font-size:21px;font-weight:800;letter-spacing:-.3px;color:#fff;}
+  .fc-count{font-family:var(--mono);font-size:12px;font-weight:700;color:#9aa6b7;}
+  .fc-desc{font-size:13.5px;color:#c3cad6;line-height:1.65;margin:10px 0 14px;max-width:640px;}
+  .fc-desc b{color:#fff;}
+  .fc-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+  .fc-chip{font-size:11px;font-weight:700;color:#fff;border-radius:5px;padding:3px 9px;font-family:var(--sans);}
+  .fc-cta{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:#fff;background:var(--accent);border-radius:9px;padding:8px 15px;transition:gap .15s;}
+  .feature-card:hover .fc-cta{gap:11px;}
+
   /* 빈 상태 */
   .empty{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:40px 26px;text-align:center;color:var(--muted);font-size:14px;line-height:1.7;}
   .empty code{font-family:var(--mono);background:#f0eefc;color:var(--accent);padding:2px 7px;border-radius:5px;font-size:13px;}
@@ -67,6 +82,25 @@
 </div>
 
 <main>
+
+  <p class="section-label">종합 정리</p>
+  <a class="feature-card" href="../insights/">
+    <div class="fc-eyebrow">🧭 컨콜·IR 인사이트</div>
+    <div class="fc-top">
+      <span class="fc-title">패키징 발언, 업종별 한 장 정리</span>
+      <span class="fc-count">14개 기업 · 6개 업종 · 핵심 포인트 8</span>
+    </div>
+    <p class="fc-desc">아래 등록된 기업들의 최근 <b>컨콜·IR 발언 중 첨단 패키징 관련 내용만</b> 추려, 업종별로 묶고 여기서 뽑을 수 있는 <b>핵심 포인트</b>를 한 페이지로 정리했습니다. "AI가 유일 동력 → 병목이 캐파로 이동 → 테스트·검사 인텐시티 상승, HBM4가 방아쇠"라는 밸류체인 공통 메시지를 한눈에.</p>
+    <div class="fc-chips">
+      <span class="fc-chip" style="background:#2563a8;">OSAT</span>
+      <span class="fc-chip" style="background:#7c3aed;">테스트하우스</span>
+      <span class="fc-chip" style="background:#b0357a;">테스트 장비(ATE)</span>
+      <span class="fc-chip" style="background:#d9892b;">프로브카드</span>
+      <span class="fc-chip" style="background:#0f766e;">검사·계측</span>
+      <span class="fc-chip" style="background:#1f7a4d;">패키징 장비</span>
+    </div>
+    <span class="fc-cta">업종별 정리 보기 →</span>
+  </a>
 
   <p class="section-label">등록 기업</p>
   <div class="cards">

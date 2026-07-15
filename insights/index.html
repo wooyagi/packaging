@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>패키징 컨콜·IR 인사이트 · 첨단 패키징 리서치</title>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --green:#1f7a4d;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+    /* 업종 색 */
+    --c-osat:#2563a8; --c-th:#7c3aed; --c-ate:#b0357a; --c-pc:#d9892b; --c-im:#0f766e; --c-eq:#1f7a4d;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;}
+
+  /* 히어로 */
+  .hero{background:var(--ink);color:#fff;padding:52px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+  .hero h1{font-size:31px;font-weight:800;margin:0 0 12px;letter-spacing:-.5px;line-height:1.2;}
+  .hero p{font-size:14.5px;color:#9aa6b7;margin:0;max-width:660px;line-height:1.62;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hero-stat{display:flex;flex-direction:column;gap:2px;}
+  .hero-stat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);letter-spacing:-.3px;}
+  .hero-stat .l{font-size:11px;color:#8290a3;font-weight:600;}
+
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:46px 0 14px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0 0 6px;color:var(--ink);}
+  .sub{font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.6;}
+
+  /* 논지 배너 */
+  .thesis{background:linear-gradient(135deg,#1c222c,#2a2140);color:#fff;border-radius:16px;padding:24px 26px;margin-bottom:6px;}
+  .thesis .t-eyebrow{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.8px;color:#b79cf0;text-transform:uppercase;margin-bottom:9px;}
+  .thesis p{margin:0;font-size:15px;line-height:1.7;color:#e8eaf0;}
+  .thesis b{color:#fff;}
+
+  /* 밸류체인 흐름 */
+  .flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px;}
+  .flow-col{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;position:relative;}
+  .flow-col h3{margin:0 0 3px;font-size:13px;font-weight:800;color:var(--ink);}
+  .flow-col .flow-desc{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:11px;}
+  .flow-seg{display:flex;align-items:center;gap:7px;padding:5px 0;border-top:1px dashed var(--line);}
+  .flow-seg:first-of-type{border-top:none;}
+  .flow-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;}
+  .flow-seg .fs-name{font-size:12px;font-weight:700;color:var(--text);}
+  .flow-seg .fs-co{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto;}
+  .flow-arrow{position:absolute;right:-11px;top:50%;transform:translateY(-50%);z-index:2;font-size:15px;color:#c3c8d0;font-weight:800;}
+  @media(max-width:720px){.flow{grid-template-columns:1fr;} .flow-arrow{display:none;}}
+
+  /* 업종 블록 */
+  .seg{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0;margin-bottom:16px;overflow:hidden;}
+  .seg-head{padding:16px 22px;border-left:5px solid var(--sc);display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+  .seg-badge{font-family:var(--mono);font-size:11px;font-weight:800;color:#fff;background:var(--sc);border-radius:6px;padding:4px 10px;white-space:nowrap;flex:0 0 auto;margin-top:2px;}
+  .seg-head .sh-main{flex:1;min-width:220px;}
+  .seg-head h3{margin:0 0 3px;font-size:16px;font-weight:800;color:var(--ink);}
+  .seg-head .sh-take{font-size:13px;color:#3f4653;line-height:1.55;margin:0;}
+  .seg-signal{font-size:11.5px;color:var(--sc);font-weight:700;font-family:var(--mono);background:var(--sc-bg);border-radius:7px;padding:8px 12px;line-height:1.45;flex:0 0 auto;max-width:260px;}
+
+  .co-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line);}
+  @media(max-width:640px){.co-grid{grid-template-columns:1fr;}}
+  .co{background:var(--card);padding:15px 18px 16px;text-decoration:none;color:inherit;display:block;transition:background .13s;}
+  .co:hover{background:#faf9fe;}
+  .co-top{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;}
+  .co-name{font-size:14px;font-weight:800;color:var(--ink);}
+  .co-tkr{font-size:10.5px;color:var(--muted);font-family:var(--mono);font-weight:600;}
+  .co-go{margin-left:auto;font-size:14px;color:#c3c8d0;}
+  .co:hover .co-go{color:var(--sc);}
+  .co-metric{display:inline-block;font-size:11.5px;font-weight:700;color:var(--sc);background:var(--sc-bg);border-radius:5px;padding:2px 8px;margin-bottom:9px;}
+  .co-metric .ml{color:var(--muted);font-weight:600;}
+  .quotes{list-style:none;margin:0;padding:0;}
+  .quotes li{font-size:12.5px;color:#333;line-height:1.55;padding-left:16px;position:relative;margin-bottom:6px;}
+  .quotes li:before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--sc);opacity:.55;}
+  .quotes .qp{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--sc);background:var(--sc-bg);border-radius:3px;padding:0 5px;margin-right:5px;vertical-align:1px;}
+  .quotes b{color:var(--ink);}
+
+  /* 핵심 포인트 */
+  .points{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:680px){.points{grid-template-columns:1fr;}}
+  .pt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;position:relative;}
+  .pt-n{font-family:var(--mono);font-size:12px;font-weight:800;color:#fff;background:var(--accent);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:11px;}
+  .pt h4{margin:0 0 6px;font-size:14.5px;font-weight:800;color:var(--ink);letter-spacing:-.2px;line-height:1.35;}
+  .pt p{margin:0 0 10px;font-size:12.5px;color:#3f4653;line-height:1.6;}
+  .pt .ev{font-size:11px;color:var(--muted);line-height:1.55;border-top:1px dashed var(--line);padding-top:8px;font-family:var(--mono);}
+  .pt .ev b{color:var(--accent);font-weight:700;}
+
+  /* 유의점 */
+  .watch{background:#fff8f0;border:1px solid #f2ddc0;border-left:5px solid var(--c-pc);border-radius:14px;padding:18px 22px;}
+  .watch h4{margin:0 0 10px;font-size:13px;font-weight:800;color:#9a5b12;text-transform:uppercase;letter-spacing:.4px;font-family:var(--mono);}
+  .watch ul{margin:0;padding-left:18px;} .watch li{font-size:12.5px;color:#5c4a33;line-height:1.6;margin-bottom:7px;}
+  .watch b{color:#7a3f08;}
+
+  footer{max-width:960px;margin:0 auto;padding:6px 24px 44px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.7;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:2px 0 26px;}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:600;}
+  .lg i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  @media(max-width:560px){ .hero h1{font-size:24px;} }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / 패키징 인사이트</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Insights · Earnings Call &amp; IR</div>
+    <h1>패키징 컨콜·IR 인사이트</h1>
+    <p>기업 분석에 등록된 <b style="color:#fff">14개 기업</b>의 최근 컨콜·IR 발언 중 <b style="color:#fff">첨단 패키징 관련 내용만</b> 추려, <b style="color:#fff">업종별</b>로 묶고 여기서 뽑을 수 있는 <b style="color:#fff">핵심 포인트</b>를 한 페이지에 정리했습니다. 각 기업 카드를 누르면 원문 기반 상세 분석으로 이동합니다.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="v">14</span><span class="l">기업</span></div>
+      <div class="hero-stat"><span class="v">6</span><span class="l">업종 카테고리</span></div>
+      <div class="hero-stat"><span class="v">8</span><span class="l">핵심 포인트</span></div>
+      <div class="hero-stat"><span class="v">FY25~1Q26</span><span class="l">기준 분기</span></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ 논지 ============ -->
+  <p class="section-label">한 줄 논지</p>
+  <div class="thesis">
+    <div class="t-eyebrow">The Big Picture</div>
+    <p>AI 가속기 수요가 <b>HBM·CoWoS 패키징을 병목</b>으로 만들면서, 밸류체인 전 업종의 컨콜이 사실상 <b>같은 대본</b>을 읽고 있다 — "AI가 유일한 성장 동력, 나머지 전방(PC·모바일·오토·산업)은 부진." 2025년의 병목은 기술이 아니라 <b>물리적 캐파(floor-space)</b>로 옮겨갔고, 이는 곧 <b>다년 증설(capex) 사이클</b>과 <b>테스트·검사 인텐시티 상승</b>을 의미한다. HBM4 전환이 2026~27년 차수 상향의 방아쇠다.</p>
+  </div>
+
+  <!-- ============ 밸류체인 흐름 ============ -->
+  <p class="section-label">밸류체인 위 6개 업종</p>
+  <h2>어디에 있는 회사들인가</h2>
+  <p class="sub">칩을 만든 뒤(후공정) — <b>패키징 공정을 직접 수행</b>하거나, 그 공정에 <b>장비를 파는</b> 회사들이다. 크게 서비스 · 테스트 · 장비/검사 세 갈래.</p>
+  <div class="flow">
+    <div class="flow-col">
+      <h3>① 후공정 서비스</h3>
+      <div class="flow-desc">패키징·테스트를 직접 수행 (외주)</div>
+      <div class="flow-seg"><span class="flow-dot" style="background:var(--c-osat)"></span><span class="fs-name">OSAT</span><span class="fs-co">Amkor · ASE</span></div>
+      <div class="flow-seg"><span class="flow-dot" style="background:var(--c-th)"></span><span class="fs-name">테스트하우스</span><span class="fs-co">KYEC</span></div>
+      <span class="flow-arrow">→</span>
+    </div>
+    <div class="flow-col">
+      <h3>② 테스트 장비·접점</h3>
+      <div class="flow-desc">칩을 검사하는 장비와 물리적 접점</div>
+      <div class="flow-seg"><span class="flow-dot" style="background:var(--c-ate)"></span><span class="fs-name">테스트 장비(ATE)</span><span class="fs-co">Advantest · Teradyne</span></div>
+      <div class="flow-seg"><span class="flow-dot" style="background:var(--c-pc)"></span><span class="fs-name">프로브카드</span><span class="fs-co">FormFactor · Technoprobe · MPI</span></div>
+      <span class="flow-arrow">→</span>
+    </div>
+    <div class="flow-col">
+      <h3>③ 공정 장비·검사</h3>
+      <div class="flow-desc">패키징 공정 장비와 품질 검사</div>
+      <div class="flow-seg"><span class="flow-dot" style="background:var(--c-eq)"></span><span class="fs-name">패키징 장비</span><span class="fs-co">TEL · SÜSS · DISCO</span></div>
+      <div class="flow-seg"><span class="flow-dot" style="background:var(--c-im)"></span><span class="fs-name">검사·계측</span><span class="fs-co">KLA · Onto · Camtek</span></div>
+    </div>
+  </div>
+
+  <!-- ============ 업종별 정리 ============ -->
+  <p class="section-label">업종별 발언 정리</p>
+  <h2>각 업종은 컨콜에서 무엇을 말했나</h2>
+  <p class="sub">업종별 한 줄 메시지 + 투자자가 볼 시그널, 그리고 개별 기업의 대표 발언(패키징 관련). <b>수치는 회사 공시·컨콜 기준</b>이며 인용 전 원문 재확인 권장.</p>
+
+  <!-- OSAT -->
+  <div class="seg" style="--sc:var(--c-osat);--sc-bg:#eaf1f9;">
+    <div class="seg-head">
+      <span class="seg-badge">① OSAT</span>
+      <div class="sh-main">
+        <h3>외주 패키징·테스트 — "캐파가 곧 매출"</h3>
+        <p class="sh-take">첨단 패키징(HDFO·2.5D·FOCoS)이 AI 데이터센터의 핵심. 두 회사 모두 <b>병목은 수요가 아니라 캐파</b>라며 대규모 증설 중. AI 믹스가 그룹 마진을 끌어올린다.</p>
+      </div>
+      <div class="seg-signal">📍 시그널: AI 첨단 패키징 매출 램프 속도 + 신규 팹 가동·인증 진척</div>
+    </div>
+    <div class="co-grid">
+      <a class="co" href="../company/amkor.html">
+        <div class="co-top"><span class="co-name">Amkor</span><span class="co-tkr">AMKR</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">2026 capex</span> $2.5–3.0B</span>
+        <ul class="quotes">
+          <li><span class="qp">4Q25</span>HDFO 2개 프로그램 <b>AI 데이터센터 최종 인증</b>, 2H26 한국 양산 개시.</li>
+          <li><span class="qp">4Q25</span>CEO: "첨단 패키징 <b>캐파가 병목</b> → 2026 대규모 투자." 애리조나 $7B 캠퍼스 + TSMC 10년 계약.</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/ase-technology.html">
+        <div class="co-top"><span class="co-name">ASE Technology</span><span class="co-tkr">ASX·3711</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">LEAP 2026E</span> &gt;US$3.5B (+118%)</span>
+        <ul class="quotes">
+          <li><span class="qp">1Q26</span>AI 패키징·테스트 "LEAP" <b>$0.6B(24)→$1.6B(25)→&gt;$3.5B(26E)</b>. 패키징 75%·테스트 25%.</li>
+          <li><span class="qp">4Q25</span>ATM GM 26.3%가 그룹 GM 19.5%로 점프. 6개 그린필드 착공, Kaohsiung &gt;NT$108B 투자.</li>
+        </ul>
+      </a>
+    </div>
+  </div>
+
+  <!-- 테스트하우스 -->
+  <div class="seg" style="--sc:var(--c-th);--sc-bg:#f2ecfd;">
+    <div class="seg-head">
+      <span class="seg-badge">② 테스트하우스</span>
+      <div class="sh-main">
+        <h3>독립 테스트 서비스 — "2026은 수확의 해"</h3>
+        <p class="sh-take">GPU·ASIC 테스트 물량 급증. AI/HPC가 매출의 3/4을 넘어서며 사상 최대 capex로 캐파 확장. <b>제약은 플로어스페이스.</b></p>
+      </div>
+      <div class="seg-signal">📍 시그널: 가동률(고급 테스트 &gt;80%) + NVIDIA 공급 지위·미국 투자</div>
+    </div>
+    <div class="co-grid">
+      <a class="co" href="../company/king-yuan-electronics.html">
+        <div class="co-top"><span class="co-name">King Yuan (KYEC)</span><span class="co-tkr">2449</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">AI/HPC 비중</span> 2026 ~75–77%</span>
+        <ul class="quotes">
+          <li><span class="qp">1Q26</span>매출 첫 <b>&gt;NT$100억</b>(+39% YoY), 영업이익 +82%. 세계 최대 독립 테스트.</li>
+          <li><span class="qp">4Q25</span>법설: 2026 = <b>"수확의 해"</b>, 캐파·플로어스페이스가 핵심 제약. capex NT$500억(사상최대).</li>
+        </ul>
+      </a>
+      <div class="co" style="cursor:default;background:#fbfbfc;">
+        <div class="co-top"><span class="co-name" style="color:var(--muted)">중국어 법설 위주</span></div>
+        <ul class="quotes"><li style="color:var(--muted)">KYEC·MPI 등 대만 중소형주는 영문 어닝콜 전문이 없어 <b>중국어 법인설명회(法說會)·2차 요약</b> 기반 — 축어 인용에 유의.</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATE -->
+  <div class="seg" style="--sc:var(--c-ate);--sc-bg:#f9eaf2;">
+    <div class="seg-head">
+      <span class="seg-badge">③ 테스트 장비(ATE)</span>
+      <div class="sh-main">
+        <h3>SoC·메모리 테스터 — "테스트 시간이 늘어난다"</h3>
+        <p class="sh-take">Advantest·Teradyne 듀오폴리(~80%+). AI 칩 복잡도 상승으로 칩당 <b>테스트 시간·비중이 구조적으로 증가</b>. HBM4가 다음 레그.</p>
+      </div>
+      <div class="seg-signal">📍 시그널: AI 매출 비중(TER ~70%) + HBM4 테스터(Magnum 7H) 램프</div>
+    </div>
+    <div class="co-grid">
+      <a class="co" href="../company/advantest.html">
+        <div class="co-top"><span class="co-name">Advantest</span><span class="co-tkr">6857</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">FY25 매출</span> ¥1,128.6B (+44.7%)</span>
+        <ul class="quotes">
+          <li><span class="qp">FY25Q4</span><b>Rubin/HBM4(288GB)가 테스트 시간↑ → 2026 순풍</b>. FY26 가이드 ¥1,420B(+25.8%).</li>
+          <li><span class="qp">FY25Q1</span>SoC 테스터 ¥191.3B(+¥42.4B QoQ)·메모리 테스터 ¥33.5B — AI가 두 축 동반 견인.</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/teradyne.html">
+        <div class="co-top"><span class="co-name">Teradyne</span><span class="co-tkr">TER</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">1Q26 AI 비중</span> ~70%</span>
+        <ul class="quotes">
+          <li><span class="qp">3Q25</span>메모리(HBM) 테스트 <b>QoQ 2배+ $128M</b>, 컴퓨트가 SoC 매출 &gt;50%(2023 10%).</li>
+          <li><span class="qp">1Q26</span>VIP 컴퓨트 테스트 ~50% 점유, HBM4 Magnum 7H 램프. 중기 목표 ~$6B.</li>
+        </ul>
+      </a>
+    </div>
+  </div>
+
+  <!-- 프로브카드 -->
+  <div class="seg" style="--sc:var(--c-pc);--sc-bg:#fbf1e3;">
+    <div class="seg-head">
+      <span class="seg-badge">④ 프로브카드</span>
+      <div class="sh-main">
+        <h3>웨이퍼 테스트 접점 — "HBM이 로직 난이도로 수렴"</h3>
+        <p class="sh-take">HBM용 DRAM 프로브카드가 AI 성장축. HBM 세대가 복잡해지며 <b>고병렬·at-speed</b> 요구 상승 → ASP·콘텐츠 증가. HBM4가 분기점.</p>
+      </div>
+      <div class="seg-signal">📍 시그널: DRAM/HBM 프로브카드 매출 + HBM4 인증 지위, 생산능력 2배 증설</div>
+    </div>
+    <div class="co-grid">
+      <a class="co" href="../company/formfactor.html">
+        <div class="co-top"><span class="co-name">FormFactor</span><span class="co-tkr">FORM</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">DRAM 프로브카드 1Q26</span> $82.9M (+70%)</span>
+        <ul class="quotes">
+          <li><span class="qp">1Q26</span>Smart Matrix가 <b>HBM4 고병렬·at-speed(10Gbps+) 유일 양산검증</b>. 3대 HBM사 모두 점유 확대.</li>
+          <li><span class="qp">4Q25</span>HBM4=16단, 대역폭 2+Tbps. HBM5는 하이브리드 본딩 기회. CPO(Triton) 26년 $10–20M.</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/technoprobe.html">
+        <div class="co-top"><span class="co-name">Technoprobe</span><span class="co-tkr">TPRO</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">AI 비중</span> ~38% · FY26 목표 €0.95–1.05B</span>
+        <ul class="quotes">
+          <li><span class="qp">H1'25</span>HBM은 <b>인증 단계 → 매출은 2026+</b>. "HBM 세대가 복잡해지며 로직 다이 복잡도로 수렴."</li>
+          <li><span class="qp">FY25</span>Teradyne 파트너십(DIS 인수)으로 최종테스트 인터페이스까지 수직통합. 생산능력 2배.</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/mpi-corporation.html">
+        <div class="co-top"><span class="co-name">MPI Corp.</span><span class="co-tkr">6223</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">VPC 수주</span> B/B&gt;1 · 가시성 Q3'26</span>
+        <ul class="quotes">
+          <li><span class="qp">FY25</span>VPC(수직 프로브카드) <b>풀로드</b>, 프로브카드 72%·장비 26% 믹스. 2026 capex ~NT$27억.</li>
+          <li><span class="qp">FY25</span>MEMS 월 캐파 200만 핀, <b>CPO 양면 테스트</b> 개발 — 장비 신영역. (중형주·재무 검증 제약)</li>
+        </ul>
+      </a>
+    </div>
+  </div>
+
+  <!-- 검사·계측 -->
+  <div class="seg" style="--sc:var(--c-im);--sc-bg:#e5f2f0;">
+    <div class="seg-head">
+      <span class="seg-badge">⑤ 검사·계측</span>
+      <div class="sh-main">
+        <h3>공정제어 — "패키징이 WFE 밖 별도 성장축"</h3>
+        <p class="sh-take">HBM 층수·범프 밀도 상승으로 <b>검사·계측 샘플링율이 급등</b>("결함 놓치면 안 되니까"). 3사 모두 첨단 패키징 매출이 코어보다 빠르게 성장.</p>
+      </div>
+      <div class="seg-signal">📍 시그널: AP 공정제어 매출 성장률 + HBM4 3D 계측·VPA 수주</div>
+    </div>
+    <div class="co-grid">
+      <a class="co" href="../company/kla.html">
+        <div class="co-top"><span class="co-name">KLA</span><span class="co-tkr">KLAC</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">AP 공정제어</span> CY24 $500M→CY26 ~$1B</span>
+        <ul class="quotes">
+          <li><span class="qp">FQ3'26</span>AWLP 공정제어 <b>2025년 1위</b>(점유율 +14%p, 매출 +70%). 성장률 "upper-50%대"로 상향.</li>
+          <li><span class="qp">FQ4'25</span>패키징 공정제어 인텐시티 2022 ~1% → 현재 <b>~5–6%</b>. "WFE 밖 별도 성장축."</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/onto-innovation.html">
+        <div class="co-top"><span class="co-name">Onto Innovation</span><span class="co-tkr">ONTO</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">FY26 AP 성장</span> &gt;50% · 1Q26 $292M(최대)</span>
+        <ul class="quotes">
+          <li><span class="qp">4Q25</span>한 HBM 고객과 <b>$240M+ 볼륨구매계약(3D 범프계측 $60M+ 포함)</b>. 2D→3D "50:50 이동."</li>
+          <li><span class="qp">4Q25</span>"AI 2.5D 패키징 주문 QoQ 2배+." 패널레벨 JetStep 8대 수주, 2027 램프.</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/camtek.html">
+        <div class="co-top"><span class="co-name">Camtek</span><span class="co-tkr">CAMT</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">AP 매출 비중</span> ~70% (AI ~50%)</span>
+        <ul class="quotes">
+          <li><span class="qp">1Q26</span>HBM 2개사로부터 <b>2026–27 합산 $260M+</b> 수주. HBM4 3D 계측 tool of reference.</li>
+          <li><span class="qp">1Q26</span>Eagle G5+Hawk = 25년 ~30% → 26년 ~2배. Hawk는 웨이퍼당 ~5억 마이크로범프 검사.</li>
+        </ul>
+      </a>
+      <div class="co" style="cursor:default;background:#fbfbfc;">
+        <div class="co-top"><span class="co-name" style="color:var(--muted)">가장 순수한 패키징 노출</span></div>
+        <ul class="quotes"><li style="color:var(--muted)"><b>Camtek</b>(AP ~70%)·<b>Onto</b>(AP 세그 &gt;50% 성장)는 매출의 절대다수가 첨단 패키징 — AI 패키징 사이클의 <b>가장 순수한 플레이</b>. KLA는 규모·해자(점유 ~58%)로 안정적 노출.</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 패키징 장비 -->
+  <div class="seg" style="--sc:var(--c-eq);--sc-bg:#e7f2ec;">
+    <div class="seg-head">
+      <span class="seg-badge">⑥ 패키징 장비</span>
+      <div class="sh-main">
+        <h3>본딩·리소·그라인딩 — "신성장 프랜차이즈"</h3>
+        <p class="sh-take">코터·본더·레이저·그라인더·스캐너가 CoWoS·HBM 공정의 물리적 도구. 성숙 장비사들이 <b>첨단 패키징을 신규 성장축</b>으로 재정의. 수주는 사상 최대.</p>
+      </div>
+      <div class="seg-signal">📍 시그널: AP/본더 매출 목표 + 수주(BB) — 단, 수주→매출 인식 시차 유의</div>
+    </div>
+    <div class="co-grid">
+      <a class="co" href="../company/tokyo-electron.html">
+        <div class="co-top"><span class="co-name">Tokyo Electron</span><span class="co-tkr">8035</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">AP 매출</span> FY26 ~¥200B → FY27 &gt;+60%</span>
+        <ul class="quotes">
+          <li><span class="qp">FY26</span>본더+레이저 1–2년 내 연 <b>¥100B 돌파, 2026–30 누적 ¥500B 목표</b>. 코터/디벨로퍼 세계 91%.</li>
+          <li><span class="qp">FY26</span>식각이 "HBM 인터커넥트 공정에서 매우 높은 점유." Synapse(본딩)·Ulucus(박막화·레이저).</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/suss-microtec.html">
+        <div class="co-top"><span class="co-name">SÜSS MicroTec</span><span class="co-tkr">SMHN</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">Q1'26 수주</span> €149M (BB 1.73, 사상최대)</span>
+        <ul class="quotes">
+          <li><span class="qp">Q1'26</span>본딩 시스템 수주 최강(€99.7M), Imaging은 <b>CoWoS 관련 주문</b>으로 견조. 임시본딩 세계 1위(~45%).</li>
+          <li><span class="qp">FY25</span><b>메모리 3대사 전부 임시본더 채택.</b> 단 매출은 저점 — 2026은 '전환의 해'(신제품 P&L 기여 2027부터).</li>
+        </ul>
+      </a>
+      <a class="co" href="../company/disco.html">
+        <div class="co-top"><span class="co-name">DISCO</span><span class="co-tkr">6146</span><span class="co-go">→</span></div>
+        <span class="co-metric"><span class="ml">FYE3/26</span> 6년 연속 최대 · OM 44.2%</span>
+        <ul class="quotes">
+          <li><span class="qp">4Q</span>"생성형AI 출하 신기록 + <b>첨단 패키징 기술의 복잡·고도화가 순풍</b>." GPM 70%+.</li>
+          <li><span class="qp">4Q</span>그라인더(HBM 다이 박막화)·다이서 강세. 단 메모리는 분기별 <b>소화(digestion) 변동</b> 존재.</li>
+        </ul>
+      </a>
+      <div class="co" style="cursor:default;background:#fbfbfc;">
+        <div class="co-top"><span class="co-name" style="color:var(--muted)">읽는 법: 수주 vs 매출</span></div>
+        <ul class="quotes"><li style="color:var(--muted)">장비사는 <b>수주(BB)가 선행지표, 매출은 후행</b>. SÜSS처럼 수주 사상 최대인데 매출은 저점인 '전환의 해'가 나온다 — 수주로 방향을, 매출로 시점을 읽어야.</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 핵심 포인트 ============ -->
+  <p class="section-label">여기서 뽑을 수 있는 것</p>
+  <h2>핵심 포인트 8</h2>
+  <p class="sub">여러 업종의 발언이 <b>서로 교차 검증</b>하는 구조적 포인트만 추렸다. 근거는 실제 회사·수치.</p>
+  <div class="points">
+
+    <div class="pt">
+      <div class="pt-n">1</div>
+      <h4>전 밸류체인이 같은 대본 — "AI만 좋고 나머지는 부진"</h4>
+      <p>14개사 컨콜의 공통 코러스. 패키징 수혜는 <b>AI 단일 축 의존</b>이라는 확신이자, 곧 집중 리스크이기도 하다.</p>
+      <div class="ev"><b>근거</b> · Advantest "자동차·산업 부진" / DISCO "PC·폰·오토·전력 약세" / Technoprobe "Consumer 2027 전 회복 없음" / Teradyne "사이클 둔화를 AI가 상쇄"</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">2</div>
+      <h4>병목이 '기술'에서 '공간'으로 이동 → 증설 사이클</h4>
+      <p>수요 부족이 아니라 <b>캐파·플로어스페이스 부족</b>이 성장을 제약. 이는 장비·검사사에 <b>다년 수주 가시성</b>으로 직결된다.</p>
+      <div class="ev"><b>근거</b> · Amkor "캐파가 병목" / KYEC "플로어스페이스가 제약" / KLA "제약은 툴 아닌 고객 공간" / Onto "고객이 툴 20% 추가 필요"</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">3</div>
+      <h4>"테스트 인텐시티" 상승 = 테스트 3업종 동시 레버리지</h4>
+      <p>칩당 테스트 시간·핀수·병렬도 상승 → 같은 물량에도 매출이 는다. ATE·프로브카드·테스트하우스가 <b>볼륨보다 강하게</b> 성장.</p>
+      <div class="ev"><b>근거</b> · Advantest "HBM4 288GB 테스트 시간↑" / Teradyne 컴퓨트가 SoC &gt;50% / Technoprobe "복잡도→테스트 요구" / KYEC AI 테스트 급증</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">4</div>
+      <h4>HBM4 전환이 2026–27 차수 상향의 방아쇠</h4>
+      <p>층수·범프밀도·대역폭 동반 상승 → 프로브·계측·검사·본딩 <b>스텝당 콘텐츠 증가</b>. 여러 사가 대형 수주·목표 상향으로 확인.</p>
+      <div class="ev"><b>근거</b> · Camtek HBM $260M+ / Onto HBM VPA $240M+(3D $60M) / FormFactor Smart Matrix 유일 검증 / KLA "금속층↑→검사↑"</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">5</div>
+      <h4>HBM 다음 프론티어 = 2.5D 로직 + 패널레벨(FOPLP)</h4>
+      <p>성장이 HBM 메모리에서 <b>CoWoS/2.5D 로직</b>으로, 그다음 <b>패널레벨</b>로 확산. 장비사엔 신규 TAM, 현재는 초기 램프.</p>
+      <div class="ev"><b>근거</b> · Onto "2.5D 주문 QoQ 2배" · JetStep 패널 8대(~$200M 시장) / SÜSS 310×310 스캐너 / KLA "점유 확대는 CoWoS 로직 중심"</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">6</div>
+      <h4>CPO·실리콘 포토닉스 = 공짜 옵션, 다수가 동시 진입</h4>
+      <p>아직 매출은 미미하나 <b>4개사 이상이 동시 베팅</b>. 다음 사이클의 옵션성으로 보유할 만한 테마.</p>
+      <div class="ev"><b>근거</b> · FormFactor Triton/Keystone($10–20M) / Teradyne Photon 100·MLTP JV / Technoprobe·MPI CPO 양면 / Onto CPO "5년 30% CAGR"</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">7</div>
+      <h4>수직통합·M&A로 업종 경계가 무너진다</h4>
+      <p>프로브카드↔테스트, 계측↔검사, OSAT↔파운드리 경계가 흐려지며 <b>파트너십·인수</b>로 콘텐츠를 확장. 경쟁 지형이 재편 중.</p>
+      <div class="ev"><b>근거</b> · Technoprobe+Teradyne(DIS 인수·지분10%) / Amkor+TSMC 10년 / Onto(Rigaku·Semilab·Visual Layer) / FormFactor(Keystone·FICT)</div>
+    </div>
+
+    <div class="pt">
+      <div class="pt-n">8</div>
+      <h4>실적 서프라이즈 ≠ 주가 — 기대가 이미 높다</h4>
+      <p>사상 최대 실적에도 <b>가이드·마진 궤적</b>에 주가가 흔들리는 사례 빈번. 관건은 '얼마나 좋았나'가 아니라 '눈높이를 넘었나'.</p>
+      <div class="ev"><b>근거</b> · Advantest 보수적 마진 가이드에 하락 / Teradyne 호실적에도 2Q 둔화 가이드로 −19% / Camtek 실적 상회에도 OM·opex로 하락</div>
+    </div>
+
+  </div>
+
+  <!-- ============ 유의점 ============ -->
+  <p class="section-label">엇갈리는 신호 · 유의점</p>
+  <div class="watch">
+    <h4>⚠ Watch — 반대편에서 봐야 할 것</h4>
+    <ul>
+      <li><b>수주 ≠ 매출 (시차):</b> SÜSS는 수주 사상 최대(BB 1.73)인데 <b>매출은 저점, 2026 '전환의 해'</b> — 신제품 P&L 기여는 2027부터. HBM '소화(digestion)'로 본더 매출이 줄던 국면도 있었다.</li>
+      <li><b>하이브리드 본딩은 아직 초기:</b> wafer-to-wafer는 SÜSS 스스로 "선두 아님", Camtek도 본격 기여 2027 — 상용화 시점·승자 불확실.</li>
+      <li><b>분기 변동성:</b> DISCO·TEL은 <b>집중출하의 반작용</b>으로 메모리 출하가 분기별 출렁 — 한 분기 숫자로 추세를 단정 말 것.</li>
+      <li><b>데이터 신뢰도:</b> KYEC·MPI 등 대만 중소형주는 <b>영문 어닝콜 전문이 없어</b> 중국어 법설·2차 요약 기반 — 세부 재무 검증에 제약.</li>
+      <li><b>환율 역풍:</b> Technoprobe·SÜSS(EUR), 일본 3사(JPY)는 환산 역풍이 상당(예: SÜSS ~€25–27M/년). 정률 성장과 보고 실적의 괴리 유의.</li>
+      <li><b>전제는 AI capex 지속:</b> 모든 논지가 하이퍼스케일러 투자 지속에 의존. Technoprobe는 "2026은 <b>선별의 해</b>"라며 capex 수익화 신호를 점검하라 경고.</li>
+    </ul>
+  </div>
+
+  <p class="section-label">범례 · 업종 색</p>
+  <div class="legend">
+    <span class="lg"><i style="background:var(--c-osat)"></i>OSAT</span>
+    <span class="lg"><i style="background:var(--c-th)"></i>테스트하우스</span>
+    <span class="lg"><i style="background:var(--c-ate)"></i>테스트 장비(ATE)</span>
+    <span class="lg"><i style="background:var(--c-pc)"></i>프로브카드</span>
+    <span class="lg"><i style="background:var(--c-im)"></i>검사·계측</span>
+    <span class="lg"><i style="background:var(--c-eq)"></i>패키징 장비</span>
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 14개 기업 컨콜·IR에서 <b>패키징 관련 발언</b>만 추출·업종별 정리(FY2025~1Q2026 기준).<br>
+  수치·발언은 회사 공시·컨콜 요약 기반이며, 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요. · wooyagi.github.io/packaging/
+</footer>
+
+</body>
+</html>
