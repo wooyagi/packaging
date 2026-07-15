@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cohu (COHU) · 기업 분석</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#13171e; --ink-2:#1c222c; --paper:#f6f7f9; --card:#ffffff;
+    --text:#1a1f29; --muted:#6b7280; --line:#e6e9ee;
+    --accent:#7c3aed; --blue:#2563a8; --green:#1f7a4d; --orange:#d9892b; --magenta:#b0357a; --teal:#0f766e; --gray:#9ca3af;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  .hero{background:var(--ink);color:#fff;padding:48px 24px 40px;}
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .crumb{font-size:12px;font-family:var(--mono);color:#9aa6b7;margin-bottom:18px;}
+  .crumb a{color:#9aa6b7;text-decoration:none;} .crumb a:hover{color:var(--accent);}
+  .hero-eyebrow{font-size:12px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .hero h1{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px;line-height:1.15;}
+  .hero .tick{font-family:var(--mono);font-size:14px;color:#9aa6b7;font-weight:600;margin-bottom:14px;}
+  .hero p{font-size:14.5px;color:#c2cad6;margin:0;max-width:700px;line-height:1.65;}
+  .spark{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 2.4s infinite;vertical-align:middle;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,58,237,.55)}70%{box-shadow:0 0 0 8px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+  .hero-stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;}
+  .hstat .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);}
+  .hstat .l{font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);}
+  main{max-width:960px;margin:0 auto;padding:34px 24px 80px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-family:var(--mono);margin:44px 0 4px;}
+  .section-label:first-child{margin-top:0;}
+  h2{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:4px 0 16px;}
+  h3{font-size:15px;font-weight:800;color:var(--ink-2);margin:20px 0 8px;}
+  p.lead{font-size:14px;color:#3d4451;margin:0 0 16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;}
+  .chart-wrap{position:relative;width:100%;height:380px;} .chart-sm{height:320px;}
+  .chart-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:12px;line-height:1.5;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+  .biz{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfbfd;}
+  .biz .bt{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .biz .bd{font-size:12.5px;color:#555;line-height:1.55;}
+  .biz .tag{display:inline-block;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;margin-top:8px;font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);margin-top:6px;}
+  .tbl-scroll{overflow-x:auto;}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);}
+  thead th{background:#f0f1f4;color:var(--ink-2);font-weight:700;border-bottom:2px solid #d7dbe2;}
+  tbody tr:hover td{background:#faf9ff;}
+  .hl td{background:#f4f0ff;font-weight:700;} .hl td:first-child{background:#f4f0ff;}
+  .appendix{background:linear-gradient(135deg,#fbfaff,#f6f4fd);border:1px solid #e4dcf7;border-radius:14px;padding:6px 0;margin-bottom:18px;}
+  details{border-bottom:1px solid #e8e3f5;padding:0 24px;} details:last-child{border-bottom:none;}
+  summary{cursor:pointer;padding:18px 0;font-weight:800;font-size:16px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .2s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  .q-badge{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;}
+  .q-meta{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--mono);margin-left:auto;}
+  .call-body{padding:0 0 22px;font-size:13.5px;color:#333;line-height:1.72;}
+  .call-body h4{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin:18px 0 7px;}
+  .call-body ul{margin:0 0 6px;padding-left:20px;} .call-body li{margin-bottom:6px;}
+  .call-body .num{font-family:var(--mono);font-weight:700;color:var(--ink);}
+  .ap-block{background:#eef7f2;border:1px solid #cbe6d8;border-left:4px solid var(--green);border-radius:10px;padding:14px 18px;margin:16px 0 4px;}
+  .ap-block h4{color:var(--green);margin-top:0;}
+  .ap-block .ap-tag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px;font-family:var(--mono);margin-bottom:8px;}
+  .callout{border-left:4px solid var(--accent);background:#faf8ff;border-radius:0 10px 10px 0;padding:14px 18px;font-size:13.5px;color:#333;margin:8px 0 18px;line-height:1.7;}
+  .callout b{color:var(--ink);} .callout.warn{border-color:var(--orange);background:#fff8ef;}
+  .disc{font-size:11.5px;color:#9aa1ab;font-family:var(--mono);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;margin-top:8px;}
+  footer{max-width:960px;margin:0 auto;padding:0 24px 40px;color:#9aa1ab;font-size:11px;font-family:var(--mono);line-height:1.6;}
+  .legend-inline{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-family:var(--mono);color:#555;margin:2px 0 4px;}
+  .legend-inline span{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;} .dot.line{border-radius:50%;width:9px;height:9px;}
+  @media(max-width:640px){.hero h1{font-size:23px;}.chart-wrap{height:320px;}h2{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="crumb"><a href="../">← 홈</a> / <a href="./">기업 분석</a> / Cohu</div>
+    <div class="hero-eyebrow"><span class="spark"></span>Company · 후공정 테스트·검사 · Handler·Contactor·Thermal</div>
+    <h1>Cohu</h1>
+    <div class="tick">NASDAQ: COHU · 반도체 후공정 테스트·검사 장비 + 인터페이스(컨택터) · USD · 12월 결산</div>
+    <p>반도체 <b>후공정(back-end) 테스트·검사 장비</b>(테스트 핸들러·검사/계측)와 소모성 <b>인터페이스(테스트 컨택터·프로브핀)</b> 전문. AI·HPC·HBM이 회복의 신성장 동력 — 1Q26 매출 <b>$125.1M(+29% YoY)</b>, 수주 <b>+57% YoY</b>. AI 칩 발열↑로 테스트 중 정밀 온도제어(<b>서멀</b>) 역량 부각 — Eclipse 고성능 서멀 핸들러. <b>HBM 검사(Neon)</b>가 메모리 신영역. 리커링(소모재·서비스) <b>~60%</b>가 다운사이클 방어. 2024~25 자동차·산업 다운사이클로 적자 → <b>2026 AI 주도 회복</b> 국면. 12개 분기 재무와 4개 컨콜을 실적 발표·10-Q 원문 기반 정리.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="v">$125.1M</div><div class="l">1Q26 매출 (+29% YoY)</div></div>
+      <div class="hstat"><div class="v">+57%</div><div class="l">1Q26 수주 YoY</div></div>
+      <div class="hstat"><div class="v">~60%</div><div class="l">리커링 매출비중</div></div>
+      <div class="hstat"><div class="v">~$750M</div><div class="l">AI 컴퓨트 TAM(회사 추정)</div></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1 -->
+  <p class="section-label">01 · Overview</p>
+  <h2>기업 개요 — 무엇을 하는 회사인가</h2>
+  <p class="lead">
+    Cohu는 반도체 <b>후공정 테스트·검사 장비 + 인터페이스</b> 회사입니다. 통화 USD, 12월 결산, GAAP+비GAAP 병행 보고. 회계상 <b>단일 보고 세그먼트</b>(Semiconductor Test &amp; Inspection)이나, 제품군은 <b>테스트 핸들러 · ATE 테스터 · 검사/계측 · 인터페이스(컨택터)</b>로 나뉘며 매출을 <b>시스템(장비)</b> 대 <b>리커링(소모재·서비스)</b>으로 구분합니다.
+  </p>
+  <div class="biz-grid">
+    <div class="biz">
+      <div class="bt">테스트 핸들러 (플래그십)</div>
+      <div class="bd">칩을 테스터에 정렬·<b>온도 제어</b>·분류하는 로봇 장비. <b>Eclipse</b>(고성능 <b>서멀</b> 핸들러 — AI 디바이스용) 등. AI 발열 관리가 차별화 포인트.</div>
+      <span class="tag" style="background:var(--blue);">핸들러·서멀</span>
+    </div>
+    <div class="biz">
+      <div class="bt">ATE 테스터</div>
+      <div class="bd"><b>Diamondx</b> — 공랭 유니버설 테스터로 파워·RF·MCU·믹스드시그널 신호체인을 한 플랫폼에서 커버.</div>
+      <span class="tag" style="background:var(--teal);">테스터</span>
+    </div>
+    <div class="biz">
+      <div class="bt">검사 · 계측</div>
+      <div class="bd"><b>Neon</b>(고속 웨이퍼레벨·<b>HBM 검사</b>, 0.2×0.4mm급 미세 소자), <b>Krypton</b>(6면 패키지 검사, NV-Core 비전). 첨단 패키지·메모리 신영역.</div>
+      <span class="tag" style="background:var(--magenta);">HBM·패키지 검사</span>
+    </div>
+    <div class="biz">
+      <div class="bt">인터페이스·소모재 (리커링)</div>
+      <div class="bd"><b>테스트 컨택터·프로브핀·프로브헤드</b> — 삽입 횟수마다 마모돼 교체되는 소모성 인터페이스. + 서멀 서브시스템 + SW(DI-Core·PACE). <b>매출의 ~60%</b>.</div>
+      <span class="tag" style="background:var(--green);">리커링·소모재</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">
+    <b>경쟁력 · 포지션(근거).</b> ① <b>서멀(thermal) 역량</b> — 회사는 AI 발열 관리용 정밀 온도제어를 "독자·업계 선도" 강점으로 제시(컨콜). ② <b>리커링 ~60%</b> — 컨택터·소모재·서비스가 장비 사이클 변동을 완충(4Q25 리커링 +25% YoY). ③ <b>검사(Neon·Krypton)</b>로 HBM·첨단 패키지 신규 진입. ④ <b>폭넓은 전방 분산</b>(자동차·산업·모바일·컴퓨팅). <span style="color:var(--muted)">(핸들러·컨택터 시장은 다수 경쟁사가 존재하며 세부 점유율은 회사 미공시 — 강점 서술은 회사 IR·컨콜 근거.)</span>
+  </div>
+
+  <!-- 2 -->
+  <p class="section-label">02 · Financials (12Q)</p>
+  <h2>전사 재무 추이 — 매출·GM (최근 12개 분기)</h2>
+  <div class="callout warn">
+    <b>⚠ 기준·주의.</b> Cohu는 <b>GAAP + 비GAAP</b> 병행 보고. <b>2023 고점($636.3M)</b>에서 자동차·산업 다운사이클로 <b>2024 급감($401.8M)</b> 후 <b>2025 회복($453.0M, +12.7%)</b>. <b>적자 지속</b>(FY24 순손실 −$69.8M, FY25 GAAP −$74.3M/비GAAP −$10.1M). <b>4Q25 GM 40.8%는 일회성 재고비용</b>, 1Q26 46.3%로 회복. 분기 EPS·마진은 <b>일부만 공시</b>(표에 가용분기만, 나머지 "–"=미확보, 추정 안 함).
+  </div>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>매출($M)</span>
+      <span><i class="dot line" style="background:var(--orange)"></i>GAAP 매출총이익률(%)</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    <div class="chart-note">출처: Cohu 실적 보도자료(8-K Ex-99)·10-Q — SEC EDGAR CIK 21535. 2Q23~1Q26(캘린더 정렬, 회계연도=12월 결산). 매출은 FY 합계와 정합(FY23 $636.3M·FY24 $401.8M·FY25 $453.0M). 4Q23 GM 미확보(공백).</div>
+  </div>
+
+  <!-- 3 -->
+  <p class="section-label">03 · Revenue Structure</p>
+  <h2>매출 구조 — 다운사이클·회복과 리커링 비중</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3 style="margin-top:0;">연간 매출 ($M)</h3>
+      <div class="legend-inline">
+        <span><i class="dot" style="background:var(--blue)"></i>연간 매출</span>
+      </div>
+      <div class="chart-wrap chart-sm"><canvas id="chartAnnual"></canvas></div>
+      <div class="chart-note">출처: Cohu 연간 실적. FY23 $636.3M → FY24 $401.8M(−37%, 다운사이클) → FY25 $453.0M(+12.7%, 회복). AI/HPC가 2026 성장 견인(가이드 +20~25%).</div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">2025 매출 구성 (%)</h3>
+      <div class="chart-wrap chart-sm"><canvas id="chartMix"></canvas></div>
+      <div class="chart-note">출처: FY2025 실적. <b>시스템(장비) 40% · 리커링 60%</b>. 리커링=인터페이스(컨택터)·소프트웨어·스페어·서비스. 분기 리커링 비중은 55~63% 밴드(2025).</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <p class="section-label">04 · AI/HBM Thesis</p>
+  <h2>AI·HBM 알파 — 서멀 핸들러 & HBM 검사</h2>
+  <p class="lead">AI/HPC가 Cohu 회복의 축. 회사는 <b>AI 컴퓨트 TAM ~$750M</b>(테스트 핸들러 ~$650M + HBM 검사 ~$100M)을 제시하고, <b>FY26 HPC 매출 가이드를 $80~100M로 상향</b>(기존 $60~85M). <b>HBM 매출은 +80% YoY → ~$20M</b> 전망. 파이프라인은 <b>12개 고객</b>(5곳 인증 단계·7곳 초기 협업). AI 워크로드의 전력밀도·발열 상승이 <b>테스트 중 정밀 온도제어(서멀)</b>의 중요성을 키우며 Cohu의 서멀 역량을 부각.</p>
+  <div class="card">
+    <div class="legend-inline">
+      <span><i class="dot" style="background:var(--accent)"></i>AI 컴퓨트 TAM 구성($M, 회사 추정)</span>
+    </div>
+    <div class="chart-wrap chart-sm"><canvas id="chartTam"></canvas></div>
+    <div class="chart-note">출처: 1Q26 컨콜(2026.4.30). AI 컴퓨트 TAM ~$750M = 테스트 핸들러 ~$650M + HBM 검사 ~$100M. 실제 매출은 초기 단계 — FY26 HPC $80~100M, HBM ~$20M(+80% YoY).</div>
+  </div>
+  <div class="callout">
+    <b>알파 포인트.</b> ① <b>서멀 차별화</b> — AI 발열 관리, AI 디바이스용 첫 <b>Eclipse 고성능 서멀 핸들러</b> 출하(4Q25). ② <b>HBM 검사 Neon</b> — HBM 매출 +80% YoY→~$20M, HBM 검사 TAM ~$100M. ③ <b>AI 컴퓨트 TAM ~$750M</b>·12개 고객 파이프라인. ④ <b>리커링 ~60%</b>가 다운사이클 방어. ⑤ <b>전환사채로 유동성 확보</b> — 현금·투자 $488.7M(1Q26).
+  </div>
+  <div class="callout warn">
+    <b>⚠ 유의.</b> ① <b>적자 지속</b> — 회복은 매출 레버리지·<b>GM 46%+ 유지</b>에 의존. ② <b>AI 매출은 아직 소액</b>(HBM ~$20M, HPC $80~100M) — 파이프라인 대비 실현 초기, <b>인증(qual) 단계 고객의 실주문 전환</b>이 관건. ③ 자동차·산업 회복 지연 리스크. ④ <b>밸류에이션 부담</b>(적자, EV/EBITDA ~58x, EV/매출 ~5x — AI 옵션성 선반영). ⑤ <b>전환사채 희석</b>(전환가 ~$27.18, 캡트콜로 ~$41.02까지 상쇄). ⑥ 백로그 정식 미공시(수주 YoY만).
+  </div>
+
+  <!-- 5 -->
+  <p class="section-label">05 · Valuation</p>
+  <h2>밸류에이션 (2026.7 경)</h2>
+  <div class="callout warn">
+    <b>⚠ 주의.</b> 주가 변동성 큼(AI 랠리로 급등) — <b>후행 P/E는 적자로 무의미</b>하고 멀티플이 소스·시점별로 상충. 발행일 실시간 시세로 재확인 필수. 미확인 값은 "데이터 없음".
+  </div>
+  <div class="card tbl-scroll">
+    <table>
+      <thead><tr><th>지표</th><th>값</th><th>비고 / 출처</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td>시가총액</td><td>~$2.65B</td><td>$56.20 × 47.18M주, 2026.7.12(집계)</td></tr>
+        <tr><td>P/E (TTM)</td><td>적자(N/M)</td><td>FY25 순손실 — 후행 P/E 무의미</td></tr>
+        <tr><td>EV/매출</td><td>~5.1x</td><td>집계, FY25 매출 기준</td></tr>
+        <tr><td>EV/EBITDA</td><td>~58x</td><td>낮은 EBITDA — 집계, 시점 부정확</td></tr>
+        <tr><td>P/B</td><td>데이터 없음</td><td>자기자본 미확보(총자산 ~$1.01B, 2025.6)</td></tr>
+        <tr><td>배당</td><td>없음(무배당)</td><td>—</td></tr>
+        <tr><td>현금·투자</td><td>$488.7M (1Q26)</td><td>3Q25 $198.2M → 전환사채로 급증</td></tr>
+        <tr><td>전환사채</td><td>$287.5M (1.50%, 2031만기)</td><td>2025.9.29 발행, 전환가 ~$27.18·캡트콜 ~$41.02</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6 -->
+  <p class="section-label">06 · Data Table</p>
+  <h2>원자료 테이블 (12개 분기)</h2>
+  <div class="card tbl-scroll">
+    <table>
+      <thead>
+        <tr><th>분기</th><th>매출 $M</th><th>GAAP GM</th><th>비GAAP GM</th><th>GAAP EPS</th><th>비GAAP EPS</th><th>리커링%</th></tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <div class="chart-note">비GAAP GM·EPS·리커링%는 <b>공시 확인된 분기만</b> 표기(나머지 "–"=미확보, 추정 안 함). 4Q25 GAAP EPS(−$0.48)는 FY25(−$1.59)−9M25(−$1.11) 역산. 매출은 FY 합계와 정합.</div>
+
+  <!-- 별첨 -->
+  <p class="section-label">Appendix · Earnings Calls</p>
+  <h2>별첨 — 최근 4개 분기 컨콜 요약</h2>
+  <p class="lead">CEO <b>Luis Müller</b> · CFO <b>Jeffrey Jones</b>. 실적·가이던스 / 경영진 / <b>AI·HBM</b>은 별도 블록. 수치는 GAAP·비GAAP 병기.</p>
+
+  <div class="appendix">
+
+    <details open>
+      <summary><span class="q-badge">1Q26</span> 매출 $125.1M(+29% YoY) · 수주 +57% — AI TAM $750M로 상향 <span class="q-meta">2026.4.30 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$125.1M</span>(+29% YoY, 가이드 상회, 리커링 ~60%). GAAP GM 46.3%·<b>비GAAP GM 46.5%</b>. <b>비GAAP EPS +$0.01</b>(순익 $0.6M) / GAAP −$0.26(순손실 $12.1M). 현금·투자 <span class="num">$488.7M</span>, 자사주 매입 없음.</li>
+          <li><b>Q2'26 가이드</b>: 매출 ~$144M(±$7M, +15% QoQ). <b>FY26 매출 성장 +20~25%로 상향</b>.</li>
+        </ul>
+        <h4>경영진 (CEO Müller)</h4>
+        <ul>
+          <li><b>수주 +57% YoY</b> — AI·고성능 컴퓨트가 견인. AI 발열↑로 <b>정밀 온도제어(서멀) 역량</b>이 고객에게 높이 평가됨. EPS 미스에도 매출·가이드 호조로 주가 상승.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 1Q26</span>
+          <ul>
+            <li><b>AI 컴퓨트 TAM ~$750M</b>(테스트 핸들러 ~$650M + HBM 검사 ~$100M). <b>FY26 HPC 매출 $80~100M로 상향</b>. <b>HBM 매출 +80% YoY→~$20M</b>. 파이프라인 12개 고객(5 인증·7 초기).</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">4Q25</span> 매출 $122.2M(+30% YoY) — AI 서멀 핸들러 첫 출하 <span class="q-meta">2026.2.12 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$122.2M</span>(+30% YoY, 리커링 ~60%·+25% YoY). GM 40.8%(<b>일회성 재고비용</b>, 1Q26 45%대 회복 전망). 비GAAP 순손실 −$0.15. <b>FY25 매출 $453.0M(+12.7%)</b>, GAAP 순손실 −$1.59/비GAAP −$0.22.</li>
+          <li><b>Q1'26 가이드</b>: 매출 ~$122M(±$7M, 계절적 플랫 — 실제 $125.1M로 상회).</li>
+        </ul>
+        <h4>경영진 (CEO Müller)</h4>
+        <ul>
+          <li>주문 모멘텀·리커링 견조, AI·HBM·자동차 기회 확대로 <b>2026 또 한 해 성장</b> 전망. 디자인윈: 애널로그·믹스드시그널 고객 <b>테스트 인터페이스 전환</b>, 자동차·physical AI 핸들러, Diamondx 믹스드시그널 테스터, 자동차 ADAS용 Krypton+PACE.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 4Q25</span>
+          <ul>
+            <li><b>AI 디바이스용 첫 고성능 서멀 Eclipse 핸들러 출하.</b> 메모리 개발용 <b>HBM 검사</b> 신규 수주. AI 발열 관리가 핵심 화두.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">3Q25</span> 매출 $126.2M(분기 최대) — 전환사채 $287.5M 발행 <span class="q-meta">2025.10.29 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$126.2M</span>(당시 분기 최대, 리커링 ~55%). GAAP GM 43.8%·비GAAP 44.1%. GAAP EPS −$0.09 / <b>비GAAP −$0.06</b>. 현금·투자 <span class="num">$198.2M</span>. 9M25 매출 $330.7M.</li>
+        </ul>
+        <h4>경영진 / 재무</h4>
+        <ul>
+          <li>AI 테스트 모멘텀 지속. <b>1.50% 전환사채 $287.5M(2031만기) 발행</b>(2025.9.29 종결) — 유동성·성장투자 재원. 전환가 ~$27.18, 캡트콜로 희석 상단 ~$41.02.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 3Q25</span>
+          <ul>
+            <li>HBM 검사·AI 컴퓨트 모멘텀 지속. 리커링(컨택터·서비스) 견조.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary><span class="q-badge">2Q25</span> 매출 $107.7M — 가동률 75%·$28M 디자인윈 <span class="q-meta">2025.7.31 발표</span></summary>
+      <div class="call-body">
+        <h4>실적 · 가이던스</h4>
+        <ul>
+          <li>매출 <span class="num">$107.7M</span>(리커링 ~63%). GAAP GM 43.7%·비GAAP 44.4%. GAAP EPS −$0.36 / <b>비GAAP +$0.02</b>(흑자 전환). 추정 테스트셀 가동률 <b>75%(+3%p QoQ)</b>.</li>
+        </ul>
+        <h4>경영진</h4>
+        <ul>
+          <li>다운사이클 저점 통과 신호. <b>$28M 모바일·자동차 테스트 디자인윈</b> 수주(4Q25까지 출하). 리커링 비중 상승이 실적 방어.</li>
+        </ul>
+        <div class="ap-block">
+          <span class="ap-tag">AI·HBM — 2Q25</span>
+          <ul>
+            <li>AI 램프 이전 회복 초입 — 컨택터·리커링 기반 견조, 모바일·자동차 디자인윈으로 하반기 출하 확보.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="disc">
+    <b>데이터 출처(1차 자료 기반).</b><br>
+    · 재무: Cohu 실적 보도자료(8-K Ex-99) 및 10-Q/10-K — SEC EDGAR CIK 21535. 2Q23~1Q26(캘린더 정렬, 12월 결산). GAAP·비GAAP 병기. 분기 매출은 FY 합계와 정합(FY23 $636.3M·FY24 $401.8M·FY25 $453.0M).<br>
+    · 매출 구조: 2025 시스템 40% / 리커링 60%(인터페이스·SW·스페어·서비스). 분기 리커링 55~63%.<br>
+    · AI·HBM: 1Q26 컨콜(2026.4.30) — AI 컴퓨트 TAM ~$750M(핸들러 $650M+HBM검사 $100M), FY26 HPC $80~100M, HBM +80% YoY→~$20M, 12개 고객 파이프라인. 제품: Eclipse(서멀 핸들러)·Diamondx(테스터)·Neon/Krypton(검사)·컨택터(인터페이스)·DI-Core(SW).<br>
+    · 재무이벤트: 1.50% 전환사채 $287.5M(2031만기) 2025.9.29 발행(전환가 ~$27.18·캡트콜 ~$41.02).<br>
+    · 컨콜: Cohu IR·보도자료 및 Motley Fool·Investing.com·Yahoo Finance 교차확인. CEO Luis Müller · CFO Jeffrey Jones.<br>
+    · <b>주의</b>: 본 리서치는 웹검색으로 원문을 추출했으나 SEC EDGAR·IR 원본 PDF를 직접 재검증하진 못했습니다(환경 접근 제한). 2023~2024 다수 분기 비GAAP 마진·분기 EPS·백로그·자기자본(P/B)은 미확보("데이터 없음"). 밸류에이션 소스 편차 큼 — 인용 전 8-K·10-Q·실시간 시세로 재확인 필수.<br>
+    · 본 페이지는 공개자료 정리이며 투자권유가 아닙니다. 최종 확인일 2026-07-15.
+  </div>
+
+</main>
+
+<footer>
+  첨단 패키징 투자 리서치 데스크 · 발표 자료 인용 전 원문(IR·공시·어닝콜)으로 재확인하세요.<br>
+  wooyagi.github.io/packaging/
+</footer>
+
+<script>
+const CLR={acc:'#7c3aed',blue:'#2563a8',green:'#1f7a4d',orange:'#d9892b',magenta:'#b0357a',teal:'#0f766e',gray:'#9ca3af'};
+const FONT="-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.family=FONT;Chart.defaults.font.size=11;Chart.defaults.color='#5b6678';
+const gridClr='#eceef2';
+
+const Q=["2Q23","3Q23","4Q23","1Q24","2Q24","3Q24","4Q24","1Q25","2Q25","3Q25","4Q25","1Q26"];
+const revenue=[168.9,150.8,137.2,107.6,104.7,95.3,94.1,96.8,107.7,126.2,122.2,125.1];
+const gaapGm=[47.6,47.0,null,45.8,44.8,46.8,41.9,43.7,43.7,43.8,40.8,46.3];
+// 표 전용(차트 미표기)
+const ngGm=[null,null,null,null,null,null,null,null,44.4,44.1,null,46.5];
+const gaapEps=[null,null,null,null,null,null,null,null,-0.36,-0.09,-0.48,-0.26];
+const ngEps=[null,null,null,null,null,null,null,null,0.02,-0.06,-0.15,0.01];
+const recur=[null,null,null,null,null,null,null,null,63,55,60,60];
+// 연간 매출
+const aLbl=["FY23","FY24","FY25"];
+const aVal=[636.3,401.8,453.0];
+// 2025 매출 구성
+const mixLbl=["리커링(소모재·서비스)","시스템(장비)"];
+const mixVal=[60,40];
+// AI 컴퓨트 TAM
+const tLbl=["테스트 핸들러","HBM 검사"];
+const tVal=[650,100];
+
+new Chart(document.getElementById('chartFin'),{
+  data:{labels:Q,datasets:[
+    {type:'bar',label:'매출',data:revenue,backgroundColor:'rgba(124,58,237,.85)',yAxisID:'y',order:2,barPercentage:.82},
+    {type:'line',label:'GAAP GM',data:gaapGm,borderColor:CLR.orange,backgroundColor:CLR.orange,yAxisID:'y1',tension:.3,pointRadius:2.5,borderWidth:2.5,spanGaps:true,order:1},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='매출'?'매출: $'+c.parsed.y+'M':(c.parsed.y==null?c.dataset.label+': 데이터 없음':c.dataset.label+': '+c.parsed.y.toFixed(1)+'%')}}},
+    scales:{y:{position:'left',title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'GM %'},grid:{drawOnChartArea:false},beginAtZero:false,suggestedMin:35,suggestedMax:50},
+      x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartAnnual'),{
+  type:'bar',
+  data:{labels:aLbl,datasets:[{label:'연간 매출',data:aVal,backgroundColor:[CLR.gray,CLR.gray,CLR.blue],barPercentage:.6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(1)+'M'}}},
+    scales:{y:{title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('chartMix'),{
+  type:'doughnut',
+  data:{labels:mixLbl,datasets:[{data:mixVal,backgroundColor:[CLR.green,CLR.blue],borderWidth:1,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}
+});
+
+new Chart(document.getElementById('chartTam'),{
+  type:'bar',
+  data:{labels:tLbl,datasets:[{label:'TAM',data:tVal,backgroundColor:[CLR.accent||CLR.acc,CLR.magenta],barPercentage:.55}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'~$'+c.parsed.x+'M'}}},
+    scales:{x:{title:{display:true,text:'$M'},grid:{color:gridClr},beginAtZero:true},y:{grid:{display:false}}}}
+});
+
+const tb=document.getElementById('tblBody');
+const pct=v=>v==null?'–':v.toFixed(1)+'%';
+const eps=v=>v==null?'–':(v<0?'−$'+Math.abs(v).toFixed(2):'$'+v.toFixed(2));
+const rc=v=>v==null?'–':v+'%';
+Q.forEach((q,i)=>{
+  const tr=document.createElement('tr');
+  if(i===Q.length-1)tr.className='hl';
+  tr.innerHTML=`<td>${q}</td><td>${revenue[i].toFixed(1)}</td><td>${pct(gaapGm[i])}</td><td>${pct(ngGm[i])}</td><td>${eps(gaapEps[i])}</td><td>${eps(ngEps[i])}</td><td>${rc(recur[i])}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
